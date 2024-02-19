@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = ""
+authors = ["g0dm0d <ivan.berlin06@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.2"
+black = "^24.2.0"
+flake8 = "^7.0.0"
+uvicorn = "^0.27.1"
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.27"
+pydantic-extra-types = "^2.5.0"
+phonenumbers = "^8.13.30"
+pydantic = {extras = ["email"], version = "^2.6.1"}
+pydantic-settings = "^2.2.1"
+python-dotenv = "^1.0.1"
+bcrypt = "^4.1.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+flake8 = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
