@@ -2,8 +2,6 @@ stages:
   - deploy
 
 variables:
-  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
-  SSH_KNOWN_HOSTS: $SSH_KNOWN_HOSTS
   REMOTE_USER: "ubrato"
   REMOTE_HOST: "185.103.102.159"
   REMOTE_PATH: "/home/ubrato/ubrato"
