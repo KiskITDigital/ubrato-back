@@ -1,4 +1,5 @@
 from exceptions import (
+    internal_server_exception_handler,
     not_found_exception_handler,
     request_validation_exception_handler,
 )
@@ -14,7 +15,9 @@ app.include_router(health.router)
 app.add_exception_handler(
     RequestValidationError, request_validation_exception_handler
 )
-
 app.add_exception_handler(
     status.HTTP_404_NOT_FOUND, not_found_exception_handler
+)
+app.add_exception_handler(
+    status.HTTP_500_INTERNAL_SERVER_ERROR, internal_server_exception_handler
 )

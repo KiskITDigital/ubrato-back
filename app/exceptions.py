@@ -21,3 +21,12 @@ async def not_found_exception_handler(
     return JSONResponse(
         status_code=exc.status_code, content={"detail": {"msg": exc.detail}}
     )
+
+
+async def internal_server_exception_handler(
+    request: Request, exc: HTTPException
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": {"msg": exc.detail}},
+    )

@@ -33,4 +33,4 @@ class SignUpRequest(BaseModel):
 
 
 class SignUpResponse(BaseModel):
-    status: str
+    status: bool
