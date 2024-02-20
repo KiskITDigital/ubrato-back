@@ -1,6 +1,6 @@
 FROM python:3.11.6-alpine3.18
 
-ARG SERVER_PORT=8080
+ARG SERVER_PORT=3000
 ARG SERVER_ADDR=0.0.0.0
 ARG GIT_VERSION
 
@@ -21,6 +21,7 @@ RUN pip install poetry
 WORKDIR /ubrato
 COPY poetry.lock pyproject.toml /ubrato/
 
+COPY .env /ubrato
 COPY ./app /ubrato/app
 COPY ./scripts /ubrato/scripts
 

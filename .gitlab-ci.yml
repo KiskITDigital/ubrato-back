@@ -1,0 +1,26 @@
+stages:
+  - deploy
+
+variables:
+  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
+  SSH_KNOWN_HOSTS: $SSH_KNOWN_HOSTS
+  REMOTE_USER: "ubrato"
+  REMOTE_HOST: "185.103.102.159"
+  REMOTE_PATH: "/home/ubrato/ubrato"
+
+before_script:
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+  - chmod 644 ~/.ssh/known_hosts
+
+deploy:
+  stage: deploy
+  script:
+    - ssh $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
+      ./clean.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
+      cd ubrato-back && docker build --build-arg GIT_VERSION=$CI_COMMIT_SHORT_SHA -t ubrato:latest . &&
+      docker compose up -d"

@@ -5,5 +5,4 @@ flake.nix
 __pycache__
 .vscode
 .venv
-.env
 .env.example
