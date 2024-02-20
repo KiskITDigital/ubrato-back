@@ -17,15 +17,24 @@ router = APIRouter(
     "/signup",
     response_model=SignUpResponse,
     responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse}
     },
 )
 async def signup_user(
     user: SignUpRequest, user_service: UserService = Depends()
-):
+) -> SignUpResponse:
+    _, err = user_service.get_by_email(user.email)
+    if err is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"description": "user already exist"},
+        )
+
+
     err = user_service.create(
         user.brand_name,
-        user.inn,
+        str(user.inn),
         user.email,
         user.phone,
         user.password,
@@ -37,7 +46,7 @@ async def signup_user(
     if err is not None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"description": "user already exist"},
+            detail={"description": str(err)},
         )
 
     return SignUpResponse(status=True)
@@ -55,12 +64,18 @@ async def signin_user(
     data: SignInRequest,
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
-):
+) -> SignInResponse:
     user, err = user_service.get_by_email(data.email)
-    if err is not None:
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"description": err},
+            detail={"description": "user not found"},
+        )
+    
+    if err is not None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"description": str(err)},
         )
 
     if not user_service.password_valid(data.password, user.password):

@@ -42,17 +42,16 @@ class UserService:
             last_name,
         )
 
-    # TODO: JWT!
     def get_by_email(
         self, email: str
-    ) -> tuple[user_model.User, Optional[Exception]]:
+    ) -> tuple[Optional[user_model.User], Optional[Exception]]:
         user, err = self.user_repository.get_by_email(email)
 
         if err is not None:
             return None, err
 
         if user is None:
-            return None, "user not found"
+            return None, Exception("user not found")
 
         return user, None
 

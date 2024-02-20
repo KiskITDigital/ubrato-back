@@ -15,22 +15,5 @@ class SignUpRequest(BaseModel):
     middle_name: str
     last_name: str
 
-    def to_model(self) -> User:
-        return User(
-            id=None,
-            brand_name=self.brand_name,
-            inn=self.inn,
-            email=self.email,
-            phone=self.phone,
-            password=self.password,
-            first_name=self.first_name,
-            middle_name=self.middle_name,
-            last_name=self.last_name,
-            verify=None,
-            role=None,
-            create_date=None,
-        )
-
-
 class SignUpResponse(BaseModel):
     status: bool

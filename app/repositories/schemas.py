@@ -1,53 +1,27 @@
 from models import user_model
-from sqlalchemy import Boolean, Column, DateTime, SmallInteger, String, func
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Boolean, DateTime, SmallInteger, String, func
+from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import DeclarativeBase
 
-Base = declarative_base()
 
+class Base(DeclarativeBase):
+    pass
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(String, primary_key=True)
-    brand_name = Column(String)
-    inn = Column(String)
-    email = Column(String)
-    phone = Column(String)
-    password = Column(String)
-    first_name = Column(String)
-    middle_name = Column(String)
-    last_name = Column(String)
-    verify = Column(Boolean, default=False)
-    role = Column(SmallInteger, default=0)
-    created_at = Column(DateTime, default=func.current_timestamp())
-
-    def __init__(
-        self,
-        id: str,
-        brand_name: str,
-        inn: str,
-        email: str,
-        phone: str,
-        password: str,
-        first_name: str,
-        middle_name: str,
-        last_name: str,
-        verify: bool,
-        role: int,
-        created_at: str,
-    ):
-        self.id = (id,)
-        self.brand_name = brand_name
-        self.inn = inn
-        self.email = email
-        self.phone = phone
-        self.password = password
-        self.first_name = first_name
-        self.middle_name = middle_name
-        self.last_name = last_name
-        self.verify = verify
-        self.role = role
-        self.created_at = created_at
+    id = mapped_column(String, primary_key=True)
+    brand_name = mapped_column(String)
+    inn = mapped_column(String)
+    email = mapped_column(String)
+    phone = mapped_column(String)
+    password = mapped_column(String)
+    first_name = mapped_column(String)
+    middle_name = mapped_column(String)
+    last_name = mapped_column(String)
+    verify = mapped_column(Boolean, default=False)
+    role = mapped_column(SmallInteger, default=0)
+    created_at = mapped_column(DateTime, default=func.current_timestamp())
 
     def to_model(self) -> user_model.User:
         return user_model.User(

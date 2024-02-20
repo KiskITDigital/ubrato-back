@@ -1,4 +1,4 @@
-from typing import Self
+from datetime import datetime
 
 
 class JWTUser:
@@ -7,7 +7,7 @@ class JWTUser:
     middle_name: str
     last_name: str
     role: int
-    exp: int
+    exp: float
 
     def __init__(
         self,
@@ -16,11 +16,13 @@ class JWTUser:
         middle_name: str,
         last_name: str,
         role: int,
-        exp: int,
-    ) -> Self:
+        exp: datetime,
+    ) -> None:
         self.id = id
         self.first_name = first_name
         self.middle_name = middle_name
         self.last_name = last_name
         self.role = role
-        self.exp = exp
+        self.exp = exp.timestamp()
+        
+        return
