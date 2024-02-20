@@ -17,12 +17,12 @@ before_script:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
 
-  - cp $KNOWN_HOSTS ~/.ssh
+  - cp $KNOWN_HOSTS ~/.ssh/known_hosts
 
 deploy:
   stage: deploy
   script:
-    - ssh $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
+    - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
       ./clean.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
       cd ubrato-back && docker build --build-arg GIT_VERSION=$CI_COMMIT_SHORT_SHA -t ubrato:latest . &&
       docker compose up -d"
