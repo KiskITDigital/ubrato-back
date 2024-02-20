@@ -17,6 +17,8 @@ before_script:
   - mkdir -p ~/.ssh
   - chmod 700 ~/.ssh
 
+  - cp $KNOWN_HOSTS ~/.ssh
+
 deploy:
   stage: deploy
   script:
