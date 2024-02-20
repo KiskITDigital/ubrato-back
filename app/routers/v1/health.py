@@ -2,15 +2,14 @@ import os
 
 from fastapi import APIRouter
 
+from schemas.health import HealthResponse
+
 router = APIRouter(
     prefix="/health",
     tags=["health"],
 )
 
 
-@router.get("/")
+@router.get("/", response_model=HealthResponse)
 async def health_status():
-    return {
-        "ok": True,
-        "git_version": os.environ.get("GIT_VERSION", "non git version"),
-    }
+    return HealthResponse(ok=True, version=os.environ.get("GIT_VERSION", "non git version"))
