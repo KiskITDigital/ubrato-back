@@ -1,0 +1,10 @@
+from fastapi import APIRouter, Depends
+
+from routers.v1.dependencies import authorized, super_admin
+
+
+router = APIRouter(
+    prefix="/v1/role",
+    tags=["role"],
+    dependencies=[Depends(authorized)],
+) 

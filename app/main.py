@@ -5,12 +5,13 @@ from exceptions import (
 )
 from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
-from routers.v1 import auth, health
+from routers.v1 import auth, health, role
 
 app = FastAPI()
 
 app.include_router(auth.router)
 app.include_router(health.router)
+app.include_router(role.router)
 
 app.add_exception_handler(
     RequestValidationError, request_validation_exception_handler

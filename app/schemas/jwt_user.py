@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 
 class JWTUser:
@@ -7,7 +8,7 @@ class JWTUser:
     middle_name: str
     last_name: str
     role: int
-    exp: float
+    exp: int
 
     def __init__(
         self,
@@ -23,6 +24,14 @@ class JWTUser:
         self.middle_name = middle_name
         self.last_name = last_name
         self.role = role
-        self.exp = exp.timestamp()
-        
-        return
+        self.exp = int(exp.timestamp())
+
+    def to_payload(self) -> dict[str, Any]:
+        return {
+            'user_id': self.user_id,
+            'first_name': self.first_name,
+            'middle_name': self.middle_name,
+            'last_name': self.last_name,
+            'role': self.role,
+            'exp': self.exp
+        }

@@ -19,3 +19,8 @@ class Config:
         manager = 1 << 5
         
         guest = 1 << 0
+
+config = Config()
+
+def get_config() -> Config:
+    return config
