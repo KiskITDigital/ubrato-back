@@ -49,7 +49,7 @@ async def super_admin(
             detail={"description": "access token invalid"},
         )
 
-    if user["role"] < get_config().Role.super_admin:
+    if user.role < get_config().Role.super_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={"description": "no access"},

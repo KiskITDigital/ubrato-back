@@ -7,7 +7,16 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from routers.v1 import auth, health, role
 
-app = FastAPI()
+app = FastAPI(
+    title="Ubrato API",
+    version="0.1.0",
+    servers=[
+        {
+            "url": "https://git.godmod.dev",
+            "description": "development environment",
+        },
+    ],
+)
 
 app.include_router(auth.router)
 app.include_router(health.router)

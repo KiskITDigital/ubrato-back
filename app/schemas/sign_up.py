@@ -16,4 +16,4 @@ class SignUpRequest(BaseModel):
 
 
 class SignUpResponse(BaseModel):
-    status: bool
+    access_token: str

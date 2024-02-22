@@ -12,21 +12,22 @@ from services.user import UserService
 router = APIRouter(
     prefix="/v1/auth",
     tags=["auth"],
-    # dependencies=[Depends(get_bearer_header)],
-    # responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}},
 )
 
 
 @router.post(
     "/signup",
     response_model=SignUpResponse,
+    status_code = status.HTTP_201_CREATED,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},
     },
 )
 async def signup_user(
-    user: SignUpRequest, user_service: UserService = Depends()
+    user: SignUpRequest,
+    user_service: UserService = Depends(),
+    jwt_service: JWTService = Depends(),
 ) -> SignUpResponse:
     _, err = user_service.get_by_email(user.email)
     if err is None:
@@ -35,7 +36,7 @@ async def signup_user(
             detail={"description": "user already exist"},
         )
 
-    err = user_service.create(
+    created_user, err = user_service.create(
         user.email,
         user.phone,
         user.password,
@@ -50,7 +51,7 @@ async def signup_user(
             detail={"description": str(err)},
         )
 
-    return SignUpResponse(status=True)
+    return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
 
 
 @router.post(
@@ -114,7 +115,7 @@ async def user_requires_verification(
         real_address=data.real_address,
         registered_address=data.registered_address,
         mail_address=data.mail_address,
-        documents=data.documents,
+        links=data.documents,
     )
 
     if err is not None:

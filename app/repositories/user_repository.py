@@ -16,37 +16,15 @@ class UserRepository:
     ) -> None:
         self.db = db
 
-    def create(
-        self,
-        id: str,
-        email: str,
-        phone: str,
-        password: str,
-        first_name: str,
-        middle_name: str,
-        last_name: str,
-    ) -> Optional[Exception]:
-        user = User(
-            id=id,
-            email=email,
-            phone=phone,
-            password=password,
-            first_name=first_name,
-            middle_name=middle_name,
-            last_name=last_name,
-        )
-
+    def create(self, user: User) -> tuple[Optional[user_model.User], Optional[Exception]]:
         try:
             self.db.add(user)
             self.db.commit()
 
-            # TODO: return user and generate session
-            # self.db.refresh(author)
-            # return author
-
-            return None
+            self.db.refresh(user)
+            return user.to_model(), None
         except SQLAlchemyError as err:
-            return Exception(err.code)
+            return None, Exception(err.code)
 
     def get_by_email(
         self, email: str
@@ -62,45 +40,14 @@ class UserRepository:
 
     def save_verify_info(
         self,
-        user_id: str,
-        id: str,
-        brand_name: str,
-        short_name: str,
-        inn: str,
-        okpo: str,
-        orgn: str,
-        kpp: str,
-        tax_code: int,
-        real_address: str,
-        registered_address: str,
-        mail_address: str,
-        documents: List[Tuple[str, str]],
+        org: Organization,
+        documents: List[Document],
     ) -> Optional[Exception]:
-        org = Organization(
-            id=id,
-            brand_name=brand_name,
-            short_name=short_name,
-            inn=inn,
-            okpo=okpo,
-            orgn=orgn,
-            kpp=kpp,
-            tax_code=tax_code,
-            real_address=real_address,
-            mail_address=mail_address,
-            registered_address=registered_address,
-            user_id=user_id,
-        )
 
         try:
             self.db.add(org)
-            for doc_id, link in documents:
-                document = Document(
-                    id=doc_id,
-                    url=link,
-                    organization_id=id,
-                )
+            for document in documents:
                 self.db.add(document)
-
             self.db.commit()
             return None
         except SQLAlchemyError as err:

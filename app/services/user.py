@@ -4,6 +4,7 @@ from typing import List, Optional
 import bcrypt
 from fastapi import Depends
 from models import user_model
+from repositories.schemas import Document, Organization, User
 from repositories.user_repository import UserRepository
 
 
@@ -21,22 +22,32 @@ class UserService:
         first_name: str,
         middle_name: str,
         last_name: str,
-    ) -> Optional[Exception]:
+    ) -> tuple[Optional[user_model.User], Optional[Exception]]:
         id = "usr_" + str(uuid.uuid4())
 
         password = bcrypt.hashpw(
             password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
 
-        return self.user_repository.create(
-            id,
-            email,
-            phone,
-            password,
-            first_name,
-            middle_name,
-            last_name,
+        user = User(
+            id=id,
+            email=email,
+            phone=phone,
+            password=password,
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
         )
+
+        created_user, err = self.user_repository.create(user)
+
+        if err is not None:
+            return None, err
+        
+        if created_user is None:
+            return None, Exception("internal error when creating a user") 
+
+        return created_user, None
 
     def get_by_email(
         self, email: str
@@ -69,24 +80,33 @@ class UserService:
         real_address: str,
         registered_address: str,
         mail_address: str,
-        documents: List[str],
+        links: List[str],
     ) -> Optional[Exception]:
         id = "org_" + str(uuid.uuid4())
-        documents_with_ids = [
-            (f"doc_{uuid.uuid4()}", doc) for doc in documents
-        ]
-        return self.user_repository.save_verify_info(
-            user_id,
-            id,
-            brand_name,
-            short_name,
-            str(inn),
-            str(okpo),
-            str(orgn),
-            str(kpp),
-            tax_code,
-            real_address,
-            registered_address,
-            mail_address,
-            documents_with_ids,
+
+        org = Organization(
+            id=id,
+            brand_name=brand_name,
+            short_name=short_name,
+            inn=inn,
+            okpo=okpo,
+            orgn=orgn,
+            kpp=kpp,
+            tax_code=tax_code,
+            real_address=real_address,
+            mail_address=mail_address,
+            registered_address=registered_address,
+            user_id=user_id,
         )
+
+        documents: List[Document] = []
+
+        for link in links:
+            document = Document(
+                id=f"doc_{uuid.uuid4()}",
+                url=link,
+                organization_id=id,
+            )
+            documents.append(document)
+
+        return self.user_repository.save_verify_info(org, documents)

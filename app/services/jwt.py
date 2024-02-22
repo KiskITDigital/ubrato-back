@@ -30,11 +30,12 @@ class JWTService:
             user.middle_name,
             user.last_name,
             user.role,
+            user.verify,
             int(exp.timestamp()),
         )
 
         encoded_data = jwt.encode(
-            jwt_user.to_payload(), key=self.secret, algorithm=self.algorithm
+            vars(jwt_user), key=self.secret, algorithm=self.algorithm
         )
 
         return encoded_data
@@ -45,14 +46,7 @@ class JWTService:
                 token, self.secret, algorithms=self.algorithm
             )
 
-            jwt_user = JWTUser(
-                userd_dict["id"],
-                userd_dict["first_name"],
-                userd_dict["middle_name"],
-                userd_dict["last_name"],
-                userd_dict["role"],
-                userd_dict["exp"],
-            )
+            jwt_user = JWTUser(**userd_dict)
 
             return (
                 jwt_user,
