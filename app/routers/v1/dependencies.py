@@ -10,15 +10,11 @@ async def authorized(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> None:
-    header = authorization.split(" ", 1)
-    if header[0] != "Bearer":
-        raise HTTPException(status_code=401, detail="Bearer token invalid")
-    _, err = jwt_service.decode_jwt(header[1])
-
+    _, err = jwt_service.unmarshal_jwt(authorization)
     if err is not None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"description": "access token invalid"},
+            detail={"description": err},
         )
 
 
@@ -26,12 +22,12 @@ async def get_user(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> Optional[JWTUser]:
-    header = authorization.split(" ", 1)
-    if header[0] != "Bearer":
-        return None
-    user, err = jwt_service.decode_jwt(header[1])
+    user, err = jwt_service.unmarshal_jwt(authorization)
     if err is not None:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={"description": err},
+        )
     return user
 
 
@@ -39,14 +35,11 @@ async def super_admin(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> None:
-    header = authorization.split(" ", 1)
-    if header[0] != "Bearer":
-        raise HTTPException(status_code=401, detail="Bearer token invalid")
-    user, err = jwt_service.decode_jwt(header[1])
+    user, err = jwt_service.unmarshal_jwt(authorization)
     if err is not None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"description": "access token invalid"},
+            detail={"description": err},
         )
 
     if user.role < get_config().Role.super_admin:

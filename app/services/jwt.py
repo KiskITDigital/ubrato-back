@@ -1,5 +1,6 @@
 import datetime
 from datetime import timezone
+from typing import Optional
 
 import jwt
 from config import Config, get_config
@@ -54,3 +55,14 @@ class JWTService:
             )
         except Exception as err:
             return JWTUser, err
+        
+    def unmarshal_jwt(self, authorization: str) -> tuple[Optional[JWTUser], Optional[Exception]]:
+        header = authorization.split(" ", 1)
+        if header[0] != "Bearer":
+            return None, "not bearer token"
+        
+        user, err = self.decode_jwt(header[1])
+        if err is not None:
+            return None, "bearer token invalid"
+        
+        return user, None
