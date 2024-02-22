@@ -1,4 +1,3 @@
-from models.user_model import User
 from pydantic import BaseModel, EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
@@ -14,6 +13,7 @@ class SignUpRequest(BaseModel):
     first_name: str
     middle_name: str
     last_name: str
+
 
 class SignUpResponse(BaseModel):
     status: bool

@@ -8,8 +8,6 @@ PhoneNumber.phone_format = "E164"
 
 class User(BaseModel):
     id: str
-    brand_name: str
-    inn: int
     email: EmailStr
     phone: PhoneNumber
     password: str

@@ -17,10 +17,12 @@ class Config:
         super_admin = 1 << 7
         admin = 1 << 6
         manager = 1 << 5
-        
+
         guest = 1 << 0
 
+
 config = Config()
+
 
 def get_config() -> Config:
     return config

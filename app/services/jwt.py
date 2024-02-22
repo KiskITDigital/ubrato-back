@@ -1,14 +1,14 @@
 import datetime
 from datetime import timezone
-from fastapi import Depends
 
 import jwt
 from config import Config, get_config
+from fastapi import Depends
 from models.user_model import User
 from schemas.jwt_user import JWTUser
 
 
-class JWTService():
+class JWTService:
     secret: str
     time_live: int
     algorithm: str
@@ -30,7 +30,7 @@ class JWTService():
             user.middle_name,
             user.last_name,
             user.role,
-            exp,
+            int(exp.timestamp()),
         )
 
         encoded_data = jwt.encode(
@@ -38,13 +38,25 @@ class JWTService():
         )
 
         return encoded_data
-    
+
     def decode_jwt(self, token: str) -> tuple[JWTUser, Exception]:
         try:
-            return jwt.decode(token, self.secret, algorithms=self.algorithm), None
+            userd_dict = jwt.decode(
+                token, self.secret, algorithms=self.algorithm
+            )
+
+            jwt_user = JWTUser(
+                userd_dict["id"],
+                userd_dict["first_name"],
+                userd_dict["middle_name"],
+                userd_dict["last_name"],
+                userd_dict["role"],
+                userd_dict["exp"],
+            )
+
+            return (
+                jwt_user,
+                None,
+            )
         except Exception as err:
             return JWTUser, err
-        
-
-    # def is_super_admin(self, role) -> bool:
-    #     role >= self.

@@ -1,7 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from routers.v1.dependencies import authorized, get_user
 from schemas.exception import ErrorResponse
+from schemas.jwt_user import JWTUser
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
+from schemas.success import SuccessResponse
+from schemas.verify_request import VerifyRequest
 from services.jwt import JWTService
 from services.user import UserService
 
@@ -18,7 +22,7 @@ router = APIRouter(
     response_model=SignUpResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse}
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},
     },
 )
 async def signup_user(
@@ -31,10 +35,7 @@ async def signup_user(
             detail={"description": "user already exist"},
         )
 
-
     err = user_service.create(
-        user.brand_name,
-        str(user.inn),
         user.email,
         user.phone,
         user.password,
@@ -71,7 +72,7 @@ async def signin_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"description": "user not found"},
         )
-    
+
     if err is not None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -85,3 +86,41 @@ async def signin_user(
         )
 
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
+
+
+@router.post(
+    "/verify",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def user_requires_verification(
+    data: VerifyRequest,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    err = user_service.user_requires_verification(
+        user_id=user.id,
+        brand_name=data.brand_name,
+        short_name=data.short_name,
+        inn=data.inn,
+        okpo=data.okpo,
+        orgn=data.orgn,
+        kpp=data.kpp,
+        tax_code=data.tax_code,
+        real_address=data.real_address,
+        registered_address=data.registered_address,
+        mail_address=data.mail_address,
+        documents=data.documents,
+    )
+
+    if err is not None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"description": str(err)},
+        )
+
+    return SuccessResponse()

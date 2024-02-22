@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+from typing import List, Optional
 
 import bcrypt
 from fastapi import Depends
@@ -15,8 +15,6 @@ class UserService:
 
     def create(
         self,
-        brand_name: str,
-        inn: str,
         email: str,
         phone: str,
         password: str,
@@ -32,8 +30,6 @@ class UserService:
 
         return self.user_repository.create(
             id,
-            brand_name,
-            inn,
             email,
             phone,
             password,
@@ -58,4 +54,39 @@ class UserService:
     def password_valid(self, password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(
             password.encode("utf-8"), hashed_password.encode("utf-8")
+        )
+
+    def user_requires_verification(
+        self,
+        user_id: str,
+        brand_name: str,
+        short_name: str,
+        inn: int,
+        okpo: int,
+        orgn: int,
+        kpp: int,
+        tax_code: int,
+        real_address: str,
+        registered_address: str,
+        mail_address: str,
+        documents: List[str],
+    ) -> Optional[Exception]:
+        id = "org_" + str(uuid.uuid4())
+        documents_with_ids = [
+            (f"doc_{uuid.uuid4()}", doc) for doc in documents
+        ]
+        return self.user_repository.save_verify_info(
+            user_id,
+            id,
+            brand_name,
+            short_name,
+            str(inn),
+            str(okpo),
+            str(orgn),
+            str(kpp),
+            tax_code,
+            real_address,
+            registered_address,
+            mail_address,
+            documents_with_ids,
         )
