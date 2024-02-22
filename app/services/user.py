@@ -43,9 +43,9 @@ class UserService:
 
         if err is not None:
             return None, err
-        
+
         if created_user is None:
-            return None, Exception("internal error when creating a user") 
+            return None, Exception("internal error when creating a user")
 
         return created_user, None
 

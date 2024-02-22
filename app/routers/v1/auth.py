@@ -18,7 +18,7 @@ router = APIRouter(
 @router.post(
     "/signup",
     response_model=SignUpResponse,
-    status_code = status.HTTP_201_CREATED,
+    status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},

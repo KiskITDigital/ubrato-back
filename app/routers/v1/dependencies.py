@@ -31,7 +31,7 @@ async def get_user(
     return user
 
 
-async def super_admin(
+async def has_permission(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> None:
@@ -42,7 +42,7 @@ async def super_admin(
             detail={"description": err},
         )
 
-    if user.role < get_config().Role.super_admin:
+    if user.role < get_config().Role.admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={"description": "no access"},

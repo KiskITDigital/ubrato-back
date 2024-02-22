@@ -16,7 +16,9 @@ class UserRepository:
     ) -> None:
         self.db = db
 
-    def create(self, user: User) -> tuple[Optional[user_model.User], Optional[Exception]]:
+    def create(
+        self, user: User
+    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
         try:
             self.db.add(user)
             self.db.commit()
@@ -28,7 +30,7 @@ class UserRepository:
 
     def get_by_email(
         self, email: str
-    ) -> tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
         try:
             query = self.db.query(User).filter(User.email == email)
             user = query.first()
@@ -43,7 +45,6 @@ class UserRepository:
         org: Organization,
         documents: List[Document],
     ) -> Optional[Exception]:
-
         try:
             self.db.add(org)
             for document in documents:
@@ -51,4 +52,20 @@ class UserRepository:
             self.db.commit()
             return None
         except SQLAlchemyError as err:
+            return Exception(err.code)
+
+    def update_verify_status(
+        self, user_id: str, status: bool
+    ) -> Optional[Exception]:
+        try:
+            user = self.db.query(User).filter_by(id=user_id).first()
+
+            if user:
+                user.verify = status
+
+                self.db.commit()
+                return
+            return Exception("User with ID {} not found.".format(user_id))
+        except SQLAlchemyError as err:
+            self.db.rollback()
             return Exception(err.code)
