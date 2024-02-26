@@ -25,6 +25,8 @@ COPY .env /ubrato
 COPY ./app /ubrato/app
 COPY ./scripts /ubrato/scripts
 
+RUN poetry lock
+
 RUN poetry install
 
 EXPOSE $SERVER_PORT
