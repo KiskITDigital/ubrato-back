@@ -62,10 +62,38 @@ class UserRepository:
 
             if user:
                 user.verify = status
-
                 self.db.commit()
-                return
+                return None
+
             return Exception("User with ID {} not found.".format(user_id))
         except SQLAlchemyError as err:
             self.db.rollback()
             return Exception(err.code)
+
+    def get_all_users(
+        self
+    ) -> Tuple[List[user_model.User], Optional[Exception]]:
+        try:
+            query = self.db.query(User)
+            users: List[user_model.User] = []
+
+            for user in query:
+                users.append(user.to_model())
+
+            return users, None
+        except SQLAlchemyError as err:
+            return [], Exception(err.code)
+        
+    def get_by_id(
+        self, user_id: str
+    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
+        try:
+            user = self.db.query(User).filter_by(id=user_id).first()
+
+            if user:
+                return user.to_model(), None
+
+            return None, Exception("User with ID {} not found.".format(user_id))
+        except SQLAlchemyError as err:
+            self.db.rollback()
+            return None, Exception(err.code)

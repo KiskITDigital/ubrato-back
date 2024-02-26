@@ -30,8 +30,8 @@ async def get_user(
         )
     return user
 
-
-async def has_permission(
+# TODO: rename and make for all roles
+async def is_admin(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> None:

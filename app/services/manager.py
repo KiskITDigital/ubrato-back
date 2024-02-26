@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from fastapi import Depends
+from models.user_model import User
 from repositories.user_repository import UserRepository
 
 
@@ -14,3 +15,13 @@ class ManagerService:
         self, user_id: str, status: bool
     ) -> Optional[Exception]:
         return self.user_repository.update_verify_status(user_id, status)
+
+    def get_all_users(
+        self
+    ) -> Tuple[List[User], Optional[Exception]]:
+        return self.user_repository.get_all_users()
+    
+    def get_by_id(
+        self, user_id: str
+    ) -> Tuple[User, Optional[Exception]]:
+        return self.user_repository.get_by_id(user_id=user_id)
