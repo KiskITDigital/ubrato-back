@@ -16,12 +16,8 @@ class ManagerService:
     ) -> Optional[Exception]:
         return self.user_repository.update_verify_status(user_id, status)
 
-    def get_all_users(
-        self
-    ) -> Tuple[List[User], Optional[Exception]]:
+    def get_all_users(self) -> Tuple[List[User], Optional[Exception]]:
         return self.user_repository.get_all_users()
-    
-    def get_by_id(
-        self, user_id: str
-    ) -> Tuple[User, Optional[Exception]]:
+
+    def get_by_id(self, user_id: str) -> Tuple[User, Optional[Exception]]:
         return self.user_repository.get_by_id(user_id=user_id)

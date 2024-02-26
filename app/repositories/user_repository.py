@@ -71,7 +71,7 @@ class UserRepository:
             return Exception(err.code)
 
     def get_all_users(
-        self
+        self,
     ) -> Tuple[List[user_model.User], Optional[Exception]]:
         try:
             query = self.db.query(User)
@@ -83,7 +83,7 @@ class UserRepository:
             return users, None
         except SQLAlchemyError as err:
             return [], Exception(err.code)
-        
+
     def get_by_id(
         self, user_id: str
     ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
@@ -93,7 +93,9 @@ class UserRepository:
             if user:
                 return user.to_model(), None
 
-            return None, Exception("User with ID {} not found.".format(user_id))
+            return None, Exception(
+                "User with ID {} not found.".format(user_id)
+            )
         except SQLAlchemyError as err:
             self.db.rollback()
             return None, Exception(err.code)

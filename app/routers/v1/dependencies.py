@@ -30,6 +30,7 @@ async def get_user(
         )
     return user
 
+
 # TODO: rename and make for all roles
 async def is_admin(
     authorization: Annotated[str, Header()],

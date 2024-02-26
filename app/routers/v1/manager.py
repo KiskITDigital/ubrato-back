@@ -1,4 +1,5 @@
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.user_model import User
 from routers.v1.dependencies import is_admin
@@ -30,12 +31,13 @@ async def update_user_verify_status(
         )
     return SuccessResponse()
 
+
 @router.get(
     "/users/",
     response_model=List[User],
     dependencies=[Depends(is_admin)],
 )
-async def get_user(
+async def get_users(
     user_service: ManagerService = Depends(),
 ) -> SuccessResponse:
     users, err = user_service.get_all_users()
@@ -45,6 +47,7 @@ async def get_user(
             detail={"description": str(err)},
         )
     return users
+
 
 @router.get(
     "/users/{user_id}",
