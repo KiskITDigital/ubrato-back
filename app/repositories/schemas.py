@@ -6,6 +6,7 @@ from sqlalchemy import (
     Integer,
     SmallInteger,
     String,
+    Text,
     func,
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
@@ -74,3 +75,15 @@ class Document(Base):
     organization_id = mapped_column(String(40), ForeignKey("organizations.id"))
 
     organization = relationship("Organization", back_populates="documents")
+
+
+class Logs(Base):
+    __tablename__ = "logs"
+
+    id = mapped_column(String(40), primary_key=True)
+    method = mapped_column(String(6), nullable=False)
+    url = mapped_column(String(255), nullable=False)
+    body = mapped_column(Text, nullable=False)
+    code = mapped_column(SmallInteger, nullable=False)
+    msg = mapped_column(Text, default="")
+    created_at = mapped_column(DateTime, default=func.current_timestamp())

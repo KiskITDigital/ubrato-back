@@ -2,6 +2,17 @@ from fastapi import HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from services.logs import LogsService
+
+
+class ServiceException(HTTPException):
+    status_code: int
+    detail: str
+    logs_service: LogsService
+
+    def __init__(self, *args, logs_service: LogsService, **kwargs):
+        self.logs_service = logs_service
+        return super().__init__(*args, **kwargs)
 
 
 async def request_validation_exception_handler(
@@ -15,18 +26,15 @@ async def request_validation_exception_handler(
     )
 
 
-async def not_found_exception_handler(
-    request: Request, exc: HTTPException
+async def exception_handler(
+    request: Request,
+    exc: ServiceException,
 ) -> JSONResponse:
-    return JSONResponse(
-        status_code=exc.status_code, content={"detail": {"msg": exc.detail}}
+    id = await exc.logs_service.save_logs(
+        request=request,
+        status_code=exc.status_code,
+        msg=exc.detail,
     )
-
-
-async def internal_server_exception_handler(
-    request: Request, exc: HTTPException
-) -> JSONResponse:
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": {"msg": exc.detail}},
+        status_code=exc.status_code, content={"id": id, "msg": exc.detail}
     )

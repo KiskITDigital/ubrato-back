@@ -1,12 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from exceptions import ServiceException
+from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import authorized, get_user
-from schemas.exception import ErrorResponse
+from routers.v1.exceptions import (
+    INVALID_CREDENTIAL,
+    USER_ALREADY_EXIST,
+    USER_NOT_FOUND,
+)
+from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
 from schemas.success import SuccessResponse
 from schemas.verify_request import VerifyRequest
 from services.jwt import JWTService
+from services.logs import LogsService
 from services.user import UserService
 
 router = APIRouter(
@@ -20,20 +27,22 @@ router = APIRouter(
     response_model=SignUpResponse,
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
 )
 async def signup_user(
     user: SignUpRequest,
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
+    logs_service: LogsService = Depends(),
 ) -> SignUpResponse:
     _, err = user_service.get_by_email(user.email)
     if err is None:
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"description": "user already exist"},
+            detail=USER_ALREADY_EXIST,
+            logs_service=logs_service,
         )
 
     created_user, err = user_service.create(
@@ -46,9 +55,10 @@ async def signup_user(
     )
 
     if err is not None:
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"description": str(err)},
+            detail=str(err),
+            logs_service=logs_service,
         )
 
     return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
@@ -58,32 +68,36 @@ async def signup_user(
     "/signin",
     response_model=SignInResponse,
     responses={
-        status.HTTP_404_NOT_FOUND: {"model": ErrorResponse},
-        status.HTTP_401_UNAUTHORIZED: {"model": ErrorResponse},
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
     },
 )
 async def signin_user(
     data: SignInRequest,
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
+    logs_service: LogsService = Depends(),
 ) -> SignInResponse:
     user, err = user_service.get_by_email(data.email)
     if user is None:
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"description": "user not found"},
+            detail=USER_NOT_FOUND,
+            logs_service=logs_service,
         )
 
     if err is not None:
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"description": str(err)},
+            detail=str(err),
+            logs_service=logs_service,
         )
 
     if not user_service.password_valid(data.password, user.password):
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail={"description": "invalid email or password"},
+            detail=INVALID_CREDENTIAL,
+            logs_service=logs_service,
         )
 
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
@@ -93,8 +107,8 @@ async def signin_user(
     "/verify",
     response_model=SuccessResponse,
     responses={
-        status.HTTP_400_BAD_REQUEST: {"model": ErrorResponse},
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ErrorResponse},
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
 )
@@ -102,6 +116,7 @@ async def user_requires_verification(
     data: VerifyRequest,
     user_service: UserService = Depends(),
     user: JWTUser = Depends(get_user),
+    logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
     err = user_service.user_requires_verification(
         user_id=user.id,
@@ -119,9 +134,10 @@ async def user_requires_verification(
     )
 
     if err is not None:
-        raise HTTPException(
+        raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"description": str(err)},
+            detail=str(err),
+            logs_service=logs_service,
         )
 
     return SuccessResponse()

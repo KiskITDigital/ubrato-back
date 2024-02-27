@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 
 
-class Detail(BaseModel):
+class ExceptionResponse(BaseModel):
+    id: str
     msg: str
-
-
-class ErrorResponse(BaseModel):
-    detail: Detail

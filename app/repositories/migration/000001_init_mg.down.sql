@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS logs;
+
 DROP TABLE IF EXISTS documents;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS users;

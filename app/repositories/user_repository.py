@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 from fastapi import Depends
 from models import user_model
 from repositories.database import get_db_connection
+from repositories.exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
 from repositories.schemas import Document, Organization, User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
@@ -36,7 +37,7 @@ class UserRepository:
             user = query.first()
             if user is not None:
                 return user.to_model(), None
-            return None, Exception("user not found")
+            return None, Exception(USER_EMAIL_NOT_FOUND.format(email))
         except SQLAlchemyError as err:
             return None, Exception(err.code)
 
@@ -65,7 +66,7 @@ class UserRepository:
                 self.db.commit()
                 return None
 
-            return Exception("User with ID {} not found.".format(user_id))
+            return Exception(USERID_NOT_FOUND.format(user_id))
         except SQLAlchemyError as err:
             self.db.rollback()
             return Exception(err.code)
@@ -93,9 +94,7 @@ class UserRepository:
             if user:
                 return user.to_model(), None
 
-            return None, Exception(
-                "User with ID {} not found.".format(user_id)
-            )
+            return None, Exception(USERID_NOT_FOUND.format(user_id))
         except SQLAlchemyError as err:
             self.db.rollback()
             return None, Exception(err.code)
