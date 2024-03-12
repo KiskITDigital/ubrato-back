@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import bcrypt
 from fastapi import Depends
+from exceptions import ERROR_WHILE_CREATE_USER, USER_EMAIL_NOT_FOUND
 from models import user_model
 from repositories.schemas import Document, Organization, User
 from repositories.user_repository import UserRepository
@@ -45,7 +46,7 @@ class UserService:
             return None, err
 
         if created_user is None:
-            return None, Exception("internal error when creating a user")
+            return None, Exception(ERROR_WHILE_CREATE_USER)
 
         return created_user, None
 
@@ -58,7 +59,7 @@ class UserService:
             return None, err
 
         if user is None:
-            return None, Exception("user not found")
+            return None, Exception(USER_EMAIL_NOT_FOUND.format(email))
 
         return user, None
 

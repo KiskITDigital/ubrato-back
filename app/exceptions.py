@@ -5,6 +5,19 @@ from fastapi.responses import JSONResponse
 from services.logs import LogsService
 
 
+ERROR_WHILE_CREATE_USER = "Internal error when creating a user"
+USER_NOT_FOUND = "User not found"
+USER_ALREADY_EXIST = "User already exist"
+INVALID_CREDENTIAL = "Invalid credentials"
+UNAUTHORIZED = "You are unauthorized"
+NO_BARRIER_TOKEN = "No barrier token"
+INVALID_BARRIER = "Bearer token is invalid"
+NO_ACCESS = "You don't have access"   
+
+USERID_NOT_FOUND = "User with ID {} not found."
+USER_EMAIL_NOT_FOUND = "User with email {} not found."
+
+
 class ServiceException(HTTPException):
     status_code: int
     detail: str
@@ -13,6 +26,18 @@ class ServiceException(HTTPException):
     def __init__(self, *args, logs_service: LogsService, **kwargs):
         self.logs_service = logs_service
         return super().__init__(*args, **kwargs)
+
+
+class AuthException(HTTPException):
+    detail: str
+
+async def auth_exception_handler(
+    request: Request,
+    exc: ServiceException,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code, content={"msg": exc.detail}
+    )
 
 
 async def request_validation_exception_handler(

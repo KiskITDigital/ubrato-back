@@ -1,9 +1,9 @@
 from typing import List, Optional, Tuple
 
 from fastapi import Depends
+from exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
 from models import user_model
 from repositories.database import get_db_connection
-from repositories.exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
 from repositories.schemas import Document, Organization, User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session

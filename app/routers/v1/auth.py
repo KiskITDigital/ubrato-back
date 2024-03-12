@@ -1,11 +1,6 @@
-from exceptions import ServiceException
+from exceptions import INVALID_CREDENTIAL, USER_ALREADY_EXIST, USER_EMAIL_NOT_FOUND, ServiceException
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import authorized, get_user
-from routers.v1.exceptions import (
-    INVALID_CREDENTIAL,
-    USER_ALREADY_EXIST,
-    USER_NOT_FOUND,
-)
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.sign_up import SignUpRequest, SignUpResponse
@@ -82,7 +77,7 @@ async def signin_user(
     if user is None:
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=USER_NOT_FOUND,
+            detail=USER_EMAIL_NOT_FOUND.format(data.email),
             logs_service=logs_service,
         )
 

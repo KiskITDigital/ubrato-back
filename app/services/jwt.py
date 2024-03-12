@@ -5,6 +5,7 @@ from typing import Optional
 import jwt
 from config import Config, get_config
 from fastapi import Depends
+from exceptions import INVALID_BARRIER, NO_BARRIER_TOKEN
 from models.user_model import User
 from schemas.jwt_user import JWTUser
 
@@ -61,10 +62,10 @@ class JWTService:
     ) -> tuple[Optional[JWTUser], Optional[Exception]]:
         header = authorization.split(" ", 1)
         if header[0] != "Bearer":
-            return None, "not bearer token"
+            return None, NO_BARRIER_TOKEN
 
         user, err = self.decode_jwt(header[1])
         if err is not None:
-            return None, "bearer token invalid"
+            return None, INVALID_BARRIER
 
         return user, None

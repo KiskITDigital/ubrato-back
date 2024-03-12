@@ -1,7 +1,8 @@
 from models import user_model
 from sqlalchemy import (
+    ARRAY,
+    TIMESTAMP,
     Boolean,
-    DateTime,
     ForeignKey,
     Integer,
     SmallInteger,
@@ -28,9 +29,10 @@ class User(Base):
     last_name = mapped_column(String(100), nullable=False)
     verify = mapped_column(Boolean, default=False)
     role = mapped_column(SmallInteger, default=0)
-    created_at = mapped_column(DateTime, default=func.current_timestamp())
+    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
 
     organization = relationship("Organization", back_populates="user")
+    tender = relationship("Tender", back_populates="user")
 
     def to_model(self) -> user_model.User:
         return user_model.User(
@@ -76,6 +78,33 @@ class Document(Base):
 
     organization = relationship("Organization", back_populates="documents")
 
+
+class Tender(Base):
+    __tablename__ = "tender"
+
+    id = mapped_column(String(40), primary_key=True)
+    name = mapped_column(String(255), nullable=False)
+    regions = mapped_column(ARRAY(Text), nullable=False)
+    floor_space = mapped_column(Integer, nullable=False)
+    description = mapped_column(String(400))
+    wishes = mapped_column(String(400))
+    attachments = mapped_column(ARRAY(Text))
+    services_groups = mapped_column(ARRAY(Integer))
+    services_types = mapped_column(ARRAY(Integer))
+    reception_start = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+    reception_end = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+    work_start = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+    work_end = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+    object_group_id = mapped_column(Integer, ForeignKey('objects_groups.id'))
+    object_type_id = mapped_column(Integer, ForeignKey('objects_types.id'))
+    user_id = mapped_column(String(40), ForeignKey('users.id'), nullable=False)
+    created_at = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+
+    user = relationship("User", back_populates="tender")
+    object_group = relationship("ObjectGroup", back_populates="tender")
+    object_type = relationship("ObjectType", back_populates="tender")
+
+
 class ObjectGroup(Base):
     __tablename__ = "objects_groups"
 
@@ -83,6 +112,7 @@ class ObjectGroup(Base):
     name = mapped_column(String(40))
 
     object_type = relationship("ObjectType", back_populates="object_group")
+    tender = relationship("Tender", back_populates="object_group")
 
 
 class ObjectType(Base):
@@ -93,6 +123,7 @@ class ObjectType(Base):
     object_group_id = mapped_column(Integer, ForeignKey("objects_groups.id"))
 
     object_group = relationship("ObjectGroup", back_populates="object_type")
+    tender = relationship("Tender", back_populates="object_type")
 
 
 class ServiceGroup(Base):
@@ -122,4 +153,4 @@ class Logs(Base):
     body = mapped_column(Text, nullable=False)
     code = mapped_column(SmallInteger, nullable=False)
     msg = mapped_column(Text, default="")
-    created_at = mapped_column(DateTime, default=func.current_timestamp())
+    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())

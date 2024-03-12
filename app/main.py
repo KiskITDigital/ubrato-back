@@ -1,5 +1,7 @@
 from exceptions import (
+    AuthException,
     ServiceException,
+    auth_exception_handler,
     exception_handler,
     request_validation_exception_handler,
 )
@@ -27,3 +29,4 @@ app.include_router(tender.router)
 app.add_exception_handler(RequestValidationError, request_validation_exception_handler)
 
 app.add_exception_handler(ServiceException, exception_handler)
+app.add_exception_handler(AuthException, auth_exception_handler)
