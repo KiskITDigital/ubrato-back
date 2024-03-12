@@ -1,5 +1,11 @@
-DROP TABLE IF EXISTS logs;
+DROP TABLE IF EXISTS objects_types;
+DROP TABLE IF EXISTS services_types;
 
+DROP TABLE IF EXISTS objects_groups;
+DROP TABLE IF EXISTS services_groups;
+
+DROP TABLE IF EXISTS tender;
+DROP TABLE IF EXISTS logs;
 DROP TABLE IF EXISTS documents;
 DROP TABLE IF EXISTS organizations;
 DROP TABLE IF EXISTS users;

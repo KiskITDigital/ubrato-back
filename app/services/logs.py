@@ -13,6 +13,7 @@ class LogsService:
     ) -> None:
         self.logs_repository = logs_repository
 
+    # TODO: save headers
     async def save_logs(
         self, request: Request, status_code: int, msg: str
     ) -> str:

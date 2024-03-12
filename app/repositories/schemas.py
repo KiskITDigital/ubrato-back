@@ -15,7 +15,7 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
 class Base(DeclarativeBase):
     pass
 
-
+# TODO: add info for admin row
 class User(Base):
     __tablename__ = "users"
 
@@ -76,6 +76,42 @@ class Document(Base):
 
     organization = relationship("Organization", back_populates="documents")
 
+class ObjectGroup(Base):
+    __tablename__ = "objects_groups"
+
+    id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String(40))
+
+    object_type = relationship("ObjectType", back_populates="object_group")
+
+
+class ObjectType(Base):
+    __tablename__ = "objects_types"
+
+    id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String(40))
+    object_group_id = mapped_column(Integer, ForeignKey("objects_groups.id"))
+
+    object_group = relationship("ObjectGroup", back_populates="object_type")
+
+
+class ServiceGroup(Base):
+    __tablename__ = "services_groups"
+
+    id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String(40))
+
+    service_type = relationship("ServiceType", back_populates="service_group")
+
+
+class ServiceType(Base):
+    __tablename__ = "services_types"
+
+    id = mapped_column(Integer, primary_key=True)
+    name = mapped_column(String(90))
+    service_group_id = mapped_column(Integer, ForeignKey("services_groups.id"))
+
+    service_group = relationship("ServiceGroup", back_populates="service_type")
 
 class Logs(Base):
     __tablename__ = "logs"
