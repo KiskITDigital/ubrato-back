@@ -31,16 +31,6 @@ class TagsRepository:
     ) -> None:
         self.db = db
 
-    def create_tender(self, tender: Tender) -> Optional[Exception]:
-        try:
-            self.db.add(tender)
-            self.db.commit()
-
-            return None
-        except SQLAlchemyError as err:
-            print(err._sql_message)
-            return Exception(err.code)
-
     def get_all_objects_with_types(
         self,
     ) -> Tuple[ObjectsGroupsWithTypes, Optional[Exception]]:

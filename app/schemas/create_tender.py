@@ -6,6 +6,8 @@ from pydantic import BaseModel
 
 class CreateTenderRequest(BaseModel):
     name: str
+    price: int
+    is_contract_price: bool
     regions: List[str]
     floor_space: int
     description: str

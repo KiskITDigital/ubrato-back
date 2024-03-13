@@ -7,6 +7,8 @@ from pydantic import BaseModel
 class Tender(BaseModel):
     id: str
     name: str
+    price: int
+    is_contract_price: bool
     regions: List[str]
     floor_space: int
     description: str
@@ -14,6 +16,7 @@ class Tender(BaseModel):
     attachments: List[str]
     services_groups: List[int]
     services_types: List[int]
+    active: bool
     reception_start: datetime
     reception_end: datetime
     work_start: datetime
@@ -21,4 +24,4 @@ class Tender(BaseModel):
     object_group_id: int
     object_type_id: int
     user_id: str
-    create_date: datetime
+    created_at: datetime

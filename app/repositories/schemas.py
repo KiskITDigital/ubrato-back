@@ -85,6 +85,8 @@ class Tender(Base):
 
     id = mapped_column(String(40), primary_key=True)
     name = mapped_column(String(255), nullable=False)
+    price = mapped_column(Integer, nullable=False)
+    is_contract_price = mapped_column(Boolean, nullable=False)
     regions = mapped_column(ARRAY(Text), nullable=False)
     floor_space = mapped_column(Integer, nullable=False)
     description = mapped_column(String(400))
@@ -92,6 +94,7 @@ class Tender(Base):
     attachments = mapped_column(ARRAY(Text))
     services_groups = mapped_column(ARRAY(Integer))
     services_types = mapped_column(ARRAY(Integer))
+    active = mapped_column(Boolean, default=False, nullable=False)
     reception_start = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
