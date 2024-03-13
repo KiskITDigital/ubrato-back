@@ -4,8 +4,8 @@ from typing import Optional
 
 import jwt
 from config import Config, get_config
-from fastapi import Depends
 from exceptions import INVALID_BARRIER, NO_BARRIER_TOKEN
+from fastapi import Depends
 from models.user_model import User
 from schemas.jwt_user import JWTUser
 

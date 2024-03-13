@@ -26,7 +26,9 @@ app.include_router(role.router)
 app.include_router(manager.router)
 app.include_router(tender.router)
 
-app.add_exception_handler(RequestValidationError, request_validation_exception_handler)
+app.add_exception_handler(
+    RequestValidationError, request_validation_exception_handler
+)
 
 app.add_exception_handler(ServiceException, exception_handler)
 app.add_exception_handler(AuthException, auth_exception_handler)

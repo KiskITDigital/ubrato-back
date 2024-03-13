@@ -16,6 +16,7 @@ from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
 class Base(DeclarativeBase):
     pass
 
+
 # TODO: add info for admin row
 class User(Base):
     __tablename__ = "users"
@@ -91,14 +92,24 @@ class Tender(Base):
     attachments = mapped_column(ARRAY(Text))
     services_groups = mapped_column(ARRAY(Integer))
     services_types = mapped_column(ARRAY(Integer))
-    reception_start = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
-    reception_end = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
-    work_start = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
-    work_end = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
-    object_group_id = mapped_column(Integer, ForeignKey('objects_groups.id'))
-    object_type_id = mapped_column(Integer, ForeignKey('objects_types.id'))
-    user_id = mapped_column(String(40), ForeignKey('users.id'), nullable=False)
-    created_at = mapped_column(TIMESTAMP, server_default=func.current_timestamp())
+    reception_start = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    reception_end = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    work_start = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    work_end = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    object_group_id = mapped_column(Integer, ForeignKey("objects_groups.id"))
+    object_type_id = mapped_column(Integer, ForeignKey("objects_types.id"))
+    user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
+    created_at = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
 
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")
@@ -143,6 +154,7 @@ class ServiceType(Base):
     service_group_id = mapped_column(Integer, ForeignKey("services_groups.id"))
 
     service_group = relationship("ServiceGroup", back_populates="service_type")
+
 
 class Logs(Base):
     __tablename__ = "logs"

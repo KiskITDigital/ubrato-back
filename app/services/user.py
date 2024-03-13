@@ -2,8 +2,8 @@ import uuid
 from typing import List, Optional
 
 import bcrypt
-from fastapi import Depends
 from exceptions import ERROR_WHILE_CREATE_USER, USER_EMAIL_NOT_FOUND
+from fastapi import Depends
 from models import user_model
 from repositories.schemas import Document, Organization, User
 from repositories.user_repository import UserRepository

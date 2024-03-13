@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, status
 from exceptions import ServiceException
+from fastapi import APIRouter, Depends, status
 from models.object_group import ObjectsGroupsWithTypes
 from models.service_group import ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user
 from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
-
 from services.logs import LogsService
 from services.tenders import TenderService
 
@@ -14,6 +13,7 @@ router = APIRouter(
     prefix="/v1/tenders",
     tags=["tenders"],
 )
+
 
 @router.post(
     "/create",
@@ -28,7 +28,7 @@ async def create_tender(
     tender: CreateTenderRequest,
     tender_service: TenderService = Depends(),
     logs_service: LogsService = Depends(),
-    user: JWTUser = Depends(get_user)
+    user: JWTUser = Depends(get_user),
 ) -> CreateTenderResponse:
     id, err = tender_service.create_tender(tender=tender, user_id=user.id)
     if err is not None:
@@ -38,6 +38,7 @@ async def create_tender(
             logs_service=logs_service,
         )
     return CreateTenderResponse(id=id)
+
 
 @router.get(
     "/objects-types",
@@ -58,6 +59,7 @@ async def get_all_objects_types(
             logs_service=logs_service,
         )
     return objects
+
 
 @router.get(
     "/services-types",

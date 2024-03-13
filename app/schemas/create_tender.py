@@ -20,5 +20,6 @@ class CreateTenderRequest(BaseModel):
     object_group_id: int
     object_type_id: int
 
+
 class CreateTenderResponse(BaseModel):
     id: str

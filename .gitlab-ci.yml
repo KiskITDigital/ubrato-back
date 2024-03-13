@@ -1,4 +1,5 @@
 stages:
+  - build
   - deploy
 
 variables:
@@ -19,11 +20,40 @@ before_script:
 
   - cp $KNOWN_HOSTS ~/.ssh/known_hosts
 
-deploy:
+dev-build:
+  only:
+    - dev
+  stage: build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+
+dev-deploy:
+  only:
+    - dev
   stage: deploy
   script:
     - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
       ./clean.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
       cd ubrato-back && cp .env.prod .env &&
-      docker build --build-arg GIT_VERSION=$CI_COMMIT_SHORT_SHA -t ubrato:latest . &&
+      docker compose up -d"
+
+prod-build:
+  only:
+    - main
+  stage: build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+
+prod-deploy:
+  only:
+    - main
+  stage: deploy
+  script:
+    - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
+      ./clean.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
+      cd ubrato-back && cp .env.prod .env &&
       docker compose up -d"

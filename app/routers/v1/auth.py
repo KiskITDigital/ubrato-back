@@ -1,4 +1,9 @@
-from exceptions import INVALID_CREDENTIAL, USER_ALREADY_EXIST, USER_EMAIL_NOT_FOUND, ServiceException
+from exceptions import (
+    INVALID_CREDENTIAL,
+    USER_ALREADY_EXIST,
+    USER_EMAIL_NOT_FOUND,
+    ServiceException,
+)
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import authorized, get_user
 from schemas.exception import ExceptionResponse
