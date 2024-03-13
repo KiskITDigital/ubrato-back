@@ -1,4 +1,5 @@
 from typing import List
+
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
 from models import tender_model
@@ -55,7 +56,9 @@ async def get_page_tenders(
     tender_service: TenderService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> ObjectsGroupsWithTypes:
-    tenders, err = tender_service.get_page_active_tenders(page=page, page_size=page_size)
+    tenders, err = tender_service.get_page_active_tenders(
+        page=page, page_size=page_size
+    )
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

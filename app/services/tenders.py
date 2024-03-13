@@ -15,7 +15,11 @@ class TenderService:
     tags_repository: TagsRepository
     tender_repository: TenderRepository
 
-    def __init__(self, tags_repository: TagsRepository = Depends(), tender_repository: TenderRepository = Depends()) -> None:
+    def __init__(
+        self,
+        tags_repository: TagsRepository = Depends(),
+        tender_repository: TenderRepository = Depends(),
+    ) -> None:
         self.tags_repository = tags_repository
         self.tender_repository = tender_repository
 
@@ -28,13 +32,15 @@ class TenderService:
             Tender(**tender.__dict__, id=id, user_id=user_id)
         )
         return id, err
-    
+
     def get_page_active_tenders(
         self,
         page: int,
         page_size: int,
     ) -> Tuple[List[tender_model.Tender], Optional[Exception]]:
-        return self.tender_repository.get_page_active_tenders(page=page, page_size=page_size)
+        return self.tender_repository.get_page_active_tenders(
+            page=page, page_size=page_size
+        )
 
     def get_all_objects_with_types(
         self,

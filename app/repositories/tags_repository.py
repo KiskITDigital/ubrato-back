@@ -17,7 +17,6 @@ from repositories.schemas import (
     ObjectType,
     ServiceGroup,
     ServiceType,
-    Tender,
 )
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
