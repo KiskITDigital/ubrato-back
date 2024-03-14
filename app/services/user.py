@@ -2,11 +2,11 @@ import uuid
 from typing import List, Optional
 
 import bcrypt
-from exceptions import ERROR_WHILE_CREATE_USER, USER_EMAIL_NOT_FOUND
+import models
 from fastapi import Depends
-from models import user_model
+from repositories import UserRepository
 from repositories.schemas import Document, Organization, User
-from repositories.user_repository import UserRepository
+from services.exceptions import ERROR_WHILE_CREATE_USER, USER_EMAIL_NOT_FOUND
 
 
 class UserService:
@@ -23,7 +23,7 @@ class UserService:
         first_name: str,
         middle_name: str,
         last_name: str,
-    ) -> tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> tuple[Optional[models.User], Optional[Exception]]:
         id = "usr_" + str(uuid.uuid4())
 
         password = bcrypt.hashpw(
@@ -52,7 +52,7 @@ class UserService:
 
     def get_by_email(
         self, email: str
-    ) -> tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> tuple[Optional[models.User], Optional[Exception]]:
         user, err = self.user_repository.get_by_email(email)
 
         if err is not None:

@@ -1,13 +1,12 @@
 import uuid
 from typing import List, Optional, Tuple
 
+import models
 from fastapi import Depends
-from models import tender_model
 from models.object_group import ObjectsGroupsWithTypes
 from models.service_group import ServicesGroupsWithTypes
+from repositories import TagsRepository, TenderRepository
 from repositories.schemas import Tender
-from repositories.tags_repository import TagsRepository
-from repositories.tender_repository import TenderRepository
 from schemas.create_tender import CreateTenderRequest
 
 
@@ -37,7 +36,7 @@ class TenderService:
         self,
         page: int,
         page_size: int,
-    ) -> Tuple[List[tender_model.Tender], Optional[Exception]]:
+    ) -> Tuple[List[models.Tender], Optional[Exception]]:
         return self.tender_repository.get_page_active_tenders(
             page=page, page_size=page_size
         )

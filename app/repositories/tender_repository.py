@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List, Optional, Tuple
 
+import models
 from fastapi import Depends
-from models import tender_model
 from repositories.database import get_db_connection
 from repositories.schemas import Tender
 from sqlalchemy.exc import SQLAlchemyError
@@ -28,7 +28,7 @@ class TenderRepository:
 
     def get_page_active_tenders(
         self, page: int, page_size: int
-    ) -> Tuple[List[tender_model.Tender], Optional[Exception]]:
+    ) -> Tuple[List[models.Tender], Optional[Exception]]:
         try:
             query = (
                 self.db.query(Tender)
@@ -40,10 +40,10 @@ class TenderRepository:
                 .limit(page_size)
                 .offset((page - 1) * page_size)
             )
-            tenders: List[tender_model.Tender] = []
+            tenders: List[models.Tender] = []
 
             for tender in query:
-                tenders.append(tender_model.Tender(**tender.__dict__))
+                tenders.append(models.Tender(**tender.__dict__))
 
             return tenders, None
         except SQLAlchemyError as err:

@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import Depends, Request
-from repositories.logs_repository import LogsRepository
+from repositories import LogsRepository
 from repositories.schemas import Logs
 
 

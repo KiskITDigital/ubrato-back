@@ -3,11 +3,11 @@ from datetime import timezone
 from typing import Optional
 
 import jwt
+import models
 from config import Config, get_config
-from exceptions import INVALID_BARRIER, NO_BARRIER_TOKEN
 from fastapi import Depends
-from models.user_model import User
 from schemas.jwt_user import JWTUser
+from services.exceptions import INVALID_BARRIER, NO_BARRIER_TOKEN
 
 
 class JWTService:
@@ -21,9 +21,9 @@ class JWTService:
         self.algorithm = "HS256"
         return
 
-    def generate_jwt(self, user: User) -> str:
+    def generate_jwt(self, user: models.User) -> str:
         exp = datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(
-            hours=self.time_live
+            minutes=self.time_live
         )
 
         jwt_user = JWTUser(
@@ -62,10 +62,10 @@ class JWTService:
     ) -> tuple[Optional[JWTUser], Optional[Exception]]:
         header = authorization.split(" ", 1)
         if header[0] != "Bearer":
-            return None, NO_BARRIER_TOKEN
+            return None, Exception(NO_BARRIER_TOKEN)
 
         user, err = self.decode_jwt(header[1])
         if err is not None:
-            return None, INVALID_BARRIER
+            return None, Exception(INVALID_BARRIER)
 
         return user, None

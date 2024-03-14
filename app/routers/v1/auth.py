@@ -1,16 +1,16 @@
-from exceptions import (
+from typing import Annotated
+
+from exceptions import ServiceException
+from fastapi import APIRouter, Cookie, Depends, Response, status
+from routers.v1.exceptions import (
     INVALID_CREDENTIAL,
     USER_ALREADY_EXIST,
     USER_EMAIL_NOT_FOUND,
-    ServiceException,
 )
-from fastapi import APIRouter, Depends, status
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
-from services.jwt import JWTService
-from services.logs import LogsService
-from services.user import UserService
+from services import JWTService, LogsService, SessionService, UserService
 
 router = APIRouter(
     prefix="/v1/auth",
@@ -28,9 +28,11 @@ router = APIRouter(
     },
 )
 async def signup_user(
+    response: Response,
     user: SignUpRequest,
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
+    session_service: SessionService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> SignUpResponse:
     _, err = user_service.get_by_email(user.email)
@@ -57,6 +59,15 @@ async def signup_user(
             logs_service=logs_service,
         )
 
+    session_id, err = session_service.create_session(created_user.id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+    response.set_cookie(key="session_id", value=session_id)
+
     return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
 
 
@@ -69,9 +80,11 @@ async def signup_user(
     },
 )
 async def signin_user(
+    response: Response,
     data: SignInRequest,
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
+    session_service: SessionService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> SignInResponse:
     user, err = user_service.get_by_email(data.email)
@@ -96,4 +109,37 @@ async def signin_user(
             logs_service=logs_service,
         )
 
+    session_id, err = session_service.create_session(user.id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+    response.set_cookie(key="session_id", value=session_id)
+
+    return SignInResponse(access_token=jwt_service.generate_jwt(user))
+
+
+@router.get(
+    "/refresh",
+    response_model=SignInResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
+    },
+)
+async def refresh_session(
+    session_id: Annotated[str | None, Cookie()],
+    jwt_service: JWTService = Depends(),
+    session_service: SessionService = Depends(),
+    logs_service: LogsService = Depends(),
+) -> SignInResponse:
+    user, err = session_service.get_user_session_by_id(session_id=session_id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=err,
+            logs_service=logs_service,
+        )
     return SignInResponse(access_token=jwt_service.generate_jwt(user))

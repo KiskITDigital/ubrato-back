@@ -1,11 +1,11 @@
 from typing import Annotated, Optional
 
 from config import get_config
-from exceptions import NO_ACCESS, AuthException, ServiceException
+from exceptions import AuthException, ServiceException
 from fastapi import Depends, Header, status
+from routers.v1.exceptions import NO_ACCESS
 from schemas.jwt_user import JWTUser
-from services.jwt import JWTService
-from services.logs import LogsService
+from services import JWTService, LogsService
 
 
 async def authorized(

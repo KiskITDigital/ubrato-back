@@ -11,7 +11,10 @@ class Config:
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
-        time_live: int = int(os.getenv("JWT_TIME_LIVE", 24))
+        time_live: int = int(os.getenv("JWT_TTL", 20))
+
+    class Session:
+        time_live: int = int(os.getenv("SESSION_TTL", 336))
 
     class Role:
         super_admin = 1 << 7

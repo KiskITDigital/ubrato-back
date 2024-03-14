@@ -4,18 +4,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from services.logs import LogsService
 
-ERROR_WHILE_CREATE_USER = "Internal error when creating a user"
-USER_NOT_FOUND = "User not found"
-USER_ALREADY_EXIST = "User already exist"
-INVALID_CREDENTIAL = "Invalid credentials"
-UNAUTHORIZED = "You are unauthorized"
-NO_BARRIER_TOKEN = "No barrier token"
-INVALID_BARRIER = "Bearer token is invalid"
-NO_ACCESS = "You don't have access"
-
-USERID_NOT_FOUND = "User with ID {} not found."
-USER_EMAIL_NOT_FOUND = "User with email {} not found."
-
 
 class ServiceException(HTTPException):
     status_code: int

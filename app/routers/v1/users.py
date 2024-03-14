@@ -5,8 +5,7 @@ from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.verify_request import VerifyRequest
-from services.logs import LogsService
-from services.user import UserService
+from services import LogsService, UserService
 
 router = APIRouter(
     prefix="/v1/users",

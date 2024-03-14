@@ -1,9 +1,9 @@
 from typing import List, Optional, Tuple
 
-from exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
+import models
 from fastapi import Depends
-from models import user_model
 from repositories.database import get_db_connection
+from repositories.exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
 from repositories.schemas import Document, Organization, User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
@@ -19,7 +19,7 @@ class UserRepository:
 
     def create(
         self, user: User
-    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> Tuple[models.User, Optional[Exception]]:
         try:
             self.db.add(user)
             self.db.commit()
@@ -27,19 +27,19 @@ class UserRepository:
             self.db.refresh(user)
             return user.to_model(), None
         except SQLAlchemyError as err:
-            return None, Exception(err.code)
+            return models.User, Exception(err.code)
 
     def get_by_email(
         self, email: str
-    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> Tuple[models.User, Optional[Exception]]:
         try:
             query = self.db.query(User).filter(User.email == email)
             user = query.first()
             if user is not None:
                 return user.to_model(), None
-            return None, Exception(USER_EMAIL_NOT_FOUND.format(email))
+            return models.User, Exception(USER_EMAIL_NOT_FOUND.format(email))
         except SQLAlchemyError as err:
-            return None, Exception(err.code)
+            return models.User, Exception(err.code)
 
     def save_verify_info(
         self,
@@ -73,10 +73,10 @@ class UserRepository:
 
     def get_all_users(
         self,
-    ) -> Tuple[List[user_model.User], Optional[Exception]]:
+    ) -> Tuple[List[models.User], Optional[Exception]]:
         try:
             query = self.db.query(User)
-            users: List[user_model.User] = []
+            users: List[models.User] = []
 
             for user in query:
                 users.append(user.to_model())
@@ -87,14 +87,14 @@ class UserRepository:
 
     def get_by_id(
         self, user_id: str
-    ) -> Tuple[Optional[user_model.User], Optional[Exception]]:
+    ) -> Tuple[models.User, Optional[Exception]]:
         try:
             user = self.db.query(User).filter_by(id=user_id).first()
 
             if user:
                 return user.to_model(), None
 
-            return None, Exception(USERID_NOT_FOUND.format(user_id))
+            return models.User, Exception(USERID_NOT_FOUND.format(user_id))
         except SQLAlchemyError as err:
             self.db.rollback()
-            return None, Exception(err.code)
+            return models.User, Exception(err.code)

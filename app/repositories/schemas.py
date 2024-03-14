@@ -1,4 +1,4 @@
-from models import user_model
+import models
 from sqlalchemy import (
     ARRAY,
     TIMESTAMP,
@@ -34,9 +34,10 @@ class User(Base):
 
     organization = relationship("Organization", back_populates="user")
     tender = relationship("Tender", back_populates="user")
+    session = relationship("Session", back_populates="user")
 
-    def to_model(self) -> user_model.User:
-        return user_model.User(
+    def to_model(self) -> models.User:
+        return models.User(
             id=self.id,
             email=self.email,
             phone=self.phone,
@@ -169,3 +170,14 @@ class Logs(Base):
     code = mapped_column(SmallInteger, nullable=False)
     msg = mapped_column(Text, default="")
     created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
+
+
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id = mapped_column(String(40), primary_key=True)
+    user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
+    expires_at = mapped_column(TIMESTAMP, nullable=False)
+    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
+
+    user = relationship("User", back_populates="session")

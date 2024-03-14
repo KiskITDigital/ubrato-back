@@ -1,16 +1,15 @@
 from typing import List
 
+import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
-from models import tender_model
 from models.object_group import ObjectsGroupsWithTypes
 from models.service_group import ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user
 from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
-from services.logs import LogsService
-from services.tenders import TenderService
+from services import LogsService, TenderService
 
 router = APIRouter(
     prefix="/v1/tenders",
@@ -45,7 +44,7 @@ async def create_tender(
 
 @router.get(
     "/",
-    response_model=List[tender_model.Tender],
+    response_model=List[models.Tender],
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },

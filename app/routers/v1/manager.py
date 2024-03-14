@@ -1,14 +1,13 @@
 from typing import List
 
+import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
-from models.user_model import User
 from routers.v1.dependencies import is_admin
 from schemas.exception import ExceptionResponse
 from schemas.success import SuccessResponse
 from schemas.verify_status_set import VerifyStatusSet
-from services.logs import LogsService
-from services.manager import ManagerService
+from services import LogsService, ManagerService
 
 router = APIRouter(
     prefix="/v1/manager",
@@ -42,7 +41,7 @@ async def update_user_verify_status(
 
 @router.get(
     "/users/",
-    response_model=List[User],
+    response_model=List[models.User],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
@@ -64,7 +63,7 @@ async def get_users(
 
 @router.get(
     "/users/{user_id}",
-    response_model=User,
+    response_model=models.User,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
