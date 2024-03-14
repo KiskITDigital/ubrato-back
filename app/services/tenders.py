@@ -31,13 +31,23 @@ class TenderService:
         )
         return id, err
 
-    def get_page_active_tenders(
+    def get_page_tenders(
         self,
         page: int,
         page_size: int,
+        object_group_id: Optional[int], object_type_id: Optional[int],
+        service_type_ids: Optional[List[int]], service_group_ids: Optional[List[int]],
+        floor_space_from: Optional[int], floor_space_to: Optional[int],
+        price_from: Optional[int], price_to: Optional[int], 
+        text: Optional[str]
     ) -> Tuple[List[models.Tender], Optional[Exception]]:
-        return self.tender_repository.get_page_active_tenders(
-            page=page, page_size=page_size
+        return self.tender_repository.get_page_tenders(
+            page=page, page_size=page_size,
+            object_group_id=object_group_id, object_type_id=object_type_id,
+            service_type_ids=service_type_ids, service_group_ids=service_group_ids,
+            floor_space_from=floor_space_from, floor_space_to=floor_space_to,
+            price_from=price_from, price_to=price_to,
+            text=text,
         )
 
     def get_all_objects_with_types(

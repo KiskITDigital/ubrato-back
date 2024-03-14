@@ -20,3 +20,19 @@ CREATE TABLE IF NOT EXISTS tender (
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
     created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE tender ADD COLUMN document_tsv tsvector;
+
+CREATE OR REPLACE FUNCTION update_tender_document_tsv() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.document_tsv :=
+        setweight(to_tsvector('russian', coalesce(NEW.name, '')), 'A') ||
+        setweight(to_tsvector('russian', coalesce(NEW.description, '')), 'B') ||
+        setweight(to_tsvector('russian', coalesce(NEW.wishes, '')), 'C');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tsvector_update_tender
+BEFORE INSERT OR UPDATE OF name, description, wishes ON tender
+FOR EACH ROW EXECUTE FUNCTION update_tender_document_tsv();

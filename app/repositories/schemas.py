@@ -11,6 +11,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
+from sqlalchemy.dialects.postgresql import TSVECTOR
 
 
 class Base(DeclarativeBase):
@@ -114,6 +115,7 @@ class Tender(Base):
     created_at = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
+    document_tsv = mapped_column(TSVECTOR)
 
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")
