@@ -45,7 +45,10 @@ class SessionService:
         if err is not None:
             return models.User, err
 
-        if session.expires_at.timestamp() < datetime.datetime.now().timestamp():
+        if (
+            session.expires_at.timestamp()
+            < datetime.datetime.now().timestamp()
+        ):
             return models.User, SESSION_EXPIRED
 
         user, err = self.user_repository.get_by_id(user_id=session.user_id)

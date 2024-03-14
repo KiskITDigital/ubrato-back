@@ -1,14 +1,14 @@
-from typing import List
+from typing import List, Optional
 
 import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
-from models.object_group import ObjectsGroupsWithTypes
-from models.service_group import ServicesGroupsWithTypes
+from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user
 from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
+from schemas.tender_count import TenderCountResponse
 from services import LogsService, TenderService
 
 router = APIRouter(
@@ -107,3 +107,29 @@ async def get_all_services_types(
             logs_service=logs_service,
         )
     return objects
+
+
+@router.get(
+    "/stats/count",
+    response_model=TenderCountResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+)
+async def get_count_active_tenders(
+    object_group_id: Optional[int] = None,
+    service_type_id: Optional[int] = None,
+    tender_service: TenderService = Depends(),
+    logs_service: LogsService = Depends(),
+) -> ServicesGroupsWithTypes:
+    count, err = tender_service.get_count_active_tenders(
+        object_group_id=object_group_id, service_type_id=service_type_id
+    )
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+
+    return TenderCountResponse(count=count)

@@ -1,12 +1,10 @@
 from typing import List, Optional, Tuple
 
 from fastapi import Depends
-from models.object_group import (
+from models import (
     ObjectGroupWithTypes,
     ObjectsGroupsWithTypes,
     ObjectTypeModel,
-)
-from models.service_group import (
     ServiceGroupWithTypes,
     ServicesGroupsWithTypes,
     ServiceTypeModel,

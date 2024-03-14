@@ -17,9 +17,7 @@ class UserRepository:
     ) -> None:
         self.db = db
 
-    def create(
-        self, user: User
-    ) -> Tuple[models.User, Optional[Exception]]:
+    def create(self, user: User) -> Tuple[models.User, Optional[Exception]]:
         try:
             self.db.add(user)
             self.db.commit()

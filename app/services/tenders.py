@@ -3,8 +3,7 @@ from typing import List, Optional, Tuple
 
 import models
 from fastapi import Depends
-from models.object_group import ObjectsGroupsWithTypes
-from models.service_group import ServicesGroupsWithTypes
+from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from repositories import TagsRepository, TenderRepository
 from repositories.schemas import Tender
 from schemas.create_tender import CreateTenderRequest
@@ -50,3 +49,12 @@ class TenderService:
         self,
     ) -> Tuple[ServicesGroupsWithTypes, Optional[Exception]]:
         return self.tags_repository.get_all_services_with_types()
+
+    def get_count_active_tenders(
+        self,
+        object_group_id: Optional[int],
+        service_type_id: Optional[int],
+    ) -> Tuple[int, Optional[Exception]]:
+        return self.tender_repository.get_count_active_tenders(
+            object_group_id=object_group_id, service_type_id=service_type_id
+        )

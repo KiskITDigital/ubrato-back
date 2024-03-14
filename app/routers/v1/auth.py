@@ -21,6 +21,7 @@ router = APIRouter(
 @router.post(
     "/signup",
     response_model=SignUpResponse,
+    response_description="It also returns a session_id cookie",
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
@@ -73,6 +74,7 @@ async def signup_user(
 
 @router.post(
     "/signin",
+    response_description="It also returns a session_id cookie",
     response_model=SignInResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
@@ -123,6 +125,7 @@ async def signin_user(
 
 @router.get(
     "/refresh",
+    response_description="Uses the session_id cookie to update the access token",
     response_model=SignInResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
