@@ -10,15 +10,15 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import TSVECTOR
+from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
     pass
 
 
-# TODO: add info for admin row
+# TODO: add info row for admin
 class User(Base):
     __tablename__ = "users"
 

@@ -7,6 +7,7 @@ from exceptions import (
 )
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from routers.v1 import auth, health, manager, role, tender, users
 
 app = FastAPI(
@@ -18,6 +19,15 @@ app = FastAPI(
             "description": "development environment",
         },
     ],
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
