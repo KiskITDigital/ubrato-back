@@ -5,8 +5,6 @@ PhoneNumber.phone_format = "E164"
 
 
 class SignUpRequest(BaseModel):
-    brand_name: str
-    inn: int
     email: EmailStr
     phone: PhoneNumber
     password: str
