@@ -95,7 +95,7 @@ async def get_page_tenders(
 
 
 @router.get(
-    "/{tender_id}",
+    "/tender/{tender_id}",
     response_model=models.Tender,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
@@ -123,7 +123,7 @@ async def get_tender(
 
 
 @router.put(
-    "/{tender_id}",
+    "/tender/{tender_id}",
     response_model=SuccessResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
