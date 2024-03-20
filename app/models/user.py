@@ -14,6 +14,18 @@ class User(BaseModel):
     first_name: str
     middle_name: str
     last_name: str
-    verify: bool
+    verified: bool
     role: int
-    create_date: datetime
+    created_at: datetime
+
+class UserPrivateDTO(BaseModel):
+    id: str
+    email: EmailStr
+    phone: PhoneNumber
+    first_name: str
+    middle_name: str
+    last_name: str
+    verified: bool
+    role: int
+    created_at: datetime
+

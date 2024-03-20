@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS tender (
-    id                  VARCHAR(40)     PRIMARY KEY,
+    id                  SERIAL          PRIMARY KEY,
     name                VARCHAR(255)    NOT NULL,
     price               INT             NOT NULL,
     is_contract_price   BOOLEAN         NOT NULL DEFAULT FALSE,
-    regions             TEXT[]          NOT NULL,
+    location            VARCHAR(80)     NOT NULL,
     floor_space         INT             NOT NULL,
     description         VARCHAR(400)    NULL,
     wishes              VARCHAR(400)    NULL,
@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS tender (
     object_group_id     INT 		    REFERENCES objects_groups(id),
     object_type_id      INT 		    REFERENCES objects_types(id),
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
-    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
+    verified            BOOLEAN         NOT NULL DEFAULT FALSE
 );
 
 ALTER TABLE tender ADD COLUMN document_tsv tsvector;
@@ -28,7 +29,8 @@ BEGIN
     NEW.document_tsv :=
         setweight(to_tsvector('russian', coalesce(NEW.name, '')), 'A') ||
         setweight(to_tsvector('russian', coalesce(NEW.description, '')), 'B') ||
-        setweight(to_tsvector('russian', coalesce(NEW.wishes, '')), 'C');
+        setweight(to_tsvector('russian', coalesce(NEW.wishes, '')), 'C') ||
+        setweight(to_tsvector('russian', coalesce(NEW.location, '')), 'D');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

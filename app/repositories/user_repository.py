@@ -23,7 +23,7 @@ class UserRepository:
             self.db.commit()
 
             self.db.refresh(user)
-            return user.to_model(), None
+            return models.User(**user.__dict__), None
         except SQLAlchemyError as err:
             return models.User, Exception(err.code)
 
@@ -34,7 +34,7 @@ class UserRepository:
             query = self.db.query(User).filter(User.email == email)
             user = query.first()
             if user is not None:
-                return user.to_model(), None
+                return models.User(**user.__dict__), None
             return models.User, Exception(USER_EMAIL_NOT_FOUND.format(email))
         except SQLAlchemyError as err:
             return models.User, Exception(err.code)
@@ -53,14 +53,14 @@ class UserRepository:
         except SQLAlchemyError as err:
             return Exception(err.code)
 
-    def update_verify_status(
+    def update_verified_status(
         self, user_id: str, status: bool
     ) -> Optional[Exception]:
         try:
             user = self.db.query(User).filter_by(id=user_id).first()
 
             if user:
-                user.verify = status
+                user.verified = status
                 self.db.commit()
                 return None
 
@@ -77,7 +77,7 @@ class UserRepository:
             users: List[models.User] = []
 
             for user in query:
-                users.append(user.to_model())
+                users.append(models.User(**user.__dict__))
 
             return users, None
         except SQLAlchemyError as err:
@@ -90,7 +90,7 @@ class UserRepository:
             user = self.db.query(User).filter_by(id=user_id).first()
 
             if user:
-                return user.to_model(), None
+                return models.User(**user.__dict__), None
 
             return models.User, Exception(USERID_NOT_FOUND.format(user_id))
         except SQLAlchemyError as err:

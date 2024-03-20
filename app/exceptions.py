@@ -16,15 +16,20 @@ class ServiceException(HTTPException):
 
 
 class AuthException(HTTPException):
-    detail: str
+    status_code: int
+    detail: Exception
+        
+    def __init__(self, *args, **kwargs):
+        detail = "asdasd"
+        return super().__init__(*args, **kwargs)
 
 
 async def auth_exception_handler(
     request: Request,
-    exc: ServiceException,
+    exc: AuthException,
 ) -> JSONResponse:
     return JSONResponse(
-        status_code=exc.status_code, content={"msg": exc.detail}
+        status_code=exc.status_code, content={"msg": str(exc.detail)}
     )
 
 

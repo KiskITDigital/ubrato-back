@@ -6,7 +6,11 @@ import models
 from fastapi import Depends
 from repositories import UserRepository
 from repositories.schemas import Document, Organization, User
-from services.exceptions import ERROR_WHILE_CREATE_USER, USER_EMAIL_NOT_FOUND
+from services.exceptions import (
+    ERROR_WHILE_CREATE_USER,
+    USER_EMAIL_NOT_FOUND,
+    USER_NOT_FOUND,
+)
 
 
 class UserService:
@@ -62,6 +66,17 @@ class UserService:
             return None, Exception(USER_EMAIL_NOT_FOUND.format(email))
 
         return user, None
+
+    def get_by_id(self, id: str) -> tuple[models.UserPrivateDTO, Optional[Exception]]:
+        user, err = self.user_repository.get_by_id(id)
+
+        if err is not None:
+            return None, err
+
+        if user is None:
+            return None, Exception(USER_NOT_FOUND)
+
+        return models.UserPrivateDTO(**user.__dict__), None
 
     def password_valid(self, password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(

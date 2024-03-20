@@ -4,10 +4,12 @@ import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
 from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
-from routers.v1.dependencies import authorized, get_user
+from routers.v1.dependencies import authorized, get_user, is_creator_or_manager
+from routers.v1.exceptions import TENDER_NOT_FOUND
 from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
+from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
 from services import LogsService, TenderService
 
@@ -61,6 +63,9 @@ async def get_page_tenders(
     price_from: Optional[int] = None,
     price_to: Optional[int] = None,
     text: Optional[str] = None,
+    active: Optional[bool] = True,
+    verified: Optional[bool] = True,
+    user_id: Optional[str] = None,
     tender_service: TenderService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> ObjectsGroupsWithTypes:
@@ -76,6 +81,9 @@ async def get_page_tenders(
         price_from=price_from,
         price_to=price_to,
         text=text,
+        active=active,
+        verified=verified,
+        user_id=user_id,
     )
     if err is not None:
         raise ServiceException(
@@ -84,6 +92,74 @@ async def get_page_tenders(
             logs_service=logs_service,
         )
     return tenders
+
+
+@router.get(
+    "/{tender_id}",
+    response_model=models.Tender,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+)
+async def get_tender(
+    tender_id: str,
+    tender_service: TenderService = Depends(),
+    logs_service: LogsService = Depends(),
+) -> models.Tender:
+    tender, err = tender_service.get_by_id(id=tender_id)
+    if tender is None:
+        raise ServiceException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=TENDER_NOT_FOUND,
+            logs_service=logs_service,
+        )
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+    return tender
+
+
+@router.put(
+    "/{tender_id}",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def update_tender(
+    tender_id: str,
+    tender: CreateTenderRequest,
+    tender_service: TenderService = Depends(),
+    logs_service: LogsService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    original_tender, err = tender_service.get_by_id(id=tender_id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+    if tender is None:
+        raise ServiceException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=TENDER_NOT_FOUND,
+            logs_service=logs_service,
+        )
+    
+    await is_creator_or_manager(user_id=original_tender.user_id, user=user)
+    err = tender_service.update_tender(tender=tender, tender_id=tender_id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+    return SuccessResponse()
 
 
 @router.get(

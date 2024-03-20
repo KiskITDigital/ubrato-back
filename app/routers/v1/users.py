@@ -1,3 +1,4 @@
+import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import authorized, get_user
@@ -51,3 +52,28 @@ async def user_requires_verification(
         )
 
     return SuccessResponse()
+
+
+@router.get(
+    "/me",
+    response_model=models.UserPrivateDTO,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def get_me(
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+    logs_service: LogsService = Depends(),
+) -> models.UserPrivateDTO:
+    user, err = user_service.get_by_id(user.id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+
+    return user

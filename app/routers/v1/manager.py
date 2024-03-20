@@ -26,10 +26,10 @@ router = APIRouter(
 async def update_user_verify_status(
     user_id: str,
     data: VerifyStatusSet,
-    user_service: ManagerService = Depends(),
+    manager_service: ManagerService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
-    err = user_service.update_verify_status(user_id, data.status)
+    err = manager_service.update_user_verified_status(user_id, data.status)
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -41,17 +41,17 @@ async def update_user_verify_status(
 
 @router.get(
     "/users/",
-    response_model=List[models.User],
+    response_model=List[models.UserPrivateDTO],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(is_admin)],
 )
 async def get_users(
-    user_service: ManagerService = Depends(),
+    manager_service: ManagerService = Depends(),
     logs_service: LogsService = Depends(),
-) -> SuccessResponse:
-    users, err = user_service.get_all_users()
+) -> List[models.UserPrivateDTO]:
+    users, err = manager_service.get_all_users()
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -61,24 +61,24 @@ async def get_users(
     return users
 
 
-@router.get(
-    "/users/{user_id}",
+@router.put(
+    "/tender/{tender_id}/verify",
     response_model=models.User,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(is_admin)],
 )
-async def get_user(
-    user_id: str,
-    user_service: ManagerService = Depends(),
+async def update_tender_verified_status(
+    tender_id: int,
+    manager_service: ManagerService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
-    user, err = user_service.get_by_id(user_id=user_id)
+    err = manager_service.update_tender_verified_status(id=tender_id)
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err),
             logs_service=logs_service,
         )
-    return user
+    return SuccessResponse()

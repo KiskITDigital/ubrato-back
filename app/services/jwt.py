@@ -32,7 +32,7 @@ class JWTService:
             user.middle_name,
             user.last_name,
             user.role,
-            user.verify,
+            user.verified,
             int(exp.timestamp()),
         )
 

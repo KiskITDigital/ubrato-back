@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name  VARCHAR(100)    NOT NULL,
     middle_name VARCHAR(100)    NOT NULL,
     last_name   VARCHAR(100)    NOT NULL,
-    verify      BOOLEAN         DEFAULT FALSE,
+    verified    BOOLEAN         DEFAULT FALSE,
     role        SMALLINT        DEFAULT 0,
     created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );

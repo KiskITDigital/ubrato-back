@@ -1,9 +1,9 @@
-import models
 from sqlalchemy import (
     ARRAY,
     TIMESTAMP,
     Boolean,
     ForeignKey,
+    Identity,
     Integer,
     SmallInteger,
     String,
@@ -29,27 +29,13 @@ class User(Base):
     first_name = mapped_column(String(100), nullable=False)
     middle_name = mapped_column(String(100), nullable=False)
     last_name = mapped_column(String(100), nullable=False)
-    verify = mapped_column(Boolean, default=False)
+    verified = mapped_column(Boolean, default=False)
     role = mapped_column(SmallInteger, default=0)
     created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
 
     organization = relationship("Organization", back_populates="user")
     tender = relationship("Tender", back_populates="user")
     session = relationship("Session", back_populates="user")
-
-    def to_model(self) -> models.User:
-        return models.User(
-            id=self.id,
-            email=self.email,
-            phone=self.phone,
-            password=self.password,
-            first_name=self.first_name,
-            middle_name=self.middle_name,
-            last_name=self.last_name,
-            verify=self.verify,
-            role=self.role,
-            create_date=self.created_at,
-        )
 
 
 class Organization(Base):
@@ -85,11 +71,11 @@ class Document(Base):
 class Tender(Base):
     __tablename__ = "tender"
 
-    id = mapped_column(String(40), primary_key=True)
+    id = mapped_column(Integer, Identity(start=1, cycle=True), primary_key=True)
     name = mapped_column(String(255), nullable=False)
     price = mapped_column(Integer, nullable=False)
     is_contract_price = mapped_column(Boolean, nullable=False)
-    regions = mapped_column(ARRAY(Text), nullable=False)
+    location = mapped_column(String(80), nullable=False)
     floor_space = mapped_column(Integer, nullable=False)
     description = mapped_column(String(400))
     wishes = mapped_column(String(400))
@@ -116,6 +102,7 @@ class Tender(Base):
         TIMESTAMP, server_default=func.current_timestamp()
     )
     document_tsv = mapped_column(TSVECTOR)
+    verified = mapped_column(Boolean, default=False, nullable=False)
 
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")

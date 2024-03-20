@@ -8,6 +8,7 @@ class ObjectTypeModel(BaseModel):
     name: str
     count: int = None
 
+
 class ObjectGroupModel(BaseModel):
     id: int
     name: str

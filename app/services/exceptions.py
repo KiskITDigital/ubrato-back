@@ -1,5 +1,6 @@
 ERROR_WHILE_CREATE_USER = "Internal error when creating a user"
 USER_EMAIL_NOT_FOUND = "User with email {} not found."
+USER_NOT_FOUND = "User not found."
 SESSION_EXPIRED = "Session expired"
 NO_BARRIER_TOKEN = "No barrier token"
 INVALID_BARRIER = "Bearer token is invalid"

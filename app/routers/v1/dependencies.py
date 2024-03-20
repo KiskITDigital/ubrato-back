@@ -43,14 +43,24 @@ async def is_admin(
 ) -> None:
     user, err = jwt_service.unmarshal_jwt(authorization)
     if err is not None:
-        raise ServiceException(
+        raise AuthException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=err,
-            logs_service=logs_service,
         )
 
     if user.role < get_config().Role.admin:
-        raise ServiceException(
+        raise AuthException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=NO_ACCESS,
+        )
+
+
+async def is_creator_or_manager(
+    user_id: str,
+    user: JWTUser,
+) -> None:
+    if user.role < get_config().Role.manager and user.id != user_id:
+        raise AuthException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=NO_ACCESS,
         )

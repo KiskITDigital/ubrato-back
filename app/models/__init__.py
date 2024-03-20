@@ -10,5 +10,5 @@ from .service_group import (
     ServicesGroupsWithTypes,
     ServiceTypeModel,
 )
-from .tender_model import Tender
-from .user_model import User
+from .tender import Tender
+from .user import User, UserPrivateDTO

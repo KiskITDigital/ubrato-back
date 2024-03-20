@@ -5,11 +5,11 @@ from pydantic import BaseModel
 
 
 class Tender(BaseModel):
-    id: str
+    id: int
     name: str
     price: int
     is_contract_price: bool
-    regions: List[str]
+    location: str
     floor_space: int
     description: str
     wishes: str
@@ -25,3 +25,4 @@ class Tender(BaseModel):
     object_type_id: int
     user_id: str
     created_at: datetime
+    verified: bool

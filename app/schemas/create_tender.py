@@ -8,7 +8,7 @@ class CreateTenderRequest(BaseModel):
     name: str
     price: int
     is_contract_price: bool
-    regions: List[str]
+    location: str
     floor_space: int
     description: str
     wishes: str
@@ -24,4 +24,4 @@ class CreateTenderRequest(BaseModel):
 
 
 class CreateTenderResponse(BaseModel):
-    id: str
+    id: int
