@@ -26,6 +26,7 @@ origins = [
     "https://apiubrato.godmod.dev",
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:5174",
 ]
 
 app.add_middleware(
