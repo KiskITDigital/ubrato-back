@@ -67,7 +67,7 @@ async def signup_user(
             detail=str(err),
             logs_service=logs_service,
         )
-    response.set_cookie(key="session_id", value=session_id, httponly=True)
+    response.set_cookie(key="session_id", value=session_id, httponly=True, samesite='none')
 
     return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
 
@@ -118,7 +118,7 @@ async def signin_user(
             detail=str(err),
             logs_service=logs_service,
         )
-    response.set_cookie(key="session_id", value=session_id, httponly=True)
+    response.set_cookie(key="session_id", value=session_id, httponly=True, samesite='none')
 
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
 
