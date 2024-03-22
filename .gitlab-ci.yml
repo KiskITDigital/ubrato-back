@@ -7,7 +7,7 @@ stages:
 
 variables:
   REMOTE_USER: "ubrato"
-  REMOTE_HOST: "185.103.102.159"
+  REMOTE_HOST: "194.58.96.228"
   REMOTE_PATH: "/home/ubrato/ubrato"
 
 before_script:
