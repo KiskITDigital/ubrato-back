@@ -54,5 +54,5 @@ async def exception_handler(
         msg=exc.detail,
     )
     return JSONResponse(
-        status_code=exc.status_code, content={"id": id, "msg": exc.detail}
+        status_code=exc.status_code, content={"id": id, "msg": str(exc.detail)}
     )

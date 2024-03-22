@@ -44,6 +44,9 @@ class SessionService:
         session, err = self.session_repository.get_by_id(session_id=session_id)
         if err is not None:
             return models.User, err
+        
+        if session is None:
+            return models.User, SESSION_EXPIRED
 
         if (
             session.expires_at.timestamp()

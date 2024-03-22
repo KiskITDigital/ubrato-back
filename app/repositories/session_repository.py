@@ -26,7 +26,7 @@ class SessionRepository:
 
     def get_by_id(
         self, session_id: str
-    ) -> Tuple[Session, Optional[Exception]]:
+    ) -> Tuple[Optional[Session], Optional[Exception]]:
         try:
             session = self.db.query(Session).filter_by(id=session_id).first()
 
