@@ -6,7 +6,7 @@ networks:
 services:
   api:
     container_name: ubrato-api
-    image: registry.gitlab.com/ubrato/ubrato-back:latest
+    image: registry.ubrato.ru:5050/godmod/ubrato-back:latest
     expose:
       - "3000"
     ports:
