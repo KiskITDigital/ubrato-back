@@ -150,7 +150,7 @@ async def update_tender(
             detail=TENDER_NOT_FOUND,
             logs_service=logs_service,
         )
-    
+
     await is_creator_or_manager(user_id=original_tender.user_id, user=user)
     err = tender_service.update_tender(tender=tender, tender_id=tender_id)
     if err is not None:

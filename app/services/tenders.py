@@ -117,7 +117,6 @@ class TenderService:
     ) -> Tuple[Optional[models.Tender], Optional[Exception]]:
         return self.tender_repository.get_tender_by_id(id)
 
-
     def update_tender(
         self, tender: CreateTenderRequest, tender_id: int
     ) -> Optional[Exception]:

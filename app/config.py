@@ -23,6 +23,9 @@ class Config:
 
         guest = 1 << 0
 
+    class Dadata:
+        api_key = os.getenv("DADATA_TOKEN", 336)
+
 
 config = Config()
 

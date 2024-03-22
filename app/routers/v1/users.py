@@ -6,7 +6,7 @@ from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.verify_request import VerifyRequest
-from services import LogsService, UserService
+from services import LogsService, OrganizationService, UserService
 
 router = APIRouter(
     prefix="/v1/users",
@@ -25,24 +25,10 @@ router = APIRouter(
 )
 async def user_requires_verification(
     data: VerifyRequest,
-    user_service: UserService = Depends(),
-    user: JWTUser = Depends(get_user),
+    org_service: OrganizationService = Depends(),
     logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
-    err = user_service.user_requires_verification(
-        user_id=user.id,
-        brand_name=data.brand_name,
-        short_name=data.short_name,
-        inn=data.inn,
-        okpo=data.okpo,
-        orgn=data.orgn,
-        kpp=data.kpp,
-        tax_code=data.tax_code,
-        real_address=data.real_address,
-        registered_address=data.registered_address,
-        mail_address=data.mail_address,
-        links=data.documents,
-    )
+    err = org_service.save_docs(links=data.documents, org_id=data.org_id)
 
     if err is not None:
         raise ServiceException(

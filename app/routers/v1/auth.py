@@ -10,7 +10,13 @@ from routers.v1.exceptions import (
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
-from services import JWTService, LogsService, SessionService, UserService
+from services import (
+    JWTService,
+    LogsService,
+    OrganizationService,
+    SessionService,
+    UserService,
+)
 
 router = APIRouter(
     prefix="/v1/auth",
@@ -32,6 +38,7 @@ async def signup_user(
     response: Response,
     user: SignUpRequest,
     user_service: UserService = Depends(),
+    org_service: OrganizationService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
     logs_service: LogsService = Depends(),
@@ -60,6 +67,14 @@ async def signup_user(
             logs_service=logs_service,
         )
 
+    err = org_service.save_organization(inn=user.inn, user_id=created_user.id)
+    if err is not None:
+        raise ServiceException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(err),
+            logs_service=logs_service,
+        )
+
     session_id, err = session_service.create_session(created_user.id)
     if err is not None:
         raise ServiceException(
@@ -67,7 +82,13 @@ async def signup_user(
             detail=str(err),
             logs_service=logs_service,
         )
-    response.set_cookie(key="session_id", value=session_id, httponly=True, samesite='none', secure=True)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        samesite="none",
+        secure=True,
+    )
 
     return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
 
@@ -118,7 +139,13 @@ async def signin_user(
             detail=str(err),
             logs_service=logs_service,
         )
-    response.set_cookie(key="session_id", value=session_id, httponly=True, samesite='none', secure=True)
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        httponly=True,
+        samesite="none",
+        secure=True,
+    )
 
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
 

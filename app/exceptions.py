@@ -18,9 +18,8 @@ class ServiceException(HTTPException):
 class AuthException(HTTPException):
     status_code: int
     detail: Exception
-        
+
     def __init__(self, *args, **kwargs):
-        detail = "asdasd"
         return super().__init__(*args, **kwargs)
 
 

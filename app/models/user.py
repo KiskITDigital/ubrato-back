@@ -16,7 +16,9 @@ class User(BaseModel):
     last_name: str
     verified: bool
     role: int
+    is_contractor: bool
     created_at: datetime
+
 
 class UserPrivateDTO(BaseModel):
     id: str
@@ -27,5 +29,5 @@ class UserPrivateDTO(BaseModel):
     last_name: str
     verified: bool
     role: int
+    is_contractor: bool
     created_at: datetime
-

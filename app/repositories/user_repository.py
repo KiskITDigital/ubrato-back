@@ -4,7 +4,7 @@ import models
 from fastapi import Depends
 from repositories.database import get_db_connection
 from repositories.exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
-from repositories.schemas import Document, Organization, User
+from repositories.schemas import User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
 
@@ -38,20 +38,6 @@ class UserRepository:
             return models.User, Exception(USER_EMAIL_NOT_FOUND.format(email))
         except SQLAlchemyError as err:
             return models.User, Exception(err.code)
-
-    def save_verify_info(
-        self,
-        org: Organization,
-        documents: List[Document],
-    ) -> Optional[Exception]:
-        try:
-            self.db.add(org)
-            for document in documents:
-                self.db.add(document)
-            self.db.commit()
-            return None
-        except SQLAlchemyError as err:
-            return Exception(err.code)
 
     def update_verified_status(
         self, user_id: str, status: bool

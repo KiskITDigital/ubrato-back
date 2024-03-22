@@ -1,11 +1,11 @@
 import uuid
-from typing import List, Optional
+from typing import Optional
 
 import bcrypt
 import models
 from fastapi import Depends
 from repositories import UserRepository
-from repositories.schemas import Document, Organization, User
+from repositories.schemas import User
 from services.exceptions import (
     ERROR_WHILE_CREATE_USER,
     USER_EMAIL_NOT_FOUND,
@@ -67,7 +67,9 @@ class UserService:
 
         return user, None
 
-    def get_by_id(self, id: str) -> tuple[models.UserPrivateDTO, Optional[Exception]]:
+    def get_by_id(
+        self, id: str
+    ) -> tuple[models.UserPrivateDTO, Optional[Exception]]:
         user, err = self.user_repository.get_by_id(id)
 
         if err is not None:
@@ -82,47 +84,3 @@ class UserService:
         return bcrypt.checkpw(
             password.encode("utf-8"), hashed_password.encode("utf-8")
         )
-
-    def user_requires_verification(
-        self,
-        user_id: str,
-        brand_name: str,
-        short_name: str,
-        inn: int,
-        okpo: int,
-        orgn: int,
-        kpp: int,
-        tax_code: int,
-        real_address: str,
-        registered_address: str,
-        mail_address: str,
-        links: List[str],
-    ) -> Optional[Exception]:
-        id = "org_" + str(uuid.uuid4())
-
-        org = Organization(
-            id=id,
-            brand_name=brand_name,
-            short_name=short_name,
-            inn=inn,
-            okpo=okpo,
-            orgn=orgn,
-            kpp=kpp,
-            tax_code=tax_code,
-            real_address=real_address,
-            mail_address=mail_address,
-            registered_address=registered_address,
-            user_id=user_id,
-        )
-
-        documents: List[Document] = []
-
-        for link in links:
-            document = Document(
-                id=f"doc_{uuid.uuid4()}",
-                url=link,
-                organization_id=id,
-            )
-            documents.append(document)
-
-        return self.user_repository.save_verify_info(org, documents)

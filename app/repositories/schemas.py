@@ -31,6 +31,7 @@ class User(Base):
     last_name = mapped_column(String(100), nullable=False)
     verified = mapped_column(Boolean, default=False)
     role = mapped_column(SmallInteger, default=0)
+    is_contractor = mapped_column(Boolean, default=False)
     created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
 
     organization = relationship("Organization", back_populates="user")
@@ -44,14 +45,12 @@ class Organization(Base):
     id = mapped_column(String(40), primary_key=True)
     brand_name = mapped_column(String(255), nullable=False)
     short_name = mapped_column(String(50), nullable=False)
-    inn = mapped_column(String(12), nullable=False)
-    okpo = mapped_column(String(12), nullable=False)
-    orgn = mapped_column(String(12), nullable=False)
+    inn = mapped_column(String(10), nullable=False)
+    okpo = mapped_column(String(8), nullable=False)
+    ogrn = mapped_column(String(15), nullable=False)
     kpp = mapped_column(String(12), nullable=False)
     tax_code = mapped_column(Integer, nullable=False)
-    real_address = mapped_column(String(255), nullable=False)
-    registered_address = mapped_column(String(255), nullable=False)
-    mail_address = mapped_column(String(255), nullable=False)
+    address = mapped_column(String(255), nullable=False)
     user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="organization")
@@ -71,7 +70,9 @@ class Document(Base):
 class Tender(Base):
     __tablename__ = "tender"
 
-    id = mapped_column(Integer, Identity(start=1, cycle=True), primary_key=True)
+    id = mapped_column(
+        Integer, Identity(start=1, cycle=True), primary_key=True
+    )
     name = mapped_column(String(255), nullable=False)
     price = mapped_column(Integer, nullable=False)
     is_contract_price = mapped_column(Boolean, nullable=False)

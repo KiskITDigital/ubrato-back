@@ -11,6 +11,8 @@ class SignUpRequest(BaseModel):
     first_name: str
     middle_name: str
     last_name: str
+    inn: str
+    is_contractor: bool
 
 
 class SignUpResponse(BaseModel):

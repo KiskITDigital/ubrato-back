@@ -29,10 +29,14 @@ class TenderRepository:
             return tender.id, None
         except SQLAlchemyError as err:
             return 0, Exception(err.code)
-        
-    def update_tender(self, tender: dict[str, Any], tender_id: int) -> Optional[Exception]: 
+
+    def update_tender(
+        self, tender: dict[str, Any], tender_id: int
+    ) -> Optional[Exception]:
         try:
-            tender_to_update = self.db.query(Tender).filter(Tender.id == tender_id).first()
+            tender_to_update = (
+                self.db.query(Tender).filter(Tender.id == tender_id).first()
+            )
 
             if tender_to_update:
                 for key, value in tender.items():

@@ -17,7 +17,9 @@ class ManagerService:
     ) -> Optional[Exception]:
         return self.user_repository.update_verified_status(user_id, status)
 
-    def get_all_users(self) -> Tuple[List[models.UserPrivateDTO], Optional[Exception]]:
+    def get_all_users(
+        self,
+    ) -> Tuple[List[models.UserPrivateDTO], Optional[Exception]]:
         users, err = self.user_repository.get_all_users()
 
         if err is not None:
@@ -36,7 +38,7 @@ class ManagerService:
 
         if err is not None:
             return models.UserPrivateDTO, err
-        
+
         return user, None
 
     def update_tender_verified_status(
