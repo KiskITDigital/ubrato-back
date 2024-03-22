@@ -40,7 +40,7 @@ dev-deploy:
   stage: deploy
   script:
     - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cd $REMOTE_PATH &&
-      ./update-back.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
+      ./update-back.sh && git clone git@git.ubrato.ru:godmod/ubrato-back.git &&
       cd ubrato-back && cp .env.prod .env &&
       docker compose up -d"
 
@@ -60,6 +60,6 @@ prod-deploy:
   stage: deploy
   script:
     - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cd $REMOTE_PATH &&
-      ./update-back.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
+      ./update-back.sh && git clone git@git.ubrato.ru:godmod/ubrato-back.git &&
       cd ubrato-back && cp .env.prod .env &&
       docker compose up -d"
