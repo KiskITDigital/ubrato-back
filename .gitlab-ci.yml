@@ -59,7 +59,7 @@ prod-deploy:
     - main
   stage: deploy
   script:
-    - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p 2048 "cd $REMOTE_PATH &&
+    - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cd $REMOTE_PATH &&
       ./update-back.sh && git clone git@gitlab.com:ubrato/ubrato-back.git &&
       cd ubrato-back && cp .env.prod .env &&
       docker compose up -d"
