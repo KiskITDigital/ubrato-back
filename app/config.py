@@ -7,7 +7,7 @@ load_dotenv()
 
 class Config:
     class Database:
-        DB_DSN: str = os.getenv("DB_DNS", "")
+        DB_DSN: str = os.getenv("DB_DSN", "")
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
