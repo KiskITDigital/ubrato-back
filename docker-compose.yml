@@ -6,7 +6,7 @@ networks:
 services:
   api:
     container_name: ubrato-api
-    image: registry.ubrato.ru/ubrato/ubrato-back
+    image: registry.ubrato.ru:5050/ubrato/ubrato-back
     expose:
       - "3000"
     ports:
