@@ -4,7 +4,7 @@ import models
 from fastapi import Depends
 from repositories.database import get_db_connection
 from repositories.exceptions import USER_EMAIL_NOT_FOUND, USERID_NOT_FOUND
-from repositories.schemas import User
+from repositories.schemas import Organization, User
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
 
@@ -17,14 +17,19 @@ class UserRepository:
     ) -> None:
         self.db = db
 
-    def create(self, user: User) -> Tuple[models.User, Optional[Exception]]:
+    def create(self, user: User, org: Organization) -> Tuple[models.User, Optional[Exception]]:
         try:
             self.db.add(user)
+            org.user_id=user.id
+            self.db.add(org)
             self.db.commit()
 
             self.db.refresh(user)
+
             return models.User(**user.__dict__), None
         except SQLAlchemyError as err:
+            print(err._message)
+            self.db.rollback()
             return models.User, Exception(err.code)
 
     def get_by_email(

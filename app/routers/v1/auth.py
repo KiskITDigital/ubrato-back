@@ -2,8 +2,10 @@ from typing import Annotated
 
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
+from repositories.schemas import User
 from routers.v1.exceptions import (
     INVALID_CREDENTIAL,
+    INVALID_INN,
     USER_ALREADY_EXIST,
     USER_EMAIL_NOT_FOUND,
 )
@@ -50,24 +52,25 @@ async def signup_user(
             detail=USER_ALREADY_EXIST,
             logs_service=logs_service,
         )
-
-    created_user, err = user_service.create(
-        user.email,
-        user.phone,
-        user.password,
-        user.first_name,
-        user.middle_name,
-        user.last_name,
-    )
-
-    if err is not None:
+    
+    org = org_service.get_organization(inn=user.inn)
+    if org is None:
         raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=INVALID_INN,
             logs_service=logs_service,
         )
 
-    err = org_service.save_organization(inn=user.inn, user_id=created_user.id)
+    created_user, err = user_service.create(
+        email=user.email,
+        phone=user.phone,
+        password=user.password,
+        first_name=user.first_name,
+        middle_name=user.middle_name,
+        last_name=user.last_name,
+        org=org
+    )
+
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

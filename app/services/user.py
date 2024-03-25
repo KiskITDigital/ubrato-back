@@ -5,7 +5,7 @@ import bcrypt
 import models
 from fastapi import Depends
 from repositories import UserRepository
-from repositories.schemas import User
+from repositories.schemas import Organization, User
 from services.exceptions import (
     ERROR_WHILE_CREATE_USER,
     USER_EMAIL_NOT_FOUND,
@@ -27,6 +27,7 @@ class UserService:
         first_name: str,
         middle_name: str,
         last_name: str,
+        org: Organization,
     ) -> tuple[Optional[models.User], Optional[Exception]]:
         id = "usr_" + str(uuid.uuid4())
 
@@ -44,7 +45,7 @@ class UserService:
             last_name=last_name,
         )
 
-        created_user, err = self.user_repository.create(user)
+        created_user, err = self.user_repository.create(user=user, org=org)
 
         if err is not None:
             return None, err

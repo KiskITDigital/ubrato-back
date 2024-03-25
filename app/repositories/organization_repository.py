@@ -25,7 +25,6 @@ class OrganizationRepository:
 
             return None
         except SQLAlchemyError as err:
-            print(err._message)
             return Exception(err.code)
 
     def save_docs(
