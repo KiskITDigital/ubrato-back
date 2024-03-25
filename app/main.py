@@ -15,7 +15,7 @@ app = FastAPI(
     version="0.1.0",
     servers=[
         {
-            "url": "https://apiubrato.godmod.dev/docs",
+            "url": "https://api.ubrato.ru/docs",
             "description": "development environment",
         },
     ],
@@ -24,6 +24,8 @@ app = FastAPI(
 origins = [
     "http://ubrato.ru",
     "https://ubrato.ru",
+    "http://dev.ubrato.ru",
+    "https://dev.ubrato.ru",
     "http://localhost",
     "http://localhost:5174",
 ]
