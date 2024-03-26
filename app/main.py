@@ -17,7 +17,7 @@ app = FastAPI(
     version="0.1.0",
     servers=[
         {
-            "url": "https://api.ubrato.ru/docs",
+            "url": "https://api.ubrato.ru/",
             "description": "development environment",
         },
     ],
