@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List
 
 from fastapi import Depends
 from models import (
@@ -10,6 +10,7 @@ from models import (
     ServiceTypeModel,
 )
 from repositories.database import get_db_connection
+from repositories.exceptions import RepositoryException
 from repositories.schemas import (
     ObjectGroup,
     ObjectType,
@@ -30,7 +31,7 @@ class TagsRepository:
 
     def get_all_objects_with_types(
         self,
-    ) -> Tuple[ObjectsGroupsWithTypes, Optional[Exception]]:
+    ) -> ObjectsGroupsWithTypes:
         try:
             object_groups = self.db.query(ObjectGroup)
 
@@ -52,14 +53,18 @@ class TagsRepository:
                     )
                 )
 
-            return ObjectsGroupsWithTypes(groups=groups_data), None
+            return ObjectsGroupsWithTypes(groups=groups_data)
 
         except SQLAlchemyError as err:
-            return [], Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
     def get_all_services_with_types(
         self,
-    ) -> Tuple[ObjectsGroupsWithTypes, Optional[Exception]]:
+    ) -> ObjectsGroupsWithTypes:
         try:
             service_groups = self.db.query(ServiceGroup)
 
@@ -81,7 +86,11 @@ class TagsRepository:
                     )
                 )
 
-            return ServicesGroupsWithTypes(groups=groups_data), None
+            return ServicesGroupsWithTypes(groups=groups_data)
 
         except SQLAlchemyError as err:
-            return [], Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )

@@ -39,7 +39,6 @@ async def create_tender(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return CreateTenderResponse(id=id)
 
@@ -89,7 +88,6 @@ async def get_page_tenders(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return tenders
 
@@ -111,13 +109,11 @@ async def get_tender(
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=TENDER_NOT_FOUND,
-            logs_service=logs_service,
         )
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return tender
 
@@ -142,13 +138,11 @@ async def update_tender(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     if tender is None:
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=TENDER_NOT_FOUND,
-            logs_service=logs_service,
         )
 
     await is_creator_or_manager(user_id=original_tender.user_id, user=user)
@@ -157,7 +151,6 @@ async def update_tender(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return SuccessResponse()
 
@@ -178,7 +171,6 @@ async def get_all_objects_types(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return objects
 
@@ -199,7 +191,6 @@ async def get_all_services_types(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return objects
 
@@ -224,7 +215,6 @@ async def get_count_active_tenders(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
 
     return TenderCountResponse(count=count)

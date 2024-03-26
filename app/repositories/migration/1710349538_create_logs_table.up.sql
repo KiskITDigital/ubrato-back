@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS logs (
     id          VARCHAR(40)     PRIMARY KEY,
-    method      VARCHAR(6)      NOT NULL,
-    url         VARCHAR(255)    NOT NULL,
+    method      VARCHAR(6)      DEFAULT NULL,
+    url         VARCHAR(255)    DEFAULT NULL,
     body        TEXT            DEFAULT NULL,
-    code        SMALLINT        NOT NULL,
+    code        SMALLINT        DEFAULT NULL,
     msg         TEXT            DEFAULT NULL,
-    created_at   TIMESTAMP      DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
 );

@@ -11,13 +11,8 @@ from services import JWTService, LogsService
 async def authorized(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
-) -> None:
-    _, err = jwt_service.unmarshal_jwt(authorization)
-    if err is not None:
-        raise AuthException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=err,
-        )
+):
+    jwt_service.unmarshal_jwt(authorization)
 
 
 async def get_user(
@@ -30,7 +25,6 @@ async def get_user(
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=err,
-            logs_service=logs_service,
         )
     return user
 

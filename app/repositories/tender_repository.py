@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional
 
 import models
 from fastapi import Depends
 from repositories.database import get_db_connection
-from repositories.exceptions import TENDERID_NOT_FOUND
+from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.schemas import Tender
 from sqlalchemy import or_
 from sqlalchemy.exc import SQLAlchemyError
@@ -19,38 +19,44 @@ class TenderRepository:
     ) -> None:
         self.db = db
 
-    def create_tender(self, tender: Tender) -> Tuple[int, Optional[Exception]]:
+    def create_tender(self, tender: Tender) -> int:
         try:
             self.db.add(tender)
             self.db.commit()
 
             self.db.refresh(tender)
 
-            return tender.id, None
+            return tender.id
         except SQLAlchemyError as err:
-            return 0, Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
-    def update_tender(
-        self, tender: dict[str, Any], tender_id: int
-    ) -> Optional[Exception]:
+    def update_tender(self, tender: dict[str, Any], tender_id: int):
         try:
             tender_to_update = (
                 self.db.query(Tender).filter(Tender.id == tender_id).first()
             )
 
-            if tender_to_update:
-                for key, value in tender.items():
-                    setattr(tender_to_update, key, value)
-                    tender_to_update.active = False
-                    tender_to_update.verified = False
+            if tender_to_update is None:
+                raise RepositoryException(
+                    status_code=404, detail=tender_id, sql_msg=""
+                )
 
-                self.db.commit()
-                return None
+            for key, value in tender.items():
+                setattr(tender_to_update, key, value)
+                tender_to_update.active = False
+                tender_to_update.verified = False
 
-            return Exception(TENDERID_NOT_FOUND.format(tender_id))
-
+            self.db.commit()
         except SQLAlchemyError as err:
-            return Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
     def get_page_tenders(
         self,
@@ -68,7 +74,7 @@ class TenderRepository:
         active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
-    ) -> Tuple[List[models.Tender], Optional[Exception]]:
+    ) -> models.Tender:
         try:
             query = (
                 self.db.query(Tender)
@@ -112,40 +118,57 @@ class TenderRepository:
             for tender in query:
                 tenders.append(models.Tender(**tender.__dict__))
 
-            return tenders, None
+            return tenders
         except SQLAlchemyError as err:
-            return [], Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
-    def get_tender_by_id(
-        self, id: int
-    ) -> Tuple[Optional[models.Tender], Optional[Exception]]:
+    def get_tender_by_id(self, tender_id: int) -> models.Tender:
         try:
-            query = self.db.query(Tender).filter(Tender.id == id)
-            return query.first(), None
-        except SQLAlchemyError as err:
-            return None, Exception(err.code)
+            tender = (
+                self.db.query(Tender).filter(Tender.id == tender_id).first()
+            )
+            if tender is None:
+                raise RepositoryException(
+                    status_code=404,
+                    detail=TENDERID_NOT_FOUND.format(tender_id),
+                    sql_msg="",
+                )
 
-    def update_verified_status(
-        self, tender_id: str, status: bool
-    ) -> Optional[Exception]:
+            return tender
+        except SQLAlchemyError as err:
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
+
+    def update_verified_status(self, tender_id: str, status: bool):
         try:
             tender = (
                 self.db.query(Tender).filter(Tender.id == tender_id).first()
             )
 
-            if tender:
-                tender.verified = status
-                self.db.commit()
-                return None
+            if tender is None:
+                raise RepositoryException(
+                    status_code=404,
+                    detail=TENDERID_NOT_FOUND.format(tender_id),
+                    sql_msg="",
+                )
 
-            return Exception(TENDERID_NOT_FOUND.format(tender_id))
+            tender.verified = status
+            self.db.commit()
         except SQLAlchemyError as err:
-            self.db.rollback()
-            return Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
-    def update_active_status(
-        self, tender_id: str, active: bool
-    ) -> Optional[Exception]:
+    def update_active_status(self, tender_id: str, active: bool):
         try:
             tender = (
                 self.db.query(Tender)
@@ -153,19 +176,25 @@ class TenderRepository:
                 .first()
             )
 
-            if tender:
-                tender.active = active
-                self.db.commit()
-                return None
+            if tender is None:
+                raise RepositoryException(
+                    status_code=404,
+                    detail=TENDERID_NOT_FOUND.format(tender_id),
+                    sql_msg="",
+                )
+            tender.active = active
+            self.db.commit()
 
-            return Exception(TENDERID_NOT_FOUND.format(tender_id))
         except SQLAlchemyError as err:
-            self.db.rollback()
-            return Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
     def get_count_active_tenders(
         self, object_group_id: Optional[int], service_type_id: Optional[int]
-    ) -> Tuple[int, Optional[Exception]]:
+    ) -> int:
         try:
             query = self.db.query(Tender).filter(
                 Tender.active,
@@ -175,6 +204,10 @@ class TenderRepository:
                 service_type_id is None
                 or Tender.services_types.any(service_type_id),
             )
-            return query.count(), None
+            return query.count()
         except SQLAlchemyError as err:
-            return [], Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )

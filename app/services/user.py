@@ -1,16 +1,10 @@
 import uuid
-from typing import Optional
 
 import bcrypt
 import models
 from fastapi import Depends
 from repositories import UserRepository
 from repositories.schemas import Organization, User
-from services.exceptions import (
-    ERROR_WHILE_CREATE_USER,
-    USER_EMAIL_NOT_FOUND,
-    USER_NOT_FOUND,
-)
 
 
 class UserService:
@@ -28,7 +22,7 @@ class UserService:
         middle_name: str,
         last_name: str,
         org: Organization,
-    ) -> tuple[Optional[models.User], Optional[Exception]]:
+    ) -> models.User:
         id = "usr_" + str(uuid.uuid4())
 
         password = bcrypt.hashpw(
@@ -45,39 +39,17 @@ class UserService:
             last_name=last_name,
         )
 
-        created_user, err = self.user_repository.create(user=user, org=org)
+        created_user = self.user_repository.create(user=user, org=org)
 
-        if err is not None:
-            return None, err
+        return created_user
 
-        if created_user is None:
-            return None, Exception(ERROR_WHILE_CREATE_USER)
+    def get_by_email(self, email: str) -> models.User:
+        user = self.user_repository.get_by_email(email)
 
-        return created_user, None
+        return user
 
-    def get_by_email(
-        self, email: str
-    ) -> tuple[Optional[models.User], Optional[Exception]]:
-        user, err = self.user_repository.get_by_email(email)
-
-        if err is not None:
-            return None, err
-
-        if user is None:
-            return None, Exception(USER_EMAIL_NOT_FOUND.format(email))
-
-        return user, None
-
-    def get_by_id(
-        self, id: str
-    ) -> tuple[models.UserPrivateDTO, Optional[Exception]]:
-        user, err = self.user_repository.get_by_id(id)
-
-        if err is not None:
-            return None, err
-
-        if user is None:
-            return None, Exception(USER_NOT_FOUND)
+    def get_by_id(self, id: str) -> models.UserPrivateDTO:
+        user = self.user_repository.get_by_id(id)
 
         return models.UserPrivateDTO(**user.__dict__), None
 

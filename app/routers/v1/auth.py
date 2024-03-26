@@ -2,19 +2,12 @@ from typing import Annotated
 
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
-from repositories.schemas import User
-from routers.v1.exceptions import (
-    INVALID_CREDENTIAL,
-    INVALID_INN,
-    USER_ALREADY_EXIST,
-    USER_EMAIL_NOT_FOUND,
-)
+from routers.v1.exceptions import INVALID_CREDENTIAL
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
 from services import (
     JWTService,
-    LogsService,
     OrganizationService,
     SessionService,
     UserService,
@@ -43,47 +36,24 @@ async def signup_user(
     org_service: OrganizationService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> SignUpResponse:
-    _, err = user_service.get_by_email(user.email)
-    if err is None:
-        raise ServiceException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=USER_ALREADY_EXIST,
-            logs_service=logs_service,
-        )
-    
-    org = org_service.get_organization(inn=user.inn)
-    if org is None:
-        raise ServiceException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=INVALID_INN,
-            logs_service=logs_service,
-        )
+    org = org_service.get_organization_from_api(inn=user.inn)
 
-    created_user, err = user_service.create(
+    created_user = user_service.create(
         email=user.email,
         phone=user.phone,
         password=user.password,
         first_name=user.first_name,
         middle_name=user.middle_name,
         last_name=user.last_name,
-        org=org
+        org=org,
     )
-
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-            logs_service=logs_service,
-        )
 
     session_id, err = session_service.create_session(created_user.id)
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     response.set_cookie(
         key="session_id",
@@ -111,37 +81,17 @@ async def signin_user(
     user_service: UserService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> SignInResponse:
-    user, err = user_service.get_by_email(data.email)
-    if user is None:
-        raise ServiceException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=USER_EMAIL_NOT_FOUND.format(data.email),
-            logs_service=logs_service,
-        )
-
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-            logs_service=logs_service,
-        )
+    user = user_service.get_by_email(data.email)
 
     if not user_service.password_valid(data.password, user.password):
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=INVALID_CREDENTIAL,
-            logs_service=logs_service,
         )
 
-    session_id, err = session_service.create_session(user.id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-            logs_service=logs_service,
-        )
+    session_id = session_service.create_session(user.id)
+
     response.set_cookie(
         key="session_id",
         value=session_id,
@@ -166,13 +116,11 @@ async def refresh_session(
     session_id: Annotated[str | None, Cookie()],
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> SignInResponse:
     user, err = session_service.get_user_session_by_id(session_id=session_id)
     if err is not None:
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=err,
-            logs_service=logs_service,
         )
     return SignInResponse(access_token=jwt_service.generate_jwt(user))

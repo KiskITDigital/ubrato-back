@@ -2,6 +2,7 @@ from typing import Optional
 
 from fastapi import Depends
 from repositories.database import get_db_connection
+from repositories.exceptions import RepositoryException
 from repositories.schemas import Document, Organization
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
@@ -22,10 +23,12 @@ class OrganizationRepository:
         try:
             self.db.add(org)
             self.db.commit()
-
-            return None
         except SQLAlchemyError as err:
-            return Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
     def save_docs(
         self,
@@ -35,4 +38,8 @@ class OrganizationRepository:
             self.db.add(document)
             self.db.commit()
         except SQLAlchemyError as err:
-            return Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )

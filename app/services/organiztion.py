@@ -1,11 +1,12 @@
 import uuid
-from typing import List, Optional
+from typing import List
 
 from config import get_config
 from dadata import Dadata
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories import OrganizationRepository
 from repositories.schemas import Document, Organization
+from services.exceptions import ServiceException
 
 
 class OrganizationService:
@@ -17,13 +18,16 @@ class OrganizationService:
         self.org_repository = org_repository
         self.dadata = Dadata(get_config().Dadata.api_key)
 
-    def get_organization(self, inn: str) -> Optional[Organization]:
+    def get_organization_from_api(self, inn: str) -> Organization:
         id = "org_" + str(uuid.uuid4())
 
         result = self.dadata.find_by_id("party", inn)
 
         if len(result) == 0:
-            return None
+            raise ServiceException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="INN NOT FOUND",
+            )
 
         org = Organization(
             id=id,
@@ -39,14 +43,11 @@ class OrganizationService:
 
         return org
 
-    def save_docs(self, links: List[str], org_id: str) -> Optional[Exception]:
+    def save_docs(self, links: List[str], org_id: str):
         for link in links:
             document = Document(
                 id=f"doc_{uuid.uuid4()}",
                 url=link,
                 organization_id=org_id,
             )
-            err = self.org_repository.save_docs(document)
-            if err is not None:
-                return err
-        return None
+            self.org_repository.save_docs(document)

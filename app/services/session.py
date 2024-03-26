@@ -1,6 +1,5 @@
 import datetime
 import secrets
-from typing import Optional, Tuple
 
 import models
 from config import Config, get_config
@@ -26,27 +25,20 @@ class SessionService:
         self.user_repository = user_repository
         return
 
-    def create_session(self, user_id: str) -> Tuple[str, Optional[Exception]]:
+    def create_session(self, user_id: str) -> str:
         session_id = secrets.token_hex(32 // 2)
         expires_at = datetime.datetime.now() + datetime.timedelta(
             hours=self.time_live
         )
-        err = self.session_repository.create(
+        self.session_repository.create(
             session=Session(
                 id=session_id, user_id=user_id, expires_at=expires_at
             )
         )
-        return session_id, err
+        return session_id
 
-    def get_user_session_by_id(
-        self, session_id: str
-    ) -> Tuple[models.User, Optional[Exception]]:
-        session, err = self.session_repository.get_by_id(session_id=session_id)
-        if err is not None:
-            return models.User, err
-
-        if session is None:
-            return models.User, SESSION_EXPIRED
+    def get_user_session_by_id(self, session_id: str) -> models.User:
+        session = self.session_repository.get_by_id(session_id=session_id)
 
         if (
             session.expires_at.timestamp()
@@ -54,8 +46,6 @@ class SessionService:
         ):
             return models.User, SESSION_EXPIRED
 
-        user, err = self.user_repository.get_by_id(user_id=session.user_id)
-        if err is not None:
-            return models.User, err
+        user = self.user_repository.get_by_id(user_id=session.user_id)
 
         return user, None

@@ -1,26 +1,26 @@
-from fastapi import HTTPException, Request, status
+from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from repositories import LogsRepository
+from repositories.database import SessionLocal
+from repositories.exceptions import RepositoryException
+from services.exceptions import AuthException, ServiceException
 from services.logs import LogsService
+from sqlalchemy.orm import scoped_session
 
 
-class ServiceException(HTTPException):
-    status_code: int
-    detail: str
-    logs_service: LogsService
+class LogsDependency:
+    def __init__(self):
+        self.logs_service = LogsService(
+            logs_repository=LogsRepository(scoped_session(SessionLocal))
+        )
 
-    def __init__(self, *args, logs_service: LogsService, **kwargs):
-        self.logs_service = logs_service
-        return super().__init__(*args, **kwargs)
+    async def __call__(self) -> LogsService:
+        return self.logs_service
 
 
-class AuthException(HTTPException):
-    status_code: int
-    detail: Exception
-
-    def __init__(self, *args, **kwargs):
-        return super().__init__(*args, **kwargs)
+logs_dependency = LogsDependency()
 
 
 async def auth_exception_handler(
@@ -43,14 +43,30 @@ async def request_validation_exception_handler(
     )
 
 
-async def exception_handler(
+async def service_exception_handler(
     request: Request,
     exc: ServiceException,
 ) -> JSONResponse:
-    id = await exc.logs_service.save_logs(
+    logs_service: LogsService = await logs_dependency()
+    id = await logs_service.save_logs(
         request=request,
         status_code=exc.status_code,
         msg=exc.detail,
+    )
+    return JSONResponse(
+        status_code=exc.status_code, content={"id": id, "msg": str(exc.detail)}
+    )
+
+
+async def repository_exception_handler(
+    request: Request,
+    exc: RepositoryException,
+) -> JSONResponse:
+    logs_service: LogsService = await logs_dependency()
+    id = await logs_service.save_logs(
+        request=request,
+        status_code=exc.status_code,
+        msg=exc.sql_msg,
     )
     return JSONResponse(
         status_code=exc.status_code, content={"id": id, "msg": str(exc.detail)}

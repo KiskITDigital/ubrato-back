@@ -1,8 +1,8 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 from fastapi import Depends
 from repositories.database import get_db_connection
-from repositories.exceptions import SESSION_NOT_FOUND
+from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
 from repositories.schemas import Session
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
@@ -20,20 +20,25 @@ class SessionRepository:
         try:
             self.db.add(session)
             self.db.commit()
-            return None
         except SQLAlchemyError as err:
-            return None, Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
-    def get_by_id(
-        self, session_id: str
-    ) -> Tuple[Optional[Session], Optional[Exception]]:
+    def get_by_id(self, session_id: str) -> Session:
         try:
             session = self.db.query(Session).filter_by(id=session_id).first()
 
-            if session:
-                return session, None
-
-            return Session, Exception(SESSION_NOT_FOUND)
+            if session is None:
+                raise RepositoryException(
+                    status_code=404, detail=SESSION_NOT_FOUND, sql_msg=""
+                )
+            return session
         except SQLAlchemyError as err:
-            self.db.rollback()
-            return Session, Exception(err.code)
+            raise RepositoryException(
+                status_code=500,
+                detail=err.code,
+                sql_msg=err._message(),
+            )

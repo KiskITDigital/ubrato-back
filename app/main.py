@@ -2,12 +2,14 @@ from exceptions import (
     AuthException,
     ServiceException,
     auth_exception_handler,
-    exception_handler,
+    repository_exception_handler,
     request_validation_exception_handler,
+    service_exception_handler,
 )
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from repositories.exceptions import RepositoryException
 from routers.v1 import auth, health, manager, role, tender, users
 
 app = FastAPI(
@@ -49,5 +51,6 @@ app.add_exception_handler(
     RequestValidationError, request_validation_exception_handler
 )
 
-app.add_exception_handler(ServiceException, exception_handler)
+app.add_exception_handler(ServiceException, service_exception_handler)
+app.add_exception_handler(RepositoryException, repository_exception_handler)
 app.add_exception_handler(AuthException, auth_exception_handler)

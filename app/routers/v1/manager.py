@@ -34,7 +34,6 @@ async def update_user_verify_status(
         raise ServiceException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(err),
-            logs_service=logs_service,
         )
     return SuccessResponse()
 
@@ -56,7 +55,6 @@ async def get_users(
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err),
-            logs_service=logs_service,
         )
     return users
 
@@ -79,6 +77,5 @@ async def update_tender_verified_status(
         raise ServiceException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(err),
-            logs_service=logs_service,
         )
     return SuccessResponse()

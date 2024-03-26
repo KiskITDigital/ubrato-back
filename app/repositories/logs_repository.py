@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import Depends
 from repositories.database import get_db_connection
 from repositories.schemas import Logs
@@ -15,11 +13,9 @@ class LogsRepository:
     ) -> None:
         self.db = db
 
-    def save(self, logs: Logs) -> Optional[Exception]:
+    def save(self, logs: Logs):
         try:
             self.db.add(logs)
             self.db.commit()
-
-            return None
         except SQLAlchemyError as err:
-            return err
+            print(err._message())

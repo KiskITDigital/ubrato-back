@@ -112,9 +112,7 @@ class TenderService:
             object_group_id=object_group_id, service_type_id=service_type_id
         )
 
-    def get_by_id(
-        self, id: int
-    ) -> Tuple[Optional[models.Tender], Optional[Exception]]:
+    def get_by_id(self, id: int) -> models.Tender:
         return self.tender_repository.get_tender_by_id(id)
 
     def update_tender(
