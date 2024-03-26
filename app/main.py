@@ -30,6 +30,7 @@ origins = [
     "https://dev.ubrato.ru",
     "http://localhost",
     "http://localhost:5174",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -50,7 +51,6 @@ app.include_router(tender.router)
 app.add_exception_handler(
     RequestValidationError, request_validation_exception_handler
 )
-
 app.add_exception_handler(ServiceException, service_exception_handler)
 app.add_exception_handler(RepositoryException, repository_exception_handler)
 app.add_exception_handler(AuthException, auth_exception_handler)

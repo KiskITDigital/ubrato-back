@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 import models
 from fastapi import Depends
@@ -22,11 +22,11 @@ class TenderService:
 
     def create_tender(
         self, tender: CreateTenderRequest, user_id: str
-    ) -> Tuple[int, Optional[Exception]]:
-        id, err = self.tender_repository.create_tender(
+    ) -> int:
+        id = self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
-        return id, err
+        return id
 
     def get_page_tenders(
         self,
@@ -44,7 +44,7 @@ class TenderService:
         active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
-    ) -> Tuple[List[models.Tender], Optional[Exception]]:
+    ) -> models.Tender:
         return self.tender_repository.get_page_tenders(
             page=page,
             page_size=page_size,
@@ -64,50 +64,43 @@ class TenderService:
 
     def get_all_objects_with_types(
         self,
-    ) -> Tuple[ObjectsGroupsWithTypes, Optional[Exception]]:
-        objects, err = self.tags_repository.get_all_objects_with_types()
-
-        if err is not None:
-            return ObjectsGroupsWithTypes, err
+    ) -> ObjectsGroupsWithTypes:
+        objects = self.tags_repository.get_all_objects_with_types()
 
         for group in objects.groups:
             total = 0
             for type in group.types:
-                count, err = self.tender_repository.get_count_active_tenders(
+                count = self.tender_repository.get_count_active_tenders(
                     object_group_id=type.id, service_type_id=None
                 )
                 type.count = count
                 total += count
             group.total = total
 
-        return objects, None
+        return objects
 
     def get_all_services_with_types(
         self,
-    ) -> Tuple[ServicesGroupsWithTypes, Optional[Exception]]:
-        services, err = self.tags_repository.get_all_services_with_types()
-        if err is not None:
-            return ServicesGroupsWithTypes, err
+    ) -> ServicesGroupsWithTypes:
+        services = self.tags_repository.get_all_services_with_types()
 
         for group in services.groups:
             total = 0
             for type in group.types:
-                count, err = self.tender_repository.get_count_active_tenders(
+                count = self.tender_repository.get_count_active_tenders(
                     object_group_id=None, service_type_id=type.id
                 )
                 type.count = count
-                if err is not None:
-                    return ServicesGroupsWithTypes, err
                 total += count
             group.total = total
 
-        return services, None
+        return services
 
     def get_count_active_tenders(
         self,
         object_group_id: Optional[int],
         service_type_id: Optional[int],
-    ) -> Tuple[int, Optional[Exception]]:
+    ) -> int:
         return self.tender_repository.get_count_active_tenders(
             object_group_id=object_group_id, service_type_id=service_type_id
         )
@@ -117,8 +110,8 @@ class TenderService:
 
     def update_tender(
         self, tender: CreateTenderRequest, tender_id: int
-    ) -> Optional[Exception]:
-        return self.tender_repository.update_tender(
+    ):
+        self.tender_repository.update_tender(
             tender=tender.__dict__,
             tender_id=tender_id,
         )

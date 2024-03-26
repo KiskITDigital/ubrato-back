@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends
+from fastapi import Depends, status
 from models import (
     ObjectGroupWithTypes,
     ObjectsGroupsWithTypes,
@@ -57,7 +57,7 @@ class TagsRepository:
 
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -90,7 +90,7 @@ class TagsRepository:
 
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )

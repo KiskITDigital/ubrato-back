@@ -1,7 +1,7 @@
 from typing import List
 
 import models
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import (
     USER_ALREADY_REG,
@@ -42,7 +42,7 @@ class UserRepository:
         except SQLAlchemyError as err:
             self.db.rollback()
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -53,7 +53,7 @@ class UserRepository:
             user = query.first()
             if user is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=USER_EMAIL_NOT_FOUND.format(email),
                     sql_msg="",
                 )
@@ -61,7 +61,7 @@ class UserRepository:
             return models.User(**user.__dict__)
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -72,7 +72,7 @@ class UserRepository:
 
             if user is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=USERID_NOT_FOUND.format(user_id),
                     sql_msg="",
                 )
@@ -81,7 +81,7 @@ class UserRepository:
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -99,7 +99,7 @@ class UserRepository:
             return users
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -110,7 +110,7 @@ class UserRepository:
 
             if user is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=USERID_NOT_FOUND.format(user_id),
                     sql_msg="",
                 )
@@ -118,7 +118,7 @@ class UserRepository:
             return models.User(**user.__dict__)
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )

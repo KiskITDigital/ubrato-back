@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
 from repositories.schemas import Session
@@ -22,7 +22,7 @@ class SessionRepository:
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -33,12 +33,14 @@ class SessionRepository:
 
             if session is None:
                 raise RepositoryException(
-                    status_code=404, detail=SESSION_NOT_FOUND, sql_msg=""
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=SESSION_NOT_FOUND,
+                    sql_msg="",
                 )
             return session
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )

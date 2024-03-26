@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, List, Optional
 
 import models
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.schemas import Tender
@@ -29,7 +29,7 @@ class TenderRepository:
             return tender.id
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -42,7 +42,9 @@ class TenderRepository:
 
             if tender_to_update is None:
                 raise RepositoryException(
-                    status_code=404, detail=tender_id, sql_msg=""
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=tender_id,
+                    sql_msg="",
                 )
 
             for key, value in tender.items():
@@ -53,7 +55,7 @@ class TenderRepository:
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -121,7 +123,7 @@ class TenderRepository:
             return tenders
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -133,7 +135,7 @@ class TenderRepository:
             )
             if tender is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=TENDERID_NOT_FOUND.format(tender_id),
                     sql_msg="",
                 )
@@ -141,7 +143,7 @@ class TenderRepository:
             return tender
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -154,7 +156,7 @@ class TenderRepository:
 
             if tender is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=TENDERID_NOT_FOUND.format(tender_id),
                     sql_msg="",
                 )
@@ -163,7 +165,7 @@ class TenderRepository:
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -178,7 +180,7 @@ class TenderRepository:
 
             if tender is None:
                 raise RepositoryException(
-                    status_code=404,
+                    status_code=status.HTTP_404_NOT_FOUND,
                     detail=TENDERID_NOT_FOUND.format(tender_id),
                     sql_msg="",
                 )
@@ -187,7 +189,7 @@ class TenderRepository:
 
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
@@ -207,7 +209,7 @@ class TenderRepository:
             return query.count()
         except SQLAlchemyError as err:
             raise RepositoryException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=err.code,
                 sql_msg=err._message(),
             )
