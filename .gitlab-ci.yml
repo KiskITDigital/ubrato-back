@@ -33,7 +33,7 @@ lint:
     - poetry --version
     - poetry config virtualenvs.in-project true
     - poetry install -vv
-    - mypy app/
+    - poetry run mypy app/
     - pip install ruff 
     - ruff check --output-format=gitlab app/
 
