@@ -3,7 +3,8 @@ from repositories.database import get_db_connection
 from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
 from repositories.schemas import Session
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session, Session as SQLSession
+from sqlalchemy.orm import Session as SQLSession
+from sqlalchemy.orm import scoped_session
 
 
 class SessionRepository:

@@ -9,8 +9,13 @@ class ManagerService:
     user_repository: UserRepository
     tender_repository: TenderRepository
 
-    def __init__(self, user_repository: UserRepository = Depends()) -> None:
+    def __init__(
+        self,
+        user_repository: UserRepository = Depends(),
+        tender_repository: TenderRepository = Depends(),
+    ) -> None:
         self.user_repository = user_repository
+        self.tender_repository = tender_repository
 
     def update_user_verified_status(self, user_id: str, status: bool) -> None:
         self.user_repository.update_verified_status(

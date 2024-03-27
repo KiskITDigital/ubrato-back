@@ -48,7 +48,7 @@ async def get_users(
 
 @router.put(
     "/tender/{tender_id}/verify",
-    response_model=models.User,
+    response_model=SuccessResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },

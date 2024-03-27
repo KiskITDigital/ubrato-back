@@ -18,7 +18,7 @@ from repositories.schemas import (
     ServiceType,
 )
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session, Session
+from sqlalchemy.orm import Session, scoped_session
 
 
 class TagsRepository:

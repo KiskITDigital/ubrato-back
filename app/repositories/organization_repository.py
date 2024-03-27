@@ -3,7 +3,7 @@ from repositories.database import get_db_connection
 from repositories.exceptions import RepositoryException
 from repositories.schemas import Document, Organization
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session, Session
+from sqlalchemy.orm import Session, scoped_session
 
 
 class OrganizationRepository:

@@ -9,7 +9,6 @@ from services.exceptions import AuthException, ServiceException
 from services.logs import LogsService
 from sqlalchemy.orm import scoped_session
 
-
 __all__ = ["AuthException", "ServiceException"]
 
 
