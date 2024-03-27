@@ -8,14 +8,14 @@ from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.schemas import Tender
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import Session, scoped_session
 
 
 class TenderRepository:
-    db: scoped_session
+    db: scoped_session[Session]
 
     def __init__(
-        self, db: scoped_session = Depends(get_db_connection)
+        self, db: scoped_session[Session] = Depends(get_db_connection)
     ) -> None:
         self.db = db
 
@@ -80,25 +80,24 @@ class TenderRepository:
         try:
             reception_end_condition = Tender.reception_end > datetime.now()
 
-            object_group_condition = or_(
-                object_group_id is None,
-                Tender.object_group_id == object_group_id,
+            object_group_condition = (object_group_id is None) or (
+                Tender.object_group_id == object_group_id
             )
 
-            object_type_condition = or_(
-                object_type_id is None, Tender.object_type_id == object_type_id
+            object_type_condition = (object_type_id is None) or (
+                Tender.object_type_id == object_type_id
             )
 
             service_type_condition = (service_type_ids is None) or or_(
                 *(
-                    Tender.services_types.any(service_type_id)
+                    Tender.services_types.any(service_type_id)  # type: ignore
                     for service_type_id in service_type_ids
                 )
             )
 
             service_group_condition = (service_group_ids is None) or or_(
                 *(
-                    Tender.services_groups.any(service_group_id)
+                    Tender.services_groups.any(service_group_id)  # type: ignore
                     for service_group_id in service_group_ids
                 )
             )
@@ -136,18 +135,18 @@ class TenderRepository:
                 .filter(
                     and_(
                         reception_end_condition,
-                        object_group_condition,
-                        object_type_condition,
-                        service_type_condition,
-                        service_group_condition,
-                        floor_space_from_condition,
-                        floor_space_to_condition,
-                        price_from_condition,
-                        price_to_condition,
-                        text_condition,
-                        active_condition,
-                        verified_condition,
-                        user_id_condition,
+                        object_group_condition,  # type: ignore
+                        object_type_condition,  # type: ignore
+                        service_type_condition,  # type: ignore
+                        service_group_condition,  # type: ignore
+                        floor_space_from_condition,  # type: ignore
+                        floor_space_to_condition,  # type: ignore
+                        price_from_condition,  # type: ignore
+                        price_to_condition,  # type: ignore
+                        text_condition,  # type: ignore
+                        active_condition,  # type: ignore
+                        verified_condition,  # type: ignore
+                        user_id_condition,  # type: ignore
                     )
                 )
                 .order_by(Tender.reception_end.desc())
@@ -240,10 +239,10 @@ class TenderRepository:
             query = self.db.query(Tender).filter(
                 Tender.active,
                 Tender.reception_end > datetime.now(),
-                object_group_id is None
+                object_group_id is None  # type: ignore
                 or Tender.object_group_id == object_group_id,
-                service_type_id is None
-                or Tender.services_types.any(service_type_id),
+                service_type_id is None  # type: ignore
+                or Tender.services_types.any(service_type_id),  # type: ignore
             )
             return query.count()
         except SQLAlchemyError as err:

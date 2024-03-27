@@ -10,6 +10,9 @@ from services.logs import LogsService
 from sqlalchemy.orm import scoped_session
 
 
+__all__ = ["AuthException", "ServiceException"]
+
+
 class LogsDependency:
     def __init__(self) -> None:
         self.logs_service = LogsService(

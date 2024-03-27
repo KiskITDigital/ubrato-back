@@ -11,14 +11,14 @@ from repositories.exceptions import (
 )
 from repositories.schemas import Organization, User
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import Session, scoped_session
 
 
 class UserRepository:
-    db: scoped_session
+    db: scoped_session[Session]
 
     def __init__(
-        self, db: scoped_session = Depends(get_db_connection)
+        self, db: scoped_session[Session] = Depends(get_db_connection)
     ) -> None:
         self.db = db
 

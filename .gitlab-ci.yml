@@ -29,7 +29,9 @@ lint:
   image: python:3.11.6-slim-bullseye
   stage: lint
   script:
-    - pip install ruff
+    - pip install ruff poetry
+    - poetry install
+    - mypy ./app/
     - ruff check --output-format=gitlab ./app/
 
 prod-build:

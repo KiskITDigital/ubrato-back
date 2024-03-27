@@ -3,14 +3,14 @@ from repositories.database import get_db_connection
 from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
 from repositories.schemas import Session
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import scoped_session, Session as SQLSession
 
 
 class SessionRepository:
-    db: scoped_session
+    db: scoped_session[SQLSession]
 
     def __init__(
-        self, db: scoped_session = Depends(get_db_connection)
+        self, db: scoped_session[SQLSession] = Depends(get_db_connection)
     ) -> None:
         self.db = db
 

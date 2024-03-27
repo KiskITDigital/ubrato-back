@@ -18,14 +18,14 @@ from repositories.schemas import (
     ServiceType,
 )
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import scoped_session, Session
 
 
 class TagsRepository:
-    db: scoped_session
+    db: scoped_session[Session]
 
     def __init__(
-        self, db: scoped_session = Depends(get_db_connection)
+        self, db: scoped_session[Session] = Depends(get_db_connection)
     ) -> None:
         self.db = db
 

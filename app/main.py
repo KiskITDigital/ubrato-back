@@ -49,8 +49,10 @@ app.include_router(manager.router)
 app.include_router(tender.router)
 
 app.add_exception_handler(
-    RequestValidationError, request_validation_exception_handler
+    RequestValidationError, request_validation_exception_handler  # type: ignore
 )
-app.add_exception_handler(ServiceException, service_exception_handler)
-app.add_exception_handler(RepositoryException, repository_exception_handler)
-app.add_exception_handler(AuthException, auth_exception_handler)
+app.add_exception_handler(ServiceException, service_exception_handler)  # type: ignore
+app.add_exception_handler(
+    RepositoryException, repository_exception_handler  # type: ignore
+)
+app.add_exception_handler(AuthException, auth_exception_handler)  # type: ignore

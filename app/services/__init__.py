@@ -6,6 +6,7 @@ __all__ = [
     "SessionService",
     "TenderService",
     "UserService",
+    "AuthException",
 ]
 
 from .jwt import JWTService

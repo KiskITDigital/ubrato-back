@@ -162,7 +162,7 @@ async def get_count_active_tenders(
     object_group_id: Optional[int] = None,
     service_type_id: Optional[int] = None,
     tender_service: TenderService = Depends(),
-) -> ServicesGroupsWithTypes:
+) -> TenderCountResponse:
     count = tender_service.get_count_active_tenders(
         object_group_id=object_group_id, service_type_id=service_type_id
     )

@@ -13,6 +13,6 @@ class RepositoryException(HTTPException):
     detail: str
     sql_msg: str
 
-    def __init__(self, *args, sql_msg: str, **kwargs):
+    def __init__(self, *args, sql_msg: str, **kwargs) -> None:  # type: ignore
         self.sql_msg = sql_msg
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
