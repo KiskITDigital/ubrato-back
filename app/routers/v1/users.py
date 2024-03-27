@@ -44,6 +44,6 @@ async def get_me(
     user_service: UserService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> models.UserPrivateDTO:
-    user = user_service.get_by_id(user.id)
+    dto_user = user_service.get_by_id(user.id)
 
-    return user
+    return dto_user

@@ -18,7 +18,7 @@ class ServiceException(HTTPException):
 
 class AuthException(HTTPException):
     status_code: int
-    detail: Exception
+    detail: str
 
     def __init__(self, *args, **kwargs):
         return super().__init__(*args, **kwargs)

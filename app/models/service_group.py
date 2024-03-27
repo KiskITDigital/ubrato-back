@@ -11,14 +11,14 @@ class ServiceGroupModel(BaseModel):
 class ServiceTypeModel(BaseModel):
     id: int
     name: str
-    count: int = None
+    count: int = 0
 
 
 class ServiceGroupWithTypes(BaseModel):
     id: int
     name: str
     types: List[ServiceTypeModel]
-    total: int = None
+    total: int = 0
 
 
 class ServicesGroupsWithTypes(BaseModel):

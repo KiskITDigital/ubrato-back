@@ -66,7 +66,7 @@ class UserRepository:
                 sql_msg=err._message(),
             )
 
-    def update_verified_status(self, user_id: str, status: bool):
+    def update_verified_status(self, user_id: str, verified: bool) -> None:
         try:
             user = self.db.query(User).filter_by(id=user_id).first()
 
@@ -77,7 +77,7 @@ class UserRepository:
                     sql_msg="",
                 )
 
-            user.verified = status
+            user.verified = verified
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(

@@ -12,12 +12,14 @@ class ManagerService:
     def __init__(self, user_repository: UserRepository = Depends()) -> None:
         self.user_repository = user_repository
 
-    def update_user_verified_status(self, user_id: str, status: bool):
-        self.user_repository.update_verified_status(user_id, status)
+    def update_user_verified_status(self, user_id: str, status: bool) -> None:
+        self.user_repository.update_verified_status(
+            user_id=user_id, verified=status
+        )
 
     def get_all_users(
         self,
-    ) -> models.UserPrivateDTO:
+    ) -> List[models.UserPrivateDTO]:
         users = self.user_repository.get_all_users()
 
         usersDTO: List[models.UserPrivateDTO] = []
@@ -29,13 +31,13 @@ class ManagerService:
     def get_by_id(self, user_id: str) -> models.UserPrivateDTO:
         user = self.user_repository.get_by_id(user_id=user_id)
 
-        return user
+        return models.UserPrivateDTO(**user.__dict__)
 
     def update_tender_verified_status(
-        self, tender_id: str, status: bool
+        self, tender_id: int, status: bool
     ) -> None:
         self.tender_repository.update_verified_status(
-            tender_id=tender_id, status=status
+            tender_id=tender_id, verified=status
         )
         self.tender_repository.update_active_status(
             tender_id=tender_id, active=status

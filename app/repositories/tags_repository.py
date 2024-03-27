@@ -64,11 +64,11 @@ class TagsRepository:
 
     def get_all_services_with_types(
         self,
-    ) -> ObjectsGroupsWithTypes:
+    ) -> ServicesGroupsWithTypes:
         try:
             service_groups = self.db.query(ServiceGroup)
 
-            groups_data: List[ServicesGroupsWithTypes] = []
+            groups_data: List[ServiceGroupWithTypes] = []
 
             for group in service_groups:
                 types_in_group = (

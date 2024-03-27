@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import RepositoryException
@@ -19,7 +17,7 @@ class OrganizationRepository:
     def save_organization(
         self,
         org: Organization,
-    ) -> Optional[Exception]:
+    ) -> None:
         try:
             self.db.add(org)
             self.db.commit()
@@ -33,7 +31,7 @@ class OrganizationRepository:
     def save_docs(
         self,
         document: Document,
-    ) -> Optional[Exception]:
+    ) -> None:
         try:
             self.db.add(document)
             self.db.commit()

@@ -13,7 +13,7 @@ class LogsRepository:
     ) -> None:
         self.db = db
 
-    def save(self, logs: Logs):
+    def save(self, logs: Logs) -> None:
         try:
             self.db.add(logs)
             self.db.commit()

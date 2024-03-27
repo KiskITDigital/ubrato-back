@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class ObjectTypeModel(BaseModel):
     id: int
     name: str
-    count: int = None
+    count: int = 0
 
 
 class ObjectGroupModel(BaseModel):
@@ -17,7 +17,7 @@ class ObjectGroupModel(BaseModel):
 class ObjectGroupWithTypes(BaseModel):
     id: int
     name: str
-    total: int = None
+    total: int = 0
     types: List[ObjectTypeModel]
 
 

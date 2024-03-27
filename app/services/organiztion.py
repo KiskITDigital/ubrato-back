@@ -43,7 +43,7 @@ class OrganizationService:
 
         return org
 
-    def save_docs(self, links: List[str], org_id: str):
+    def save_docs(self, links: List[str], org_id: str) -> None:
         for link in links:
             document = Document(
                 id=f"doc_{uuid.uuid4()}",

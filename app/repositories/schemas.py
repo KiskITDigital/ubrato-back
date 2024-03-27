@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import List
+
 from sqlalchemy import (
     ARRAY,
     TIMESTAMP,
@@ -11,7 +14,7 @@ from sqlalchemy import (
     func,
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -22,17 +25,19 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = "users"
 
-    id = mapped_column(String(41), primary_key=True)
-    email = mapped_column(String(255), nullable=False)
-    phone = mapped_column(String(20), nullable=False)
-    password = mapped_column(String(255), nullable=False)
-    first_name = mapped_column(String(100), nullable=False)
-    middle_name = mapped_column(String(100), nullable=False)
-    last_name = mapped_column(String(100), nullable=False)
-    verified = mapped_column(Boolean, default=False)
-    role = mapped_column(SmallInteger, default=0)
-    is_contractor = mapped_column(Boolean, default=False)
-    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
+    id: Mapped[str] = mapped_column(String(41), primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    middle_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    role: Mapped[int] = mapped_column(SmallInteger, default=0)
+    is_contractor: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, default=func.current_timestamp()
+    )
 
     organization = relationship("Organization", back_populates="user")
     tender = relationship("Tender", back_populates="user")
@@ -42,16 +47,18 @@ class User(Base):
 class Organization(Base):
     __tablename__ = "organizations"
 
-    id = mapped_column(String(40), primary_key=True)
-    brand_name = mapped_column(String(255), nullable=False)
-    short_name = mapped_column(String(50), nullable=False)
-    inn = mapped_column(String(10), nullable=False)
-    okpo = mapped_column(String(8), nullable=False)
-    ogrn = mapped_column(String(15), nullable=False)
-    kpp = mapped_column(String(12), nullable=False)
-    tax_code = mapped_column(Integer, nullable=False)
-    address = mapped_column(String(255), nullable=False)
-    user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    brand_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    short_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    inn: Mapped[str] = mapped_column(String(10), nullable=False)
+    okpo: Mapped[str] = mapped_column(String(8), nullable=False)
+    ogrn: Mapped[str] = mapped_column(String(15), nullable=False)
+    kpp: Mapped[str] = mapped_column(String(12), nullable=False)
+    tax_code: Mapped[int] = mapped_column(Integer, nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False)
+    user_id: Mapped[str] = mapped_column(
+        String(40), ForeignKey("users.id"), nullable=False
+    )
 
     user = relationship("User", back_populates="organization")
     documents = relationship("Document", back_populates="organization")
@@ -60,9 +67,11 @@ class Organization(Base):
 class Document(Base):
     __tablename__ = "documents"
 
-    id = mapped_column(String(40), primary_key=True)
-    url = mapped_column(String(255), nullable=False)
-    organization_id = mapped_column(String(40), ForeignKey("organizations.id"))
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+    organization_id: Mapped[str] = mapped_column(
+        String(40), ForeignKey("organizations.id")
+    )
 
     organization = relationship("Organization", back_populates="documents")
 
@@ -70,40 +79,50 @@ class Document(Base):
 class Tender(Base):
     __tablename__ = "tender"
 
-    id = mapped_column(
+    id: Mapped[int] = mapped_column(
         Integer, Identity(start=1, cycle=True), primary_key=True
     )
-    name = mapped_column(String(255), nullable=False)
-    price = mapped_column(Integer, nullable=False)
-    is_contract_price = mapped_column(Boolean, nullable=False)
-    location = mapped_column(String(80), nullable=False)
-    floor_space = mapped_column(Integer, nullable=False)
-    description = mapped_column(String(400))
-    wishes = mapped_column(String(400))
-    attachments = mapped_column(ARRAY(Text))
-    services_groups = mapped_column(ARRAY(Integer))
-    services_types = mapped_column(ARRAY(Integer))
-    active = mapped_column(Boolean, default=False, nullable=False)
-    reception_start = mapped_column(
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    price: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_contract_price: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    location: Mapped[str] = mapped_column(String(80), nullable=False)
+    floor_space: Mapped[int] = mapped_column(Integer, nullable=False)
+    description: Mapped[str] = mapped_column(String(400))
+    wishes: Mapped[str] = mapped_column(String(400))
+    attachments: Mapped[str] = mapped_column(ARRAY(Text))
+    services_groups: Mapped[List[int]] = mapped_column(ARRAY(Integer))
+    services_types: Mapped[List[int]] = mapped_column(ARRAY(Integer))
+    active: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
+    reception_start: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    reception_end = mapped_column(
+    reception_end: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    work_start = mapped_column(
+    work_start: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    work_end = mapped_column(
+    work_end: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    object_group_id = mapped_column(Integer, ForeignKey("objects_groups.id"))
-    object_type_id = mapped_column(Integer, ForeignKey("objects_types.id"))
-    user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
-    created_at = mapped_column(
+    object_group_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("objects_groups.id")
+    )
+    object_type_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("objects_types.id")
+    )
+    user_id: Mapped[str] = mapped_column(
+        String(40), ForeignKey("users.id"), nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
     document_tsv = mapped_column(TSVECTOR)
-    verified = mapped_column(Boolean, default=False, nullable=False)
+    verified: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")
@@ -113,8 +132,8 @@ class Tender(Base):
 class ObjectGroup(Base):
     __tablename__ = "objects_groups"
 
-    id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(40))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(40))
 
     object_type = relationship("ObjectType", back_populates="object_group")
     tender = relationship("Tender", back_populates="object_group")
@@ -123,9 +142,11 @@ class ObjectGroup(Base):
 class ObjectType(Base):
     __tablename__ = "objects_types"
 
-    id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(40))
-    object_group_id = mapped_column(Integer, ForeignKey("objects_groups.id"))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(40))
+    object_group_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("objects_groups.id")
+    )
 
     object_group = relationship("ObjectGroup", back_populates="object_type")
     tender = relationship("Tender", back_populates="object_type")
@@ -134,8 +155,8 @@ class ObjectType(Base):
 class ServiceGroup(Base):
     __tablename__ = "services_groups"
 
-    id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(40))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(40))
 
     service_type = relationship("ServiceType", back_populates="service_group")
 
@@ -143,9 +164,11 @@ class ServiceGroup(Base):
 class ServiceType(Base):
     __tablename__ = "services_types"
 
-    id = mapped_column(Integer, primary_key=True)
-    name = mapped_column(String(90))
-    service_group_id = mapped_column(Integer, ForeignKey("services_groups.id"))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(90))
+    service_group_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("services_groups.id")
+    )
 
     service_group = relationship("ServiceGroup", back_populates="service_type")
 
@@ -153,21 +176,27 @@ class ServiceType(Base):
 class Logs(Base):
     __tablename__ = "logs"
 
-    id = mapped_column(String(40), primary_key=True)
-    method = mapped_column(String(6), nullable=False)
-    url = mapped_column(String(255), nullable=False)
-    body = mapped_column(Text, nullable=False)
-    code = mapped_column(SmallInteger, nullable=False)
-    msg = mapped_column(Text, default="")
-    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    method: Mapped[str] = mapped_column(String(6), nullable=False)
+    url: Mapped[str] = mapped_column(String(255), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    code: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    msg: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, default=func.current_timestamp()
+    )
 
 
 class Session(Base):
     __tablename__ = "sessions"
 
-    id = mapped_column(String(40), primary_key=True)
-    user_id = mapped_column(String(40), ForeignKey("users.id"), nullable=False)
-    expires_at = mapped_column(TIMESTAMP, nullable=False)
-    created_at = mapped_column(TIMESTAMP, default=func.current_timestamp())
+    id: Mapped[str] = mapped_column(String(40), primary_key=True)
+    user_id: Mapped[str] = mapped_column(
+        String(40), ForeignKey("users.id"), nullable=False
+    )
+    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, default=func.current_timestamp()
+    )
 
     user = relationship("User", back_populates="session")

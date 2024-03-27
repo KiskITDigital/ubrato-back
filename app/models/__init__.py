@@ -1,3 +1,17 @@
+__all__ = [
+    "ObjectGroupModel",
+    "ObjectGroupWithTypes",
+    "ObjectsGroupsWithTypes",
+    "ObjectTypeModel",
+    "ServiceGroupModel",
+    "ServiceGroupWithTypes",
+    "ServicesGroupsWithTypes",
+    "ServiceTypeModel",
+    "Tender",
+    "User",
+    "UserPrivateDTO",
+]
+
 from .object_group import (
     ObjectGroupModel,
     ObjectGroupWithTypes,

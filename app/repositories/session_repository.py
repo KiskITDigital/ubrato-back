@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
@@ -16,7 +14,7 @@ class SessionRepository:
     ) -> None:
         self.db = db
 
-    def create(self, session: Session) -> Optional[Exception]:
+    def create(self, session: Session) -> None:
         try:
             self.db.add(session)
             self.db.commit()

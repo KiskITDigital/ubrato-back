@@ -30,9 +30,6 @@ mypy = "^1.8.0"
 [tool.mypy]
 strict = true
 
-[tool.ruff.per-file-ignores]
-"__init__.py" = ["F401"]
-
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or

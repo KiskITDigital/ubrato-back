@@ -58,9 +58,15 @@ async def get_page_tenders(
     verified: Optional[bool] = True,
     user_id: Optional[str] = None,
     tender_service: TenderService = Depends(),
-) -> ObjectsGroupsWithTypes:
-    service_type_ids = [int(x) for x in service_type_ids_str.split(",")]
-    service_group_ids = [int(x) for x in service_group_ids_str.split(",")]
+) -> List[models.Tender]:
+    service_type_ids: List[int] | None = None
+    if service_type_ids_str is not None:
+        service_type_ids = [int(x) for x in service_type_ids_str.split(",")]
+
+    service_group_ids: List[int] | None = None
+    if service_group_ids_str is not None:
+        service_group_ids = [int(x) for x in service_group_ids_str.split(",")]
+
     tenders = tender_service.get_page_tenders(
         page=page,
         page_size=page_size,
@@ -88,7 +94,7 @@ async def get_page_tenders(
     },
 )
 async def get_tender(
-    tender_id: str,
+    tender_id: int,
     tender_service: TenderService = Depends(),
 ) -> models.Tender:
     tender = tender_service.get_by_id(id=tender_id)
@@ -104,7 +110,7 @@ async def get_tender(
     dependencies=[Depends(authorized)],
 )
 async def update_tender(
-    tender_id: str,
+    tender_id: int,
     tender: CreateTenderRequest,
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),

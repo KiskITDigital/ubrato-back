@@ -11,7 +11,7 @@ from sqlalchemy.orm import scoped_session
 
 
 class LogsDependency:
-    def __init__(self):
+    def __init__(self) -> None:
         self.logs_service = LogsService(
             logs_repository=LogsRepository(scoped_session(SessionLocal))
         )
@@ -28,7 +28,7 @@ async def auth_exception_handler(
     exc: AuthException,
 ) -> JSONResponse:
     return JSONResponse(
-        status_code=exc.status_code, content={"msg": str(exc.detail)}
+        status_code=exc.status_code, content={"msg": exc.detail}
     )
 
 

@@ -42,7 +42,7 @@ class TenderService:
         active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
-    ) -> models.Tender:
+    ) -> List[models.Tender]:
         return self.tender_repository.get_page_tenders(
             page=page,
             page_size=page_size,
@@ -106,7 +106,9 @@ class TenderService:
     def get_by_id(self, id: int) -> models.Tender:
         return self.tender_repository.get_tender_by_id(id)
 
-    def update_tender(self, tender: CreateTenderRequest, tender_id: int):
+    def update_tender(
+        self, tender: CreateTenderRequest, tender_id: int
+    ) -> None:
         self.tender_repository.update_tender(
             tender=tender.__dict__,
             tender_id=tender_id,

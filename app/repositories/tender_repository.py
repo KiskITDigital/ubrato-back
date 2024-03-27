@@ -6,7 +6,7 @@ from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.schemas import Tender
-from sqlalchemy import or_
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import scoped_session
 
@@ -34,7 +34,7 @@ class TenderRepository:
                 sql_msg=err._message(),
             )
 
-    def update_tender(self, tender: dict[str, Any], tender_id: int):
+    def update_tender(self, tender: dict[str, Any], tender_id: int) -> None:
         try:
             tender_to_update = (
                 self.db.query(Tender).filter(Tender.id == tender_id).first()
@@ -76,40 +76,79 @@ class TenderRepository:
         active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
-    ) -> models.Tender:
+    ) -> List[models.Tender]:
         try:
+            reception_end_condition = Tender.reception_end > datetime.now()
+
+            object_group_condition = or_(
+                object_group_id is None,
+                Tender.object_group_id == object_group_id,
+            )
+
+            object_type_condition = or_(
+                object_type_id is None, Tender.object_type_id == object_type_id
+            )
+
+            service_type_condition = (service_type_ids is None) or or_(
+                *(
+                    Tender.services_types.any(service_type_id)
+                    for service_type_id in service_type_ids
+                )
+            )
+
+            service_group_condition = (service_group_ids is None) or or_(
+                *(
+                    Tender.services_groups.any(service_group_id)
+                    for service_group_id in service_group_ids
+                )
+            )
+
+            floor_space_from_condition = (floor_space_from is None) or (
+                Tender.floor_space >= floor_space_from
+            )
+
+            floor_space_to_condition = (floor_space_to is None) or (
+                Tender.floor_space <= floor_space_to
+            )
+
+            price_from_condition = (price_from is None) or (
+                Tender.price >= price_from
+            )
+
+            price_to_condition = (price_to is None) or (
+                Tender.price <= price_to
+            )
+
+            text_condition = (text is None) or Tender.document_tsv.match(text)
+
+            active_condition = (active is None) or (Tender.active == active)
+
+            verified_condition = (verified is None) or (
+                Tender.verified == verified
+            )
+
+            user_id_condition = (user_id is None) or (
+                Tender.user_id == user_id
+            )
+
             query = (
                 self.db.query(Tender)
                 .filter(
-                    Tender.reception_end > datetime.now(),
-                    object_group_id is None
-                    or Tender.object_group_id == object_group_id,
-                    object_type_id is None
-                    or Tender.object_type_id == object_type_id,
-                    service_type_ids is None
-                    or or_(
-                        *(
-                            Tender.services_types.any(service_type_id)
-                            for service_type_id in service_type_ids
-                        )
-                    ),
-                    service_group_ids is None
-                    or or_(
-                        *(
-                            Tender.services_groups.any(service_group_id)
-                            for service_group_id in service_group_ids
-                        )
-                    ),
-                    floor_space_from is None
-                    or Tender.floor_space >= floor_space_from,
-                    floor_space_to is None
-                    or Tender.floor_space <= floor_space_to,
-                    price_from is None or Tender.price >= price_from,
-                    price_to is None or Tender.price <= price_to,
-                    text is None or Tender.document_tsv.match(text),
-                    active is None or Tender.active == active,
-                    verified is None or Tender.verified == verified,
-                    user_id is None or Tender.user_id == user_id,
+                    and_(
+                        reception_end_condition,
+                        object_group_condition,
+                        object_type_condition,
+                        service_type_condition,
+                        service_group_condition,
+                        floor_space_from_condition,
+                        floor_space_to_condition,
+                        price_from_condition,
+                        price_to_condition,
+                        text_condition,
+                        active_condition,
+                        verified_condition,
+                        user_id_condition,
+                    )
                 )
                 .order_by(Tender.reception_end.desc())
                 .limit(page_size)
@@ -140,7 +179,7 @@ class TenderRepository:
                     sql_msg="",
                 )
 
-            return tender
+            return models.Tender(**tender.__dict__)
         except SQLAlchemyError as err:
             raise RepositoryException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -148,7 +187,7 @@ class TenderRepository:
                 sql_msg=err._message(),
             )
 
-    def update_verified_status(self, tender_id: str, status: bool):
+    def update_verified_status(self, tender_id: int, verified: bool) -> None:
         try:
             tender = (
                 self.db.query(Tender).filter(Tender.id == tender_id).first()
@@ -161,7 +200,7 @@ class TenderRepository:
                     sql_msg="",
                 )
 
-            tender.verified = status
+            tender.verified = verified
             self.db.commit()
         except SQLAlchemyError as err:
             raise RepositoryException(
@@ -170,7 +209,7 @@ class TenderRepository:
                 sql_msg=err._message(),
             )
 
-    def update_active_status(self, tender_id: str, active: bool):
+    def update_active_status(self, tender_id: int, active: bool) -> None:
         try:
             tender = (
                 self.db.query(Tender)

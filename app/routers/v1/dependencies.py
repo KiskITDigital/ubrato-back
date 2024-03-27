@@ -11,7 +11,7 @@ from services import JWTService
 async def authorized(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
-):
+) -> None:
     jwt_service.unmarshal_jwt(authorization)
 
 

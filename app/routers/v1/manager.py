@@ -56,7 +56,10 @@ async def get_users(
 )
 async def update_tender_verified_status(
     tender_id: int,
+    data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
 ) -> SuccessResponse:
-    manager_service.update_tender_verified_status(id=tender_id)
+    manager_service.update_tender_verified_status(
+        tender_id=tender_id, status=data.status
+    )
     return SuccessResponse()

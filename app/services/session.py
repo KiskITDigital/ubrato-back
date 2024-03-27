@@ -3,10 +3,10 @@ import secrets
 
 import models
 from config import Config, get_config
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories import SessionRepository, UserRepository
 from repositories.schemas import Session
-from services.exceptions import SESSION_EXPIRED
+from services.exceptions import SESSION_EXPIRED, ServiceException
 
 
 class SessionService:
@@ -44,8 +44,11 @@ class SessionService:
             session.expires_at.timestamp()
             < datetime.datetime.now().timestamp()
         ):
-            return models.User, SESSION_EXPIRED
+            raise ServiceException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=SESSION_EXPIRED,
+            )
 
         user = self.user_repository.get_by_id(user_id=session.user_id)
 
-        return user, None
+        return user

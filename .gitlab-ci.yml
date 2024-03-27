@@ -26,7 +26,7 @@ before_script:
   - cp $KNOWN_HOSTS ~/.ssh/known_hosts
 
 lint:
-  image: python:3.11.6-alpine3.18
+  image: python:3.11.6-slim-bullseye
   stage: lint
   script:
     - pip install ruff

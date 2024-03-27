@@ -2,7 +2,7 @@ from typing import Annotated
 
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
-from routers.v1.exceptions import INVALID_CREDENTIAL
+from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
@@ -112,6 +112,11 @@ async def refresh_session(
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
 ) -> SignInResponse:
+    if session_id is None:
+        raise ServiceException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=NO_COOKIE,
+        )
     user = session_service.get_user_session_by_id(session_id=session_id)
 
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
