@@ -5,25 +5,13 @@ stages:
   - lint
   - build
   - deploy
+  - release
 
 variables:
   REMOTE_USER: "ubrato"
   REMOTE_HOST: "194.58.96.228"
   REMOTE_PORT: "2022"
   REMOTE_PATH: "/home/ubrato/ubrato"
-
-before_script:
-  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
-
-  - eval $(ssh-agent -s)
-
-  - chmod 400 "$SSH_PRIVATE_KEY"
-  - ssh-add "$SSH_PRIVATE_KEY"
-
-  - mkdir -p ~/.ssh
-  - chmod 700 ~/.ssh
-
-  - cp $KNOWN_HOSTS ~/.ssh/known_hosts
 
 lint:
   image: python:3.11.6-slim-bullseye
@@ -38,8 +26,7 @@ lint:
     - ruff check --output-format=gitlab app/
 
 prod-build:
-  only:
-    - main
+  only: [main]
   stage: build
   script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
@@ -49,7 +36,7 @@ prod-build:
 
 tags-release-build:
   only: [tags]
-  stage: build
+  stage: release
   script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - cp .env.prod .env
@@ -57,9 +44,16 @@ tags-release-build:
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
 prod-deploy:
-  only:
-    - main
+  only: [main]
   stage: deploy
+  before_script:
+  - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+  - eval $(ssh-agent -s)
+  - chmod 400 "$SSH_PRIVATE_KEY"
+  - ssh-add "$SSH_PRIVATE_KEY"
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - cp $KNOWN_HOSTS ~/.ssh/known_hosts
   script:
     - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cd $REMOTE_PATH &&
       ./update-back.sh && git clone git@git.ubrato.ru:ubrato/ubrato-back.git &&
