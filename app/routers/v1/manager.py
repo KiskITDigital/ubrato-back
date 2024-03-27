@@ -1,13 +1,12 @@
 from typing import List
 
 import models
-from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import is_admin
 from schemas.exception import ExceptionResponse
 from schemas.success import SuccessResponse
 from schemas.verify_status_set import VerifyStatusSet
-from services import LogsService, ManagerService
+from services import ManagerService
 
 router = APIRouter(
     prefix="/v1/manager",
@@ -27,14 +26,8 @@ async def update_user_verify_status(
     user_id: str,
     data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
-    err = manager_service.update_user_verified_status(user_id, data.status)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
+    manager_service.update_user_verified_status(user_id, data.status)
     return SuccessResponse()
 
 
@@ -48,14 +41,8 @@ async def update_user_verify_status(
 )
 async def get_users(
     manager_service: ManagerService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> List[models.UserPrivateDTO]:
-    users, err = manager_service.get_all_users()
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(err),
-        )
+    users = manager_service.get_all_users()
     return users
 
 
@@ -70,12 +57,6 @@ async def get_users(
 async def update_tender_verified_status(
     tender_id: int,
     manager_service: ManagerService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> SuccessResponse:
-    err = manager_service.update_tender_verified_status(id=tender_id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(err),
-        )
+    manager_service.update_tender_verified_status(id=tender_id)
     return SuccessResponse()

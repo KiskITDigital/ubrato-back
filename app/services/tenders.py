@@ -20,9 +20,7 @@ class TenderService:
         self.tags_repository = tags_repository
         self.tender_repository = tender_repository
 
-    def create_tender(
-        self, tender: CreateTenderRequest, user_id: str
-    ) -> int:
+    def create_tender(self, tender: CreateTenderRequest, user_id: str) -> int:
         id = self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
@@ -108,9 +106,7 @@ class TenderService:
     def get_by_id(self, id: int) -> models.Tender:
         return self.tender_repository.get_tender_by_id(id)
 
-    def update_tender(
-        self, tender: CreateTenderRequest, tender_id: int
-    ):
+    def update_tender(self, tender: CreateTenderRequest, tender_id: int):
         self.tender_repository.update_tender(
             tender=tender.__dict__,
             tender_id=tender_id,

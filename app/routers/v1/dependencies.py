@@ -28,12 +28,7 @@ async def is_admin(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
 ) -> None:
-    user, err = jwt_service.unmarshal_jwt(authorization)
-    if err is not None:
-        raise AuthException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=err,
-        )
+    user = jwt_service.unmarshal_jwt(authorization)
 
     if user.role < get_config().Role.admin:
         raise AuthException(

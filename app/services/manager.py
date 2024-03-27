@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List
 
 import models
 from fastapi import Depends
@@ -12,43 +12,31 @@ class ManagerService:
     def __init__(self, user_repository: UserRepository = Depends()) -> None:
         self.user_repository = user_repository
 
-    def update_user_verified_status(
-        self, user_id: str, status: bool
-    ) -> Optional[Exception]:
-        return self.user_repository.update_verified_status(user_id, status)
+    def update_user_verified_status(self, user_id: str, status: bool):
+        self.user_repository.update_verified_status(user_id, status)
 
     def get_all_users(
         self,
-    ) -> Tuple[List[models.UserPrivateDTO], Optional[Exception]]:
-        users, err = self.user_repository.get_all_users()
-
-        if err is not None:
-            return [], err
+    ) -> models.UserPrivateDTO:
+        users = self.user_repository.get_all_users()
 
         usersDTO: List[models.UserPrivateDTO] = []
         for user in users:
             usersDTO.append(models.UserPrivateDTO(**user.__dict__))
 
-        return usersDTO, None
+        return usersDTO
 
-    def get_by_id(
-        self, user_id: str
-    ) -> Tuple[models.UserPrivateDTO, Optional[Exception]]:
-        user, err = self.user_repository.get_by_id(user_id=user_id)
+    def get_by_id(self, user_id: str) -> models.UserPrivateDTO:
+        user = self.user_repository.get_by_id(user_id=user_id)
 
-        if err is not None:
-            return models.UserPrivateDTO, err
-
-        return user, None
+        return user
 
     def update_tender_verified_status(
         self, tender_id: str, status: bool
-    ) -> Optional[Exception]:
-        err = self.tender_repository.update_verified_status(
+    ) -> None:
+        self.tender_repository.update_verified_status(
             tender_id=tender_id, status=status
         )
-        if err is not None:
-            return err
-        return self.tender_repository.update_active_status(
+        self.tender_repository.update_active_status(
             tender_id=tender_id, active=status
         )

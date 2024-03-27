@@ -1,11 +1,9 @@
 from typing import List, Optional
 
 import models
-from exceptions import ServiceException
 from fastapi import APIRouter, Depends, status
 from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user, is_creator_or_manager
-from routers.v1.exceptions import TENDER_NOT_FOUND
 from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
@@ -33,12 +31,7 @@ async def create_tender(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> CreateTenderResponse:
-    id, err = tender_service.create_tender(tender=tender, user_id=user.id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
+    id = tender_service.create_tender(tender=tender, user_id=user.id)
     return CreateTenderResponse(id=id)
 
 
@@ -68,7 +61,7 @@ async def get_page_tenders(
 ) -> ObjectsGroupsWithTypes:
     service_type_ids = [int(x) for x in service_type_ids_str.split(",")]
     service_group_ids = [int(x) for x in service_group_ids_str.split(",")]
-    tenders, err = tender_service.get_page_tenders(
+    tenders = tender_service.get_page_tenders(
         page=page,
         page_size=page_size,
         object_group_id=object_group_id,
@@ -84,11 +77,6 @@ async def get_page_tenders(
         verified=verified,
         user_id=user_id,
     )
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
     return tenders
 
 
@@ -103,17 +91,7 @@ async def get_tender(
     tender_id: str,
     tender_service: TenderService = Depends(),
 ) -> models.Tender:
-    tender, err = tender_service.get_by_id(id=tender_id)
-    if tender is None:
-        raise ServiceException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=TENDER_NOT_FOUND,
-        )
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
+    tender = tender_service.get_by_id(id=tender_id)
     return tender
 
 
@@ -131,25 +109,11 @@ async def update_tender(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    original_tender, err = tender_service.get_by_id(id=tender_id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
-    if tender is None:
-        raise ServiceException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=TENDER_NOT_FOUND,
-        )
+    original_tender = tender_service.get_by_id(id=tender_id)
 
     await is_creator_or_manager(user_id=original_tender.user_id, user=user)
-    err = tender_service.update_tender(tender=tender, tender_id=tender_id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
+
+    tender_service.update_tender(tender=tender, tender_id=tender_id)
     return SuccessResponse()
 
 
@@ -193,13 +157,8 @@ async def get_count_active_tenders(
     service_type_id: Optional[int] = None,
     tender_service: TenderService = Depends(),
 ) -> ServicesGroupsWithTypes:
-    count, err = tender_service.get_count_active_tenders(
+    count = tender_service.get_count_active_tenders(
         object_group_id=object_group_id, service_type_id=service_type_id
     )
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
 
     return TenderCountResponse(count=count)

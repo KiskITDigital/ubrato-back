@@ -49,12 +49,7 @@ async def signup_user(
         org=org,
     )
 
-    session_id, err = session_service.create_session(created_user.id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(err),
-        )
+    session_id = session_service.create_session(created_user.id)
     response.set_cookie(
         key="session_id",
         value=session_id,
@@ -117,10 +112,6 @@ async def refresh_session(
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
 ) -> SignInResponse:
-    user, err = session_service.get_user_session_by_id(session_id=session_id)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=err,
-        )
+    user = session_service.get_user_session_by_id(session_id=session_id)
+
     return SignInResponse(access_token=jwt_service.generate_jwt(user))
