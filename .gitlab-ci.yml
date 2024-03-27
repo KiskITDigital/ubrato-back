@@ -29,10 +29,13 @@ lint:
   image: python:3.11.6-slim-bullseye
   stage: lint
   script:
-    - pip install ruff poetry
-    - poetry install
-    - mypy ./app/
-    - ruff check --output-format=gitlab ./app/
+    - pip install poetry
+    - poetry --version
+    - poetry config virtualenvs.in-project true
+    - poetry install -vv
+    - mypy app/
+    - pip install ruff 
+    - ruff check --output-format=gitlab app/
 
 prod-build:
   only:
