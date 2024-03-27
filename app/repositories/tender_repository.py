@@ -6,7 +6,7 @@ from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.schemas import Tender
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session
 
@@ -88,14 +88,14 @@ class TenderRepository:
                 Tender.object_type_id == object_type_id
             )
 
-            service_type_condition = (service_type_ids is None) or or_(
+            service_type_condition = (service_type_ids is None) or and_(
                 *(
                     Tender.services_types.any(service_type_id)  # type: ignore
                     for service_type_id in service_type_ids
                 )
             )
 
-            service_group_condition = (service_group_ids is None) or or_(
+            service_group_condition = (service_group_ids is None) or and_(
                 *(
                     Tender.services_groups.any(service_group_id)  # type: ignore
                     for service_group_id in service_group_ids

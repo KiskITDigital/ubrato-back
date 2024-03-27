@@ -97,7 +97,7 @@ async def get_tender(
     tender_id: int,
     tender_service: TenderService = Depends(),
 ) -> models.Tender:
-    tender = tender_service.get_by_id(id=tender_id)
+    tender = tender_service.get_by_id(tender_id=tender_id)
     return tender
 
 
@@ -115,7 +115,7 @@ async def update_tender(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    original_tender = tender_service.get_by_id(id=tender_id)
+    original_tender = tender_service.get_by_id(tender_id=tender_id)
 
     await is_creator_or_manager(user_id=original_tender.user_id, user=user)
 

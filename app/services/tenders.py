@@ -103,8 +103,8 @@ class TenderService:
             object_group_id=object_group_id, service_type_id=service_type_id
         )
 
-    def get_by_id(self, id: int) -> models.Tender:
-        return self.tender_repository.get_tender_by_id(id)
+    def get_by_id(self, tender_id: int) -> models.Tender:
+        return self.tender_repository.get_tender_by_id(tender_id=tender_id)
 
     def update_tender(
         self, tender: CreateTenderRequest, tender_id: int
