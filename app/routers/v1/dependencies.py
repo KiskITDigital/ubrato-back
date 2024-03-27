@@ -1,11 +1,11 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from config import get_config
-from exceptions import AuthException, ServiceException
+from exceptions import AuthException
 from fastapi import Depends, Header, status
 from routers.v1.exceptions import NO_ACCESS
 from schemas.jwt_user import JWTUser
-from services import JWTService, LogsService
+from services import JWTService
 
 
 async def authorized(
@@ -18,14 +18,8 @@ async def authorized(
 async def get_user(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
-    logs_service: LogsService = Depends(),
-) -> Optional[JWTUser]:
-    user, err = jwt_service.unmarshal_jwt(authorization)
-    if err is not None:
-        raise ServiceException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=err,
-        )
+) -> JWTUser:
+    user = jwt_service.unmarshal_jwt(authorization)
     return user
 
 
@@ -33,7 +27,6 @@ async def get_user(
 async def is_admin(
     authorization: Annotated[str, Header()],
     jwt_service: JWTService = Depends(),
-    logs_service: LogsService = Depends(),
 ) -> None:
     user, err = jwt_service.unmarshal_jwt(authorization)
     if err is not None:

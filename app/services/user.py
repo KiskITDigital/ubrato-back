@@ -51,7 +51,7 @@ class UserService:
     def get_by_id(self, id: str) -> models.UserPrivateDTO:
         user = self.user_repository.get_by_id(id)
 
-        return models.UserPrivateDTO(**user.__dict__), None
+        return models.UserPrivateDTO(**user.__dict__)
 
     def password_valid(self, password: str, hashed_password: str) -> bool:
         return bcrypt.checkpw(
