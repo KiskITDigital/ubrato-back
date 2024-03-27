@@ -189,7 +189,9 @@ class TenderRepository:
     def update_verified_status(self, tender_id: int, verified: bool) -> None:
         try:
             tender = (
-                self.db.query(Tender).filter(Tender.id == tender_id).first()
+                self.db.query(Tender)
+                .filter(Tender.id == tender_id)
+                .first()
             )
 
             if tender is None:
@@ -212,7 +214,7 @@ class TenderRepository:
         try:
             tender = (
                 self.db.query(Tender)
-                .filter(Tender.active == tender_id)
+                .filter(Tender.id == tender_id)
                 .first()
             )
 
