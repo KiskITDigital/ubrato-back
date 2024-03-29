@@ -6,7 +6,7 @@ authors = ["g0dm0d <ivan.berlin06@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.109.2"
+fastapi = "^0.110.0"
 black = "^24.2.0"
 flake8 = "^7.0.0"
 uvicorn = "^0.27.1"
@@ -25,7 +25,7 @@ dadata = "^21.10.1"
 black = "^24.2.0"
 flake8 = "^7.0.0"
 isort = "^5.13.2"
-mypy = "^1.8.0"
+mypy = "^1.9.0"
 ruff = "^0.3.4"
 
 [tool.mypy]

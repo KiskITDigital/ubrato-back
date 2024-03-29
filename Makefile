@@ -29,6 +29,6 @@ run:
 	cd app && uvicorn main:app --host $(SERVER_ADDR) --port $(SERVER_PORT)
 
 format:
-	isort ./app
+	isort ./app --profile black
 	black ./app --line-length 79
 	flake8 ./app

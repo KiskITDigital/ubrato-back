@@ -7,9 +7,9 @@ __all__ = [
     "UserRepository",
 ]
 
-from .logs_repository import LogsRepository
-from .organization_repository import OrganizationRepository
-from .session_repository import SessionRepository
-from .tags_repository import TagsRepository
-from .tender_repository import TenderRepository
-from .user_repository import UserRepository
+from .logs import LogsRepository
+from .organization import OrganizationRepository
+from .session import SessionRepository
+from .tags import TagsRepository
+from .tender import TenderRepository
+from .user import UserRepository

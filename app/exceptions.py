@@ -73,3 +73,12 @@ async def repository_exception_handler(
     return JSONResponse(
         status_code=exc.status_code, content={"id": id, "msg": str(exc.detail)}
     )
+
+
+async def internal_exception_hander(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=500, content={"msg": str(exc)}
+    )

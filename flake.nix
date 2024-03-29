@@ -1,7 +1,7 @@
 {
   description = "A Nix-flake-based Python development environment";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-23.11";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }:
     let
@@ -13,8 +13,8 @@
     {
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
-          packages = with pkgs; [ python311 virtualenv poetry go-migrate ruff ] ++
-            (with pkgs.python311Packages; [ pip psycopg2 python-lsp-server pyls-isort pyls-flake8 pylsp-mypy mypy ]);
+          packages = with pkgs; [ python311 virtualenv poetry go-migrate ruff ruff-lsp ] ++
+            (with pkgs.python311Packages; [ pip psycopg2 mypy ]);
         };
       });
     };

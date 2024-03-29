@@ -7,9 +7,9 @@ from config import Config, get_config
 from fastapi import Depends, status
 from schemas.jwt_user import JWTUser
 from services.exceptions import (
-    AuthException,
     INVALID_BARRIER,
     NO_BARRIER_TOKEN,
+    AuthException,
     ServiceException,
 )
 
@@ -47,7 +47,9 @@ class JWTService:
 
     def decode_jwt(self, token: str) -> JWTUser:
         try:
-            userd_dict = jwt.decode(token, self.secret, algorithms=[self.algorithm])
+            userd_dict = jwt.decode(
+                token, self.secret, algorithms=[self.algorithm]
+            )
 
             jwt_user = JWTUser(**userd_dict)
 
