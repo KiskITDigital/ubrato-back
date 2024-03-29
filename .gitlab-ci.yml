@@ -30,7 +30,6 @@ prod-build:
   stage: build
   script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
-    - cp .env.prod .env
     - docker build --build-arg GIT_VERSION=$CI_COMMIT_SHORT_SHA --pull -t "$CI_REGISTRY_IMAGE:latest" .
     - docker push "$CI_REGISTRY_IMAGE:latest"
 
@@ -56,5 +55,4 @@ prod-deploy:
   - cp $KNOWN_HOSTS ~/.ssh/known_hosts
   script:
     - ssh -o StrictHostKeyChecking=no $REMOTE_USER@$REMOTE_HOST -p $REMOTE_PORT "cd $REMOTE_PATH &&
-      ./update-back.sh && git clone git@git.ubrato.ru:ubrato/ubrato-back.git &&
-      cd ubrato-back && cp .env.prod .env && docker compose up -d"
+      ./update-back.sh"
