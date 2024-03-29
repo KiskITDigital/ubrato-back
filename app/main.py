@@ -67,5 +67,5 @@ app.add_exception_handler(
 )
 app.add_exception_handler(
     Exception,
-    internal_exception_hander  # type: ignore
+    internal_exception_hander
 )
