@@ -32,6 +32,7 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     middle_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    avatar: Mapped[str] = mapped_column(String(255), nullable=False)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
     role: Mapped[int] = mapped_column(SmallInteger, default=0)
     is_contractor: Mapped[bool] = mapped_column(Boolean, default=False)

@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     first_name      VARCHAR(100)    NOT NULL,
     middle_name     VARCHAR(100)    NOT NULL,
     last_name       VARCHAR(100)    NOT NULL,
+    avatar          VARCHAR(255)    NOT NULL,
     verified        BOOLEAN         DEFAULT FALSE,
     role            SMALLINT        DEFAULT 0,
     is_contractor   BOOLEAN         DEFAULT FALSE,

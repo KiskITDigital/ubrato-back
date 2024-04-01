@@ -14,6 +14,7 @@ class User(BaseModel):
     first_name: str
     middle_name: str
     last_name: str
+    avatar: str
     verified: bool
     role: int
     is_contractor: bool
@@ -27,6 +28,7 @@ class UserPrivateDTO(BaseModel):
     first_name: str
     middle_name: str
     last_name: str
+    avatar: str
     verified: bool
     role: int
     is_contractor: bool
