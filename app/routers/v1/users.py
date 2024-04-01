@@ -52,7 +52,7 @@ async def get_me(
 
 @router.put(
     "/me/avatar",
-    response_model=models.UserPrivateDTO,
+    response_model=SuccessResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
