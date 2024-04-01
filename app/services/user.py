@@ -21,6 +21,7 @@ class UserService:
         first_name: str,
         middle_name: str,
         last_name: str,
+        avatar: str,
         org: Organization,
     ) -> models.User:
         id = "usr_" + str(uuid.uuid4())
@@ -37,6 +38,7 @@ class UserService:
             first_name=first_name,
             middle_name=middle_name,
             last_name=last_name,
+            avatar=avatar,
         )
 
         created_user = self.user_repository.create(user=user, org=org)
