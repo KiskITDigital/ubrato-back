@@ -34,9 +34,6 @@ def get_db_connection() -> Generator[scoped_session[Session], None, None]:
             detail=err.code,
             sql_msg=err._message(),
         )
-    except Exception:
-        db.rollback()
-        raise Exception("Database error")
 
     finally:
         db.close()
