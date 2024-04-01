@@ -77,3 +77,16 @@ class UserRepository:
             )
 
         return models.User(**user.__dict__)
+
+    def update_avatar(self, user_id: str, avatar: str) -> None:
+        user = self.db.query(User).filter_by(id=user_id).first()
+
+        if user is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=USERID_NOT_FOUND.format(user_id),
+                sql_msg="",
+            )
+
+        user.avatar = avatar
+        self.db.commit()

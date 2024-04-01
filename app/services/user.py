@@ -59,3 +59,6 @@ class UserService:
         return bcrypt.checkpw(
             password.encode("utf-8"), hashed_password.encode("utf-8")
         )
+
+    def upd_avatar(self, used_id: str, avatar: str) -> None:
+        self.user_repository.update_avatar(user_id=used_id, avatar=avatar)

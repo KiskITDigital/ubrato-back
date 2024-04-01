@@ -4,6 +4,7 @@ from routers.v1.dependencies import authorized, get_user
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
+from schemas.upd_avatar import UpdAvatarRequest
 from schemas.verify_request import VerifyRequest
 from services import OrganizationService, UserService
 
@@ -47,3 +48,21 @@ async def get_me(
     dto_user = user_service.get_by_id(user.id)
 
     return dto_user
+
+
+@router.put(
+    "/me/avatar",
+    response_model=models.UserPrivateDTO,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def upd_avatar(
+    avatar: UpdAvatarRequest,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    user_service.upd_avatar(used_id=user.id, avatar=avatar.avatar)
+    return SuccessResponse()
