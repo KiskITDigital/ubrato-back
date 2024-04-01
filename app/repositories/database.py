@@ -13,7 +13,7 @@ engine = create_engine(config.Database.DB_DSN, pool_size=20, max_overflow=0)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def get_db_connection() -> Generator[scoped_session, None, None]:  # type: ignore
+def get_db_connection() -> Generator[scoped_session[Session], None, None]:
     db: scoped_session[Session] = scoped_session(SessionLocal)
     try:
         yield db
@@ -39,4 +39,4 @@ def get_db_connection() -> Generator[scoped_session, None, None]:  # type: ignor
         raise Exception("Database error")
 
     finally:
-        db.remove()
+        db.close()
