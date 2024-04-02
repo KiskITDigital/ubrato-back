@@ -25,7 +25,7 @@ def docker_compose_file(pytestconfig):
 
 @pytest.fixture(scope="session")
 def docker_compose_command() -> str:
-    return "docker-compose"
+    return "echo"
 
 
 @pytest.fixture(scope="session")
