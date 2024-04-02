@@ -35,13 +35,29 @@ def docker_cleanup() -> str:
 
 def is_responsive(docker_ip, port):
     try:
-        psycopg2.connect(
-            database="postgres",
+        conn = psycopg2.connect(
+            database="test",
             user="postgres",
             password="12345",
             host=docker_ip,
             port=port,
         )
+        migration_dir = "./app/repositories/migration/"
+        migration_files = sorted(os.listdir(migration_dir))
+
+        cursor = conn.cursor()
+
+        for migration_file in migration_files:
+            if migration_file.endswith(".up.sql"):
+                with open(
+                    os.path.join(migration_dir, migration_file), "r"
+                ) as f:
+                    sql = f.read()
+                cursor.execute(sql)
+                conn.commit()
+                print(f"Applied migration: {migration_file}")
+        conn.close()
+
         return True
     except Exception:
         return False
@@ -51,8 +67,9 @@ def is_responsive(docker_ip, port):
 def db_instance():
     """Ensure that postgres is up and responsive."""
 
-    port = 5432
-    docker_ip = "postgres"
+    port = 35432
+    docker_ip = "localhost"
+
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
         docker_ip, port
     )
@@ -60,6 +77,14 @@ def db_instance():
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     db: scoped_session[Session] = scoped_session(SessionLocal)
+
+    await_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
+
+    while is_responsive(
+        docker_ip=docker_ip, port=port
+    ) is False and datetime.datetime.now() < await_time:
+        pass
+
     yield db
 
 
