@@ -67,7 +67,7 @@ def is_responsive(db_addr, port):
 def db_instance():
     """Ensure that postgres is up and responsive."""
 
-    port = 35432
+    port = 5432
     db_addr = os.getenv("DB_ADDR", "localhost")
 
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
@@ -80,7 +80,7 @@ def db_instance():
         db_addr=db_addr, port=port
     ) is False:
         if datetime.datetime.now() > await_time:
-            raise Exception("Waiting time is up")
+            raise Exception(f"Waiting time is up. Addr: {dsn}")
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
