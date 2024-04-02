@@ -15,7 +15,7 @@ variables:
   COMPOSE_VERSION: "v2.26.1"
 
 lint:
-  image: cruizba/ubuntu-dind
+  image: python:3.11.6-slim-bullseye
   stage: test
   script:
     - pip install poetry
@@ -36,6 +36,7 @@ test:
   - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
   - chmod +x /usr/local/bin/docker-compose
   - docker-compose --version
+  - docker-compose up
   script:
     - pip install poetry
     - poetry --version
