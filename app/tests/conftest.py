@@ -1,6 +1,7 @@
 import datetime
 import os
 import sys
+from time import sleep
 
 import psycopg2
 import pytest
@@ -25,7 +26,7 @@ def docker_compose_file(pytestconfig):
 
 @pytest.fixture(scope="session")
 def docker_compose_command() -> str:
-    return "echo"
+    return ""
 
 
 @pytest.fixture(scope="session")
@@ -48,19 +49,17 @@ def is_responsive(docker_ip, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance(docker_ip, docker_services):
+def db_instance():
     """Ensure that postgres is up and responsive."""
 
-    port = docker_services.port_for("db", 5432)
+    port = 35432
+    docker_ip = "localhost"
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
         docker_ip, port
     )
 
-    docker_services.wait_until_responsive(
-        timeout=30.0,
-        pause=0.1,
-        check=lambda: is_responsive(docker_ip=docker_ip, port=port),
-    )
+    while is_responsive(docker_ip=docker_ip, port=port) is False:
+        sleep(1)
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
