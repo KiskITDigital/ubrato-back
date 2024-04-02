@@ -3,6 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres
+    network_mode: "host"
     ports:
       - "35432:5432"
     volumes:
