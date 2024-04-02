@@ -40,7 +40,7 @@ test:
   before_script:
     - apt-get update
     - apt-get install -y postgresql postgresql-client libpq-dev
-    - cd ~/work/ubrato-back/app/repositories/migration
+    - cd ./app/repositories/migration
     - for file in *up.sql; do psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f "$file"; done
   script: 
     - pip install poetry
