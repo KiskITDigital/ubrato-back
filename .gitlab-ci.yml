@@ -30,9 +30,11 @@ lint:
 test:
   image: cruizba/ubuntu-dind
   stage: test
+  services:
+  - docker:dind
   before_script:
   - apt update && apt install python3.11 python3-pip -y
-  - docker compose --version
+  - docker compose version
   script:
     - pip install poetry
     - poetry --version
