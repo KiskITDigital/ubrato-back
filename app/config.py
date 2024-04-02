@@ -7,7 +7,10 @@ load_dotenv()
 
 class Config:
     class Database:
-        DB_DSN: str = os.getenv("DB_DSN", "")
+        DB_DSN: str = os.getenv(
+            "DB_DSN",
+            "postgresql+psycopg2://postgres:12345@localhost:5432/postgres",
+        )
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
