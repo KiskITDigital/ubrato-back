@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   db:
-    container_name: ubrato-db
     image: postgres
     ports:
       - "35432:5432"
