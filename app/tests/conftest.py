@@ -33,13 +33,13 @@ def docker_cleanup() -> str:
     return "down"
 
 
-def is_responsive(port):
+def is_responsive(docker_ip, port):
     try:
         psycopg2.connect(
             database="postgres",
             user="postgres",
             password="12345",
-            host="docker",
+            host=docker_ip,
             port=port,
         )
         return True
@@ -52,12 +52,14 @@ def db_instance(docker_ip, docker_services):
     """Ensure that postgres is up and responsive."""
 
     port = docker_services.port_for("db", 5432)
-    dsn = f"postgresql+psycopg2://postgres:12345@db:{port}/postgres?sslmode=disable"
+    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
+        docker_ip, port
+    )
 
     docker_services.wait_until_responsive(
         timeout=30.0,
         pause=0.1,
-        check=lambda: is_responsive(port=port),
+        check=lambda: is_responsive(docker_ip=docker_ip, port=port),
     )
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
