@@ -18,6 +18,21 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 
+@pytest.fixture(scope="session")
+def docker_compose_file(pytestconfig):
+    return os.path.join(str(pytestconfig.rootdir), "docker-compose.yml")
+
+
+@pytest.fixture(scope="session")
+def docker_compose_command() -> str:
+    return "docker-compose"
+
+
+@pytest.fixture(scope="session")
+def docker_cleanup() -> str:
+    return "down"
+
+
 def is_responsive(docker_ip, port):
     try:
         psycopg2.connect(
@@ -33,12 +48,10 @@ def is_responsive(docker_ip, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance(docker_services):
+def db_instance(docker_ip, docker_services):
     """Ensure that postgres is up and responsive."""
 
-    # port = docker_services.port_for("db", 5432)
-    port = 5432
-    docker_ip = "postgres"
+    port = docker_services.port_for("db", 5432)
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
         docker_ip, port
     )

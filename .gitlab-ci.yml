@@ -13,6 +13,7 @@ variables:
   REMOTE_PORT: "2022"
   REMOTE_PATH: "/home/ubrato/ubrato"
   COMPOSE_VERSION: "v2.26.1"
+  DOCKER_HOST: tcp://docker:2375/
 
 lint:
   image: python:3.11.6-slim-bullseye
@@ -29,14 +30,11 @@ lint:
 test:
   image: python:3.11.6-slim-bullseye
   stage: test
-  services:
-  - name: postgres:latest
-    alias: postgres
-  - docker:dind
-  variables:
-    POSTGRES_USER: "postgres"
-    POSTGRES_PASSWORD: "12345"
-    POSTGRES_DB: "postgres"
+  before_script:
+  - apt update && apt install curl -y
+  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+  - chmod +x /usr/local/bin/docker-compose
+  - docker-compose --version
   script:
     - pip install poetry
     - poetry --version
