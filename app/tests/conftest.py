@@ -33,13 +33,13 @@ def docker_cleanup() -> str:
     return "down"
 
 
-def is_responsive(docker_ip, port):
+def is_responsive(db_addr, port):
     try:
         conn = psycopg2.connect(
             database="test",
             user="postgres",
             password="12345",
-            host=docker_ip,
+            host=db_addr,
             port=port,
         )
         migration_dir = "./app/repositories/migration/"
@@ -68,10 +68,10 @@ def db_instance():
     """Ensure that postgres is up and responsive."""
 
     port = 35432
-    docker_ip = "localhost"
+    db_addr = os.getenv("DB_ADDR", "localhost")
 
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
-        docker_ip, port
+        db_addr, port
     )
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
@@ -81,7 +81,7 @@ def db_instance():
     await_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
 
     while is_responsive(
-        docker_ip=docker_ip, port=port
+        db_addr=db_addr, port=port
     ) is False and datetime.datetime.now() < await_time:
         pass
 
