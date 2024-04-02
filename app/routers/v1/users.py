@@ -64,5 +64,5 @@ async def upd_avatar(
     user_service: UserService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    user_service.upd_avatar(used_id=user.id, avatar=avatar.avatar)
+    user_service.upd_avatar(user_id=user.id, avatar=avatar.avatar)
     return SuccessResponse()

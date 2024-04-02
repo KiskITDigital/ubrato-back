@@ -33,7 +33,7 @@ class ManagerService:
 
         return usersDTO
 
-    def get_by_id(self, user_id: str) -> models.UserPrivateDTO:
+    def get_user_by_id(self, user_id: str) -> models.UserPrivateDTO:
         user = self.user_repository.get_by_id(user_id=user_id)
 
         return models.UserPrivateDTO(**user.__dict__)

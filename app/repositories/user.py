@@ -22,6 +22,7 @@ class UserRepository:
 
     def create(self, user: User, org: Organization) -> models.User:
         self.db.add(user)
+        self.db.flush()
         org.user_id = user.id
         self.db.add(org)
         self.db.commit()

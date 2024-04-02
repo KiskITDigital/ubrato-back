@@ -4,7 +4,7 @@ import models
 from fastapi import APIRouter, Depends, status
 from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user, is_creator_or_manager
-from schemas.create_tender import CreateTenderRequest, CreateTenderResponse
+from schemas.create_tender import CreateTenderRequest
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
@@ -19,7 +19,7 @@ router = APIRouter(
 
 @router.post(
     "/create",
-    response_model=CreateTenderResponse,
+    response_model=models.Tender,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
         status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
@@ -30,9 +30,11 @@ async def create_tender(
     tender: CreateTenderRequest,
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
-) -> CreateTenderResponse:
-    id = tender_service.create_tender(tender=tender, user_id=user.id)
-    return CreateTenderResponse(id=id)
+) -> models.Tender:
+    created_tender = tender_service.create_tender(
+        tender=tender, user_id=user.id
+    )
+    return created_tender
 
 
 @router.get(

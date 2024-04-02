@@ -1,3 +1,4 @@
+import hashlib
 import uuid
 from typing import List
 
@@ -19,7 +20,6 @@ class OrganizationService:
         self.dadata = Dadata(get_config().Dadata.api_key)
 
     def get_organization_from_api(self, inn: str) -> Organization:
-        id = "org_" + str(uuid.uuid4())
 
         result = self.dadata.find_by_id("party", inn)
 
@@ -28,6 +28,8 @@ class OrganizationService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="INN NOT FOUND",
             )
+        hash = hashlib.md5(result[0]["data"]["name"]["full_with_opf"].encode())
+        id = "org_" + hash.hexdigest()
 
         org = Organization(
             id=id,

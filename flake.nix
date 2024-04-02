@@ -14,7 +14,7 @@
       devShells = forEachSupportedSystem ({ pkgs }: {
         default = pkgs.mkShell {
           packages = with pkgs; [ python311 virtualenv poetry go-migrate ruff ruff-lsp ] ++
-            (with pkgs.python311Packages; [ pip psycopg2 mypy ]);
+            (with pkgs.python311Packages; [ pip psycopg2 mypy pyyaml ]);
         };
       });
     };

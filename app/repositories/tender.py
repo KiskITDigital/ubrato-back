@@ -18,13 +18,13 @@ class TenderRepository:
     ) -> None:
         self.db = db
 
-    def create_tender(self, tender: Tender) -> int:
+    def create_tender(self, tender: Tender) -> Tender:
         self.db.add(tender)
         self.db.commit()
 
         self.db.refresh(tender)
 
-        return tender.id
+        return tender
 
     def update_tender(self, tender: dict[str, Any], tender_id: int) -> None:
         tender_to_update = (
@@ -98,9 +98,7 @@ class TenderRepository:
             Tender.price >= price_from
         )
 
-        price_to_condition = (price_to is None) or (
-            Tender.price <= price_to
-        )
+        price_to_condition = (price_to is None) or (Tender.price <= price_to)
 
         text_condition = (text is None) or Tender.document_tsv.match(text)
 
@@ -110,9 +108,7 @@ class TenderRepository:
             Tender.verified == verified
         )
 
-        user_id_condition = (user_id is None) or (
-            Tender.user_id == user_id
-        )
+        user_id_condition = (user_id is None) or (Tender.user_id == user_id)
 
         query = (
             self.db.query(Tender)
@@ -145,9 +141,7 @@ class TenderRepository:
         return tenders
 
     def get_tender_by_id(self, tender_id: int) -> models.Tender:
-        tender = (
-            self.db.query(Tender).filter(Tender.id == tender_id).first()
-        )
+        tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
         if tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -158,9 +152,7 @@ class TenderRepository:
         return models.Tender(**tender.__dict__)
 
     def update_verified_status(self, tender_id: int, verified: bool) -> None:
-        tender = (
-            self.db.query(Tender).filter(Tender.id == tender_id).first()
-        )
+        tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
 
         if tender is None:
             raise RepositoryException(
@@ -173,9 +165,7 @@ class TenderRepository:
         self.db.commit()
 
     def update_active_status(self, tender_id: int, active: bool) -> None:
-        tender = (
-            self.db.query(Tender).filter(Tender.id == tender_id).first()
-        )
+        tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
 
         if tender is None:
             raise RepositoryException(

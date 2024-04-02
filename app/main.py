@@ -54,18 +54,13 @@ app.add_exception_handler(
     request_validation_exception_handler,  # type: ignore
 )
 app.add_exception_handler(
-    ServiceException,
-    service_exception_handler  # type: ignore
+    ServiceException, service_exception_handler  # type: ignore
 )
 app.add_exception_handler(
     RepositoryException,
     repository_exception_handler,  # type: ignore
 )
 app.add_exception_handler(
-    AuthException,
-    auth_exception_handler  # type: ignore
+    AuthException, auth_exception_handler  # type: ignore
 )
-app.add_exception_handler(
-    Exception,
-    internal_exception_hander
-)
+app.add_exception_handler(Exception, internal_exception_hander)

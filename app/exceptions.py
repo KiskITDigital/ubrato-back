@@ -79,6 +79,4 @@ async def internal_exception_hander(
     request: Request,
     exc: Exception,
 ) -> JSONResponse:
-    return JSONResponse(
-        status_code=500, content={"msg": str(exc)}
-    )
+    return JSONResponse(status_code=500, content={"msg": str(exc)})

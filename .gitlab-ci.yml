@@ -2,7 +2,7 @@ image: docker:latest
 services:
   - docker:dind
 stages:
-  - lint
+  - test
   - build
   - deploy
   - release
@@ -15,7 +15,7 @@ variables:
 
 lint:
   image: python:3.11.6-slim-bullseye
-  stage: lint
+  stage: test
   script:
     - pip install poetry
     - poetry --version
@@ -24,6 +24,12 @@ lint:
     - poetry run mypy app/
     - pip install ruff 
     - ruff check --output-format=gitlab app/
+
+test:
+  image: python:3.11.6-slim-bullseye
+  stage: test
+  script:
+    - poetry run pytest
 
 prod-build:
   only: [main]
@@ -38,7 +44,6 @@ tags-release-build:
   stage: release
   script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_JOB_TOKEN" $CI_REGISTRY
-    - cp .env.prod .env
     - docker build --build-arg GIT_VERSION=$CI_COMMIT_SHORT_SHA --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG" .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
 

@@ -18,5 +18,4 @@ class LogsRepository:
             self.db.add(logs)
             self.db.commit()
         except SQLAlchemyError as err:
-            print("asd")
             print(err._message())

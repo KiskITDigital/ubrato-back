@@ -10,7 +10,12 @@ from models import (
     ServiceTypeModel,
 )
 from repositories.database import get_db_connection
-from repositories.schemas import ObjectGroup, ObjectType, ServiceGroup, ServiceType
+from repositories.schemas import (
+    ObjectGroup,
+    ObjectType,
+    ServiceGroup,
+    ServiceType,
+)
 from sqlalchemy.orm import Session, scoped_session
 
 

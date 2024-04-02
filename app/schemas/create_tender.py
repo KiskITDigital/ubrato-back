@@ -21,7 +21,3 @@ class CreateTenderRequest(BaseModel):
     work_end: datetime
     object_group_id: int
     object_type_id: int
-
-
-class CreateTenderResponse(BaseModel):
-    id: int

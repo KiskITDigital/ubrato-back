@@ -20,11 +20,13 @@ class TenderService:
         self.tags_repository = tags_repository
         self.tender_repository = tender_repository
 
-    def create_tender(self, tender: CreateTenderRequest, user_id: str) -> int:
-        id = self.tender_repository.create_tender(
+    def create_tender(
+        self, tender: CreateTenderRequest, user_id: str
+    ) -> models.Tender:
+        created_tender = self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
-        return id
+        return models.Tender(**created_tender.__dict__)
 
     def get_page_tenders(
         self,

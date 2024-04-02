@@ -23,10 +23,10 @@ def get_db_connection() -> Generator[scoped_session[Session], None, None]:
     except IntegrityError:
         db.rollback()
         raise RepositoryException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=DATA_ALREADY_EXIST,
-                sql_msg="",
-            )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=DATA_ALREADY_EXIST,
+            sql_msg="",
+        )
     except SQLAlchemyError as err:
         db.rollback()
         raise RepositoryException(

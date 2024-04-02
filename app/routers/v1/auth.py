@@ -6,7 +6,12 @@ from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
-from services import JWTService, OrganizationService, SessionService, UserService
+from services import (
+    JWTService,
+    OrganizationService,
+    SessionService,
+    UserService,
+)
 
 router = APIRouter(
     prefix="/v1/auth",
