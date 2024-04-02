@@ -78,8 +78,9 @@ def db_instance():
 
     while is_responsive(
         db_addr=db_addr, port=port
-    ) is False and datetime.datetime.now() < await_time:
-        pass
+    ) is False:
+        if datetime.datetime.now() > await_time:
+            raise Exception("Waiting time is up")
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

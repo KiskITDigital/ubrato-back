@@ -34,7 +34,7 @@ test:
     POSTGRES_DB: "test"
     DB_ADDR: "postgres"
   services:
-    - name: postgres:latest
+    - name: postgres:16.2-alpine3.19
       alias: postgres
   script:
     - pip install poetry
