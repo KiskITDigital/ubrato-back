@@ -1,7 +1,6 @@
 import datetime
 import os
 import sys
-from time import sleep
 
 import psycopg2
 import pytest
@@ -49,17 +48,13 @@ def is_responsive(docker_ip, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance():
+def db_instance(docker_ip):
     """Ensure that postgres is up and responsive."""
 
     port = 35432
-    docker_ip = "docker"
     dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
         docker_ip, port
     )
-
-    while is_responsive(docker_ip=docker_ip, port=port) is False:
-        sleep(1)
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
