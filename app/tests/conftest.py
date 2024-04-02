@@ -39,7 +39,7 @@ def is_responsive(port):
             database="postgres",
             user="postgres",
             password="12345",
-            host="db",
+            host="docker",
             port=port,
         )
         return True
@@ -52,7 +52,7 @@ def db_instance(docker_services):
     """Ensure that postgres is up and responsive."""
 
     port = docker_services.port_for("db", 5432)
-    dsn = "postgresql+psycopg2://postgres:12345@db:{port}/postgres?sslmode=disable"
+    dsn = "postgresql+psycopg2://postgres:12345@docker:{port}/postgres?sslmode=disable"
 
     docker_services.wait_until_responsive(
         timeout=30.0,
