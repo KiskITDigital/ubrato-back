@@ -50,7 +50,7 @@ async def signup_user(
         key="session_id",
         value=session_id,
         httponly=True,
-        samesite="strict",
+        samesite="none",
         secure=True,
     )
 
@@ -87,7 +87,7 @@ async def signin_user(
         key="session_id",
         value=session_id,
         httponly=True,
-        samesite="strict",
+        samesite="none",
         secure=True,
     )
 
