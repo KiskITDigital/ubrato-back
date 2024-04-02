@@ -29,6 +29,10 @@ test:
   image: python:3.11.6-slim-bullseye
   stage: test
   script:
+    - pip install poetry
+    - poetry --version
+    - poetry config virtualenvs.in-project true
+    - poetry install -vv
     - poetry run pytest
 
 prod-build:
