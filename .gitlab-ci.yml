@@ -37,9 +37,7 @@ test:
     - chmod +x /usr/local/bin/docker-compose
     - docker-compose --version
     - docker-compose up -d
-    - docker-compose port db 5432
   script:
-    - docker-compose port db 5432
     - pip install poetry
     - poetry --version
     - poetry config virtualenvs.in-project true
