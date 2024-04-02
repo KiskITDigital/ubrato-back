@@ -52,7 +52,7 @@ def db_instance(docker_ip, docker_services):
     """Ensure that postgres is up and responsive."""
 
     port = docker_services.port_for("db", 5432)
-    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
+    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/test?sslmode=disable".format(
         docker_ip, port
     )
 
