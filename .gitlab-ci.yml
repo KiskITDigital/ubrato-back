@@ -32,13 +32,14 @@ test:
   services:
   - docker:dind
   before_script:
-  - apt update && apt install curl -y
-  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-  - docker-compose --version
-  - docker-compose up -d
-  - docker ps --all
+    - apt update && apt install curl -y
+    - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+    - chmod +x /usr/local/bin/docker-compose
+    - docker-compose --version
+    - docker-compose up -d
+    - docker-compose port db 5432
   script:
+    - docker-compose port db 5432
     - pip install poetry
     - poetry --version
     - poetry config virtualenvs.in-project true
