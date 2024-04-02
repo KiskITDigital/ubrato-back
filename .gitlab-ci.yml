@@ -30,8 +30,7 @@ test:
   stage: test
   services:
   - docker:dind
-  - name: postgres:latest
-    alias: postgres
+  - postgres:16.2-alpine3.19
   variables:
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "12345"
