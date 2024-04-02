@@ -17,6 +17,8 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # Add the parent directory to the Python path
 sys.path.insert(0, project_root)
 
+DB_ADDR: str = os.getenv("POSTGRES_ADDR", "localhost")
+
 
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
@@ -36,10 +38,10 @@ def docker_cleanup() -> str:
 def is_responsive():
     try:
         psycopg2.connect(
-            database="postgres",
+            database="test",
             user="postgres",
             password="12345",
-            host="localhost",
+            host=DB_ADDR,
             port="5432",
         )
         return True
@@ -51,7 +53,7 @@ def is_responsive():
 def db_instance(docker_services):
     """Ensure that postgres is up and responsive."""
 
-    dsn = "postgresql+psycopg2://postgres:12345@localhost:5432/postgres?sslmode=disable"
+    dsn = f"postgresql+psycopg2://postgres:12345@{DB_ADDR}:5432/test?sslmode=disable"
 
     docker_services.wait_until_responsive(
         timeout=30.0,

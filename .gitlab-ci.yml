@@ -35,7 +35,8 @@ test:
   variables:
     POSTGRES_USER: "postgres"
     POSTGRES_PASSWORD: "12345"
-    POSTGRES_DB: "postgres"
+    POSTGRES_DB: "test"
+    POSTGRES_ADDR: "postgres"
   before_script:
     - apt-get update
     - apt-get install -y postgresql postgresql-client libpq-dev
