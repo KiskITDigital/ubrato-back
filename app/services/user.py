@@ -21,6 +21,7 @@ class UserService:
         first_name: str,
         middle_name: str,
         last_name: str,
+        is_contractor: bool,
         avatar: str,
         org: Organization,
     ) -> models.User:
@@ -38,6 +39,7 @@ class UserService:
             first_name=first_name,
             middle_name=middle_name,
             last_name=last_name,
+            is_contractor=is_contractor,
             avatar=avatar,
         )
 
