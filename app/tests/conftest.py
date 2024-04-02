@@ -74,16 +74,16 @@ def db_instance():
         db_addr, port
     )
 
-    engine = create_engine(dsn, pool_size=20, max_overflow=0)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db: scoped_session[Session] = scoped_session(SessionLocal)
-
     await_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
 
     while is_responsive(
         db_addr=db_addr, port=port
     ) is False and datetime.datetime.now() < await_time:
         pass
+
+    engine = create_engine(dsn, pool_size=20, max_overflow=0)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db: scoped_session[Session] = scoped_session(SessionLocal)
 
     yield db
 
