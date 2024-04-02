@@ -31,7 +31,7 @@ test:
   image: cruizba/ubuntu-dind
   stage: test
   before_script:
-  - apt update && apt install python3.11 -y
+  - apt update && apt install python3.11 python3-pip -y
   - docker compose --version
   script:
     - pip install poetry
