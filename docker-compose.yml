@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres
-    network_mode: "host"
+    container_name: test-db
     ports:
       - "35432:5432"
     volumes:
