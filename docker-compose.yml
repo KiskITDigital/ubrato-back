@@ -1,7 +1,4 @@
 version: '3.8'
-networks:
-  test-backend:
-    driver: bridge
 
 services:
   db:
@@ -15,7 +12,5 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "12345"
       POSTGRES_DB: "test"
-    networks:
-      - test-backend
 
     restart: "on-failure"
