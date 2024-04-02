@@ -17,8 +17,6 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # Add the parent directory to the Python path
 sys.path.insert(0, project_root)
 
-DB_ADDR: str = os.getenv("POSTGRES_ADDR", "localhost")
-
 
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
@@ -27,22 +25,22 @@ def docker_compose_file(pytestconfig):
 
 @pytest.fixture(scope="session")
 def docker_compose_command() -> str:
-    return "echo"
+    return "docker-compose"
 
 
 @pytest.fixture(scope="session")
 def docker_cleanup() -> str:
-    return ""
+    return "down"
 
 
-def is_responsive():
+def is_responsive(docker_ip, port):
     try:
         psycopg2.connect(
-            database="test",
+            database="postgres",
             user="postgres",
             password="12345",
-            host=DB_ADDR,
-            port="5432",
+            host=docker_ip,
+            port=port,
         )
         return True
     except Exception:
@@ -50,15 +48,18 @@ def is_responsive():
 
 
 @pytest.fixture(scope="session")
-def db_instance(docker_services):
+def db_instance(docker_ip, docker_services):
     """Ensure that postgres is up and responsive."""
 
-    dsn = f"postgresql+psycopg2://postgres:12345@{DB_ADDR}:5432/test?sslmode=disable"
+    port = docker_services.port_for("db", 5432)
+    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
+        docker_ip, port
+    )
 
     docker_services.wait_until_responsive(
         timeout=30.0,
         pause=0.1,
-        check=lambda: is_responsive(),
+        check=lambda: is_responsive(docker_ip=docker_ip, port=port),
     )
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
