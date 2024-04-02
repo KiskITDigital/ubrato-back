@@ -30,12 +30,13 @@ test:
   image: python:3.11.6-slim-bullseye
   stage: test
   services:
-    - docker:dind
-  before_script:
-  - apt update && apt install curl -y
-  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-  - docker-compose --version
+  - name: postgres:latest
+    alias: postgres
+  - docker:dind
+  variables:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "12345"
+    POSTGRES_DB: "postgres"
   script:
     - pip install poetry
     - poetry --version
