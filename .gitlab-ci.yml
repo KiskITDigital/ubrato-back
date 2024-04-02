@@ -28,13 +28,11 @@ lint:
     - ruff check --output-format=gitlab app/
 
 test:
-  image: python:3.11.6-slim-bullseye
+  image: cruizba/ubuntu-dind
   stage: test
   before_script:
-  - apt update && apt install curl -y
-  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-  - docker-compose --version
+  - apt update && apt install python3.11 -y
+  - docker compose --version
   script:
     - pip install poetry
     - poetry --version
