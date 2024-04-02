@@ -25,22 +25,22 @@ def docker_compose_file(pytestconfig):
 
 @pytest.fixture(scope="session")
 def docker_compose_command() -> str:
-    return "docker compose"
+    return "echo"
 
 
 @pytest.fixture(scope="session")
 def docker_cleanup() -> str:
-    return "down"
+    return ""
 
 
-def is_responsive(docker_ip, port):
+def is_responsive():
     try:
         psycopg2.connect(
             database="postgres",
             user="postgres",
             password="12345",
-            host=docker_ip,
-            port=port,
+            host="localhost",
+            port="5432",
         )
         return True
     except Exception:
@@ -48,18 +48,15 @@ def is_responsive(docker_ip, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance(docker_ip, docker_services):
+def db_instance(docker_services):
     """Ensure that postgres is up and responsive."""
 
-    port = docker_services.port_for("db", 5432)
-    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
-        docker_ip, port
-    )
+    dsn = "postgresql+psycopg2://postgres:12345@localhost:5432/postgres?sslmode=disable"
 
     docker_services.wait_until_responsive(
         timeout=30.0,
         pause=0.1,
-        check=lambda: is_responsive(docker_ip=docker_ip, port=port),
+        check=lambda: is_responsive(),
     )
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)

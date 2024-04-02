@@ -12,8 +12,6 @@ variables:
   REMOTE_HOST: "194.58.96.228"
   REMOTE_PORT: "2022"
   REMOTE_PATH: "/home/ubrato/ubrato"
-  COMPOSE_VERSION: "v2.26.1"
-  DOCKER_HOST: unix:///var/run/docker.sock
 
 lint:
   image: python:3.11.6-slim-bullseye
@@ -28,14 +26,22 @@ lint:
     - ruff check --output-format=gitlab app/
 
 test:
-  image: cruizba/ubuntu-dind
+  image: python:3.11.6-slim-bullseye
   stage: test
   services:
   - docker:dind
+  - name: postgres:latest
+    alias: postgres
+  variables:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "12345"
+    POSTGRES_DB: "postgres"
   before_script:
-  - apt update && apt install python3.11 python3-pip -y
-  - docker compose version
-  script:
+    - apt-get update
+    - apt-get install -y postgresql postgresql-client libpq-dev
+    - cd ~/work/ubrato-back/app/repositories/migration
+    - for file in *up.sql; do psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f "$file"; done
+  script: 
     - pip install poetry
     - poetry --version
     - poetry config virtualenvs.in-project true
