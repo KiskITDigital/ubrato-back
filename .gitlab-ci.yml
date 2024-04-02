@@ -29,11 +29,17 @@ lint:
 test:
   image: python:3.11.6-slim-bullseye
   stage: test
+  services:
+  - name: postgres:latest
+    alias: db
+  variables:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "12345"
+    POSTGRES_DB: "postgres"
+    POSTGRES_HOST_AUTH_METHOD: trust
   before_script:
-  - apt update && apt install curl -y
-  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-  - chmod +x /usr/local/bin/docker-compose
-  - docker-compose --version
+  - docker run -v ./app/repositories/migration/:/migrations --network host migrate/migrate 
+    -path=/migrations/ -database postgres://db:5432/postgres?sslmode=disable up
   script:
     - pip install poetry
     - poetry --version

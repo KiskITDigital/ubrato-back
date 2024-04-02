@@ -48,18 +48,15 @@ def is_responsive(docker_ip, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance(docker_ip, docker_services):
+def db_instance(docker_services):
     """Ensure that postgres is up and responsive."""
 
-    port = docker_services.port_for("db", 5432)
-    dsn = "postgresql+psycopg2://postgres:12345@{}:{}/postgres?sslmode=disable".format(
-        docker_ip, port
-    )
+    dsn = "postgresql+psycopg2://postgres:12345@db:5432/postgres?sslmode=disable"
 
     docker_services.wait_until_responsive(
         timeout=30.0,
         pause=0.1,
-        check=lambda: is_responsive(docker_ip=docker_ip, port=port),
+        check=lambda: is_responsive(docker_ip="db", port=5432),
     )
 
     engine = create_engine(dsn, pool_size=20, max_overflow=0)
