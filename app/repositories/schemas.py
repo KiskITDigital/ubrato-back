@@ -92,7 +92,7 @@ class Tender(Base):
     floor_space: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(400))
     wishes: Mapped[str] = mapped_column(String(400))
-    attachments: Mapped[str] = mapped_column(ARRAY(Text))
+    attachments: Mapped[List[str]] = mapped_column(ARRAY(Text))
     services_groups: Mapped[List[int]] = mapped_column(ARRAY(Integer))
     services_types: Mapped[List[int]] = mapped_column(ARRAY(Integer))
     active: Mapped[bool] = mapped_column(

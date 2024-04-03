@@ -6,6 +6,7 @@ USER_EMAIL_NOT_FOUND = "User with email {} not found."
 TENDERID_NOT_FOUND = "Tender with ID {} not found."
 DATA_ALREADY_EXIST = "Such data has already been registered."
 CITY_NOT_FOUNT = "City with id {} not found."
+SERVICE_NOT_FOUND = "Service with id {} not found."
 
 
 class RepositoryException(HTTPException):

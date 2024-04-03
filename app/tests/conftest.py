@@ -18,21 +18,6 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 
-@pytest.fixture(scope="session")
-def docker_compose_file(pytestconfig):
-    return os.path.join(str(pytestconfig.rootdir), "docker-compose.yml")
-
-
-@pytest.fixture(scope="session")
-def docker_compose_command() -> str:
-    return ""
-
-
-@pytest.fixture(scope="session")
-def docker_cleanup() -> str:
-    return "down"
-
-
 def is_responsive(db_addr, port):
     try:
         conn = psycopg2.connect(
@@ -174,7 +159,7 @@ def created_tender(tender_service, created_user, session):
         name="Office cleaning",
         price=100000,
         is_contract_price=False,
-        location=1,
+        city_id=1,
         floor_space=200,
         description="I need to clean office in Moscow city.",
         attachments=["some.link", "foo.bar"],

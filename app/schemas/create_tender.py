@@ -8,7 +8,6 @@ class CreateTenderRequest(BaseModel):
     name: str
     price: int
     is_contract_price: bool
-    location: int
     floor_space: int
     description: str
     wishes: str
@@ -19,5 +18,6 @@ class CreateTenderRequest(BaseModel):
     reception_end: datetime
     work_start: datetime
     work_end: datetime
+    city_id: int
     object_group_id: int
     object_type_id: int

@@ -4,8 +4,19 @@ from typing import Any, List, Optional
 import models
 from fastapi import Depends, status
 from repositories.database import get_db_connection
-from repositories.exceptions import TENDERID_NOT_FOUND, RepositoryException
-from repositories.schemas import Tender
+from repositories.exceptions import (
+    SERVICE_NOT_FOUND,
+    TENDERID_NOT_FOUND,
+    RepositoryException,
+)
+from repositories.schemas import (
+    City,
+    ObjectGroup,
+    ObjectType,
+    ServiceGroup,
+    ServiceType,
+    Tender,
+)
 from sqlalchemy import and_
 from sqlalchemy.orm import Session, scoped_session
 
@@ -111,7 +122,10 @@ class TenderRepository:
         user_id_condition = (user_id is None) or (Tender.user_id == user_id)
 
         query = (
-            self.db.query(Tender)
+            self.db.query(Tender, ObjectGroup.name, ObjectType.name, City.name)
+            .join(ObjectGroup, Tender.object_group_id == ObjectGroup.id)
+            .join(ObjectType, Tender.object_type_id == ObjectType.id)
+            .join(City, Tender.city_id == City.id)
             .filter(
                 and_(
                     reception_end_condition,
@@ -135,21 +149,48 @@ class TenderRepository:
         )
         tenders: List[models.Tender] = []
 
-        for tender in query:
-            tenders.append(models.Tender(**tender.__dict__))
+        for found_tender in query:
+            tender, object_group_name, object_type_name, city_name = (
+                found_tender._tuple()
+            )
+
+            tender_model = self.format_tender(
+                tender=tender,
+                object_group_name=object_group_name,
+                object_type_name=object_type_name,
+                city_name=city_name,
+            )
+            tenders.append(tender_model)
 
         return tenders
 
     def get_tender_by_id(self, tender_id: int) -> models.Tender:
-        tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
-        if tender is None:
+        found_tender = (
+            self.db.query(Tender, ObjectGroup.name, ObjectType.name, City.name)
+            .join(ObjectGroup, Tender.object_group_id == ObjectGroup.id)
+            .join(ObjectType, Tender.object_type_id == ObjectType.id)
+            .join(City, Tender.city_id == City.id)
+            .filter(Tender.id == tender_id)
+            .first()
+        )
+
+        if found_tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=TENDERID_NOT_FOUND.format(tender_id),
                 sql_msg="",
             )
 
-        return models.Tender(**tender.__dict__)
+        tender, object_group_name, object_type_name, city_name = (
+            found_tender._tuple()
+        )
+
+        return self.format_tender(
+            tender=tender,
+            object_group_name=object_group_name,
+            object_type_name=object_type_name,
+            city_name=city_name,
+        )
 
     def update_verified_status(self, tender_id: int, verified: bool) -> None:
         tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
@@ -188,3 +229,66 @@ class TenderRepository:
             or Tender.services_types.any(service_type_id),  # type: ignore
         )
         return query.count()
+
+    def format_tender(
+        self,
+        tender: Tender,
+        object_group_name: str,
+        object_type_name: str,
+        city_name: str,
+    ) -> models.Tender:
+        services_groups_names: List[str] = []
+
+        for service_group_id in tender.services_groups:
+            service_group = (
+                self.db.query(ServiceGroup)
+                .filter(ServiceGroup.id == service_group_id)
+                .first()
+            )
+            if service_group is None:
+                raise RepositoryException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=SERVICE_NOT_FOUND.format(service_group_id),
+                    sql_msg="",
+                )
+            services_groups_names.append(service_group.name)
+
+        services_type_names: List[str] = []
+
+        for service_type_id in tender.services_types:
+            service_type = (
+                self.db.query(ServiceType)
+                .filter(ServiceType.id == service_type_id)
+                .first()
+            )
+            if service_type is None:
+                raise RepositoryException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=SERVICE_NOT_FOUND.format(service_type),
+                    sql_msg="",
+                )
+            services_type_names.append(service_type.name)
+
+        return models.Tender(
+            id=tender.id,
+            name=tender.name,
+            price=tender.price,
+            is_contract_price=tender.is_contract_price,
+            location=city_name,
+            floor_space=tender.floor_space,
+            description=tender.description,
+            wishes=tender.wishes,
+            attachments=tender.attachments,
+            services_groups=services_groups_names,
+            services_types=services_type_names,
+            active=tender.active,
+            reception_start=tender.reception_start,
+            reception_end=tender.reception_end,
+            work_start=tender.work_start,
+            work_end=tender.work_end,
+            object_group_id=object_group_name,
+            object_type_id=object_type_name,
+            user_id=tender.user_id,
+            created_at=tender.created_at,
+            verified=tender.verified,
+        )

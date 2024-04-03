@@ -29,8 +29,8 @@ CREATE OR REPLACE FUNCTION update_tender_document_tsv() RETURNS TRIGGER AS $$
 BEGIN
     SELECT setweight(to_tsvector('russian', coalesce(NEW.name, '')), 'A') ||
            setweight(to_tsvector('russian', coalesce(NEW.description, '')), 'B') ||
-           setweight(to_tsvector('russian', coalesce(NEW.wishes, '')), 'C') ||
-           setweight(to_tsvector('russian', coalesce(cities.name, '')), 'D')
+           setweight(to_tsvector('russian', coalesce(NEW.wishes, '')), 'B') ||
+           setweight(to_tsvector('russian', coalesce(cities.name, '')), 'B')
     INTO NEW.document_tsv
     FROM cities
     WHERE cities.id = NEW.city_id;

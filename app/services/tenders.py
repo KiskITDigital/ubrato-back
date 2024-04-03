@@ -26,7 +26,9 @@ class TenderService:
         created_tender = self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
-        return models.Tender(**created_tender.__dict__)
+        return self.tender_repository.get_tender_by_id(
+            tender_id=created_tender.id
+        )
 
     def get_page_tenders(
         self,
