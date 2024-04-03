@@ -7,8 +7,10 @@ __all__ = [
     "TenderService",
     "UserService",
     "AuthException",
+    "DadataService",
 ]
 
+from .dadata import DadataService
 from .jwt import JWTService
 from .logs import LogsService
 from .manager import ManagerService
