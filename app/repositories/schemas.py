@@ -60,6 +60,12 @@ class Organization(Base):
     user_id: Mapped[str] = mapped_column(
         String(40), ForeignKey("users.id"), nullable=False
     )
+    update_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP, server_default=func.current_timestamp()
+    )
 
     user = relationship("User", back_populates="organization")
     documents = relationship("Document", back_populates="organization")

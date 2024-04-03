@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import uuid
 from typing import List
@@ -42,6 +43,21 @@ class OrganizationService:
             tax_code=result[0]["data"]["address"]["data"]["tax_office"],
             address=result[0]["data"]["address"]["unrestricted_value"],
         )
+
+        return org
+
+    def get_organization_by_id(self, org_id: str) -> Organization:
+        org = self.org_repository.get_organization_by_id(org_id=org_id)
+        if org.update_at < datetime.datetime.now() + datetime.timedelta(
+            days=30
+        ):
+            upd_org = self.get_organization_from_api(org.inn)
+            org = self.org_repository.update_org(upd_org=upd_org)
+
+        return org
+
+    def get_organization_by_user_id(self, user_id: str) -> Organization:
+        org = self.org_repository.get_organization_by_user_id(user_id=user_id)
 
         return org
 

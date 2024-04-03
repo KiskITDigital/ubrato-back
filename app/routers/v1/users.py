@@ -34,7 +34,7 @@ async def user_requires_verification(
 
 @router.get(
     "/me",
-    response_model=models.UserPrivateDTO,
+    response_model=models.UserMe,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
@@ -43,11 +43,15 @@ async def user_requires_verification(
 )
 async def get_me(
     user_service: UserService = Depends(),
+    org_service: OrganizationService = Depends(),
     user: JWTUser = Depends(get_user),
-) -> models.UserPrivateDTO:
+) -> models.UserMe:
     dto_user = user_service.get_by_id(user.id)
+    dto_org = models.OrganizationLiteDTO(
+        **org_service.get_organization_by_user_id(user_id=dto_user.id).__dict__
+    )
 
-    return dto_user
+    return models.UserMe(organiztion=dto_org, **dto_user.__dict__)
 
 
 @router.put(

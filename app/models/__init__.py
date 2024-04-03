@@ -10,6 +10,8 @@ __all__ = [
     "Tender",
     "User",
     "UserPrivateDTO",
+    "UserMe",
+    "OrganizationLiteDTO",
 ]
 
 from .object_group import (
@@ -18,6 +20,7 @@ from .object_group import (
     ObjectsGroupsWithTypes,
     ObjectTypeModel,
 )
+from .organization import OrganizationLiteDTO
 from .service_group import (
     ServiceGroupModel,
     ServiceGroupWithTypes,
@@ -25,4 +28,4 @@ from .service_group import (
     ServiceTypeModel,
 )
 from .tender import Tender
-from .user import User, UserPrivateDTO
+from .user import User, UserMe, UserPrivateDTO

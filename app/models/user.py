@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from models.organization import OrganizationLiteDTO
 from pydantic import BaseModel, EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
@@ -32,4 +33,19 @@ class UserPrivateDTO(BaseModel):
     verified: bool
     role: int
     is_contractor: bool
+    created_at: datetime
+
+
+class UserMe(BaseModel):
+    id: str
+    email: EmailStr
+    phone: PhoneNumber
+    first_name: str
+    middle_name: str
+    last_name: str
+    avatar: str
+    verified: bool
+    role: int
+    is_contractor: bool
+    organiztion: OrganizationLiteDTO
     created_at: datetime

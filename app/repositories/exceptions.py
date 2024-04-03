@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 
 SESSION_NOT_FOUND = "Session not found."
+ORG_NOT_FOUND = "Organization not found."
 USERID_NOT_FOUND = "User with ID {} not found."
 USER_EMAIL_NOT_FOUND = "User with email {} not found."
 TENDERID_NOT_FOUND = "Tender with ID {} not found."
