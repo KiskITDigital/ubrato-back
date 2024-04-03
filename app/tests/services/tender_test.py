@@ -9,7 +9,7 @@ def test_created_tender(tender_service, created_user, session):
         name="Office cleaning",
         price=100000,
         is_contract_price=False,
-        location="Moscow",
+        location=1,
         floor_space=200,
         description="I need to clean office in Moscow city.",
         attachments=["some.link", "foo.bar"],

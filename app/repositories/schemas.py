@@ -86,7 +86,9 @@ class Tender(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     is_contract_price: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    location: Mapped[str] = mapped_column(String(80), nullable=False)
+    city_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("cities.id"), nullable=False
+    )
     floor_space: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(400))
     wishes: Mapped[str] = mapped_column(String(400))
@@ -128,6 +130,7 @@ class Tender(Base):
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")
     object_type = relationship("ObjectType", back_populates="tender")
+    city = relationship("City")
 
 
 class ObjectGroup(Base):
@@ -201,3 +204,23 @@ class Session(Base):
     )
 
     user = relationship("User", back_populates="session")
+
+
+class Region(Base):
+    __tablename__ = "regions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+
+    cities = relationship("City", back_populates="region")
+
+
+class City(Base):
+    __tablename__ = "cities"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+    region_id: Mapped[int] = mapped_column(Integer, ForeignKey("regions.id"))
+
+    region = relationship("Region", back_populates="cities")
+    tenders = relationship("Tender", back_populates="city")

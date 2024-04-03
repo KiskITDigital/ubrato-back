@@ -76,9 +76,7 @@ def db_instance():
 
     await_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
 
-    while is_responsive(
-        db_addr=db_addr, port=port
-    ) is False:
+    while is_responsive(db_addr=db_addr, port=port) is False:
         if datetime.datetime.now() > await_time:
             raise Exception(f"Waiting time is up. Addr: {dsn}")
 
@@ -176,7 +174,7 @@ def created_tender(tender_service, created_user, session):
         name="Office cleaning",
         price=100000,
         is_contract_price=False,
-        location="Moscow",
+        location=1,
         floor_space=200,
         description="I need to clean office in Moscow city.",
         attachments=["some.link", "foo.bar"],

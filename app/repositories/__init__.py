@@ -5,8 +5,10 @@ __all__ = [
     "TagsRepository",
     "TenderRepository",
     "UserRepository",
+    "CitiesRepository",
 ]
 
+from .cities import CitiesRepository
 from .logs import LogsRepository
 from .organization import OrganizationRepository
 from .session import SessionRepository

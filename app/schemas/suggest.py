@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Tuple
 
 from pydantic import BaseModel
 
 
 class SuggestRespone(BaseModel):
-    suggestions: List[str]
+    suggestions: List[Tuple[str, str]]
