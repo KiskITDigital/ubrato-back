@@ -10,7 +10,7 @@ from exceptions import (
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from repositories.exceptions import RepositoryException
+from repositories.postgres.exceptions import RepositoryException
 from routers.v1 import auth, health, manager, role, suggest, tender, users
 
 app = FastAPI(

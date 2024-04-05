@@ -13,7 +13,6 @@ from sqlalchemy import (
     Text,
     func,
 )
-from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -101,9 +100,6 @@ class Tender(Base):
     attachments: Mapped[List[str]] = mapped_column(ARRAY(Text))
     services_groups: Mapped[List[int]] = mapped_column(ARRAY(Integer))
     services_types: Mapped[List[int]] = mapped_column(ARRAY(Integer))
-    active: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=False
-    )
     reception_start: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
@@ -128,7 +124,6 @@ class Tender(Base):
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP, server_default=func.current_timestamp()
     )
-    document_tsv = mapped_column(TSVECTOR)
     verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )

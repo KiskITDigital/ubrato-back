@@ -2,9 +2,9 @@ from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from repositories import LogsRepository
-from repositories.database import SessionLocal
-from repositories.exceptions import RepositoryException
+from repositories.postgres import LogsRepository
+from repositories.postgres.database import SessionLocal
+from repositories.postgres.exceptions import RepositoryException
 from services.exceptions import AuthException, ServiceException
 from services.logs import LogsService
 from sqlalchemy.orm import scoped_session

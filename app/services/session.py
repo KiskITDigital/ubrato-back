@@ -4,8 +4,8 @@ import secrets
 import models
 from config import Config, get_config
 from fastapi import Depends, status
-from repositories import SessionRepository, UserRepository
-from repositories.schemas import Session
+from repositories.postgres import SessionRepository, UserRepository
+from repositories.postgres.schemas import Session
 from services.exceptions import SESSION_EXPIRED, ServiceException
 
 

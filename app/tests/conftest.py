@@ -4,8 +4,10 @@ import sys
 
 import psycopg2
 import pytest
-from repositories import TenderRepository, UserRepository
-from repositories.schemas import Organization, Tender, User
+from repositories.postgres import TenderRepository, UserRepository
+from repositories.postgres.schemas import Organization, Tender, User
+from repositories.typesense.client import get_db_connection
+from repositories.typesense.tender import TenderIndex
 from schemas.create_tender import CreateTenderRequest
 from services import ManagerService, TenderService, UserService
 from sqlalchemy import create_engine
@@ -18,7 +20,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 
-def is_responsive(db_addr, port):
+def postgres_is_responsive(db_addr, port):
     try:
         conn = psycopg2.connect(
             database="test",
@@ -27,7 +29,7 @@ def is_responsive(db_addr, port):
             host=db_addr,
             port=port,
         )
-        migration_dir = "./app/repositories/migration/"
+        migration_dir = "./app/repositories/postgres/migration"
         migration_files = sorted(os.listdir(migration_dir))
 
         cursor = conn.cursor()
@@ -49,9 +51,7 @@ def is_responsive(db_addr, port):
 
 
 @pytest.fixture(scope="session")
-def db_instance():
-    """Ensure that postgres is up and responsive."""
-
+def postgres_db_instance():
     port = 5432
     db_addr = os.getenv("DB_ADDR", "localhost")
 
@@ -61,7 +61,7 @@ def db_instance():
 
     await_time = datetime.datetime.now() + datetime.timedelta(seconds=30)
 
-    while is_responsive(db_addr=db_addr, port=port) is False:
+    while postgres_is_responsive(db_addr=db_addr, port=port) is False:
         if datetime.datetime.now() > await_time:
             raise Exception(f"Waiting time is up. Addr: {dsn}")
 
@@ -73,34 +73,41 @@ def db_instance():
 
 
 @pytest.fixture(scope="session")
-def session(db_instance):
-    """
-    Create a Session, close after test session, uses `db_instance` fixture
-    """
+def typesense_session():
+    client = get_db_connection()
+    yield client
 
-    db_connection = db_instance
+
+@pytest.fixture(scope="session")
+def postgres_session(postgres_db_instance):
+    db_connection = postgres_db_instance
     yield db_connection
     db_connection.close()
 
 
 @pytest.fixture(scope="module")
-def user_repository(session):
-    yield UserRepository(db=session)
-    session.query(Organization).delete()
-    session.flush()
-    session.query(User).delete()
-    session.commit()
+def user_repository(postgres_session):
+    yield UserRepository(db=postgres_session)
+    postgres_session.query(Organization).delete()
+    postgres_session.flush()
+    postgres_session.query(User).delete()
+    postgres_session.commit()
 
 
 @pytest.fixture(scope="module")
-def tender_repository(session):
-    yield TenderRepository(db=session)
-    session.query(Tender).delete()
-    session.flush()
-    session.query(Organization).delete()
-    session.flush()
-    session.query(User).delete()
-    session.commit()
+def tender_repository(postgres_session):
+    yield TenderRepository(db=postgres_session)
+    postgres_session.query(Tender).delete()
+    postgres_session.flush()
+    postgres_session.query(Organization).delete()
+    postgres_session.flush()
+    postgres_session.query(User).delete()
+    postgres_session.commit()
+
+
+@pytest.fixture(scope="module")
+def tender_index(typesense_session):
+    yield TenderIndex(db=typesense_session)
 
 
 @pytest.fixture(scope="module")
@@ -109,8 +116,10 @@ def user_service(user_repository):
 
 
 @pytest.fixture(scope="module")
-def tender_service(tender_repository):
-    return TenderService(tender_repository=tender_repository)
+def tender_service(tender_repository, tender_index):
+    return TenderService(
+        tender_repository=tender_repository, tender_index=tender_index
+    )
 
 
 @pytest.fixture(scope="module")
@@ -121,7 +130,7 @@ def manager_service(user_repository, tender_repository):
 
 
 @pytest.fixture(scope="function")
-def created_user(user_service, session):
+def created_user(user_service, postgres_session):
     org = Organization(
         id="org_456",
         brand_name="foobar",
@@ -147,14 +156,14 @@ def created_user(user_service, session):
     )
 
     yield created_user
-    session.query(Organization).filter_by(user_id=created_user.id).delete()
-    session.flush()
-    session.query(User).filter_by(id=created_user.id).delete()
-    session.commit()
+    postgres_session.query(Organization).filter_by(user_id=created_user.id).delete()
+    postgres_session.flush()
+    postgres_session.query(User).filter_by(id=created_user.id).delete()
+    postgres_session.commit()
 
 
 @pytest.fixture(scope="function")
-def created_tender(tender_service, created_user, session):
+def created_tender(tender_service, created_user, postgres_session):
     tender = CreateTenderRequest(
         name="Office cleaning",
         price=100000,
@@ -177,5 +186,5 @@ def created_tender(tender_service, created_user, session):
     created_tender = tender_service.create_tender(tender, created_user.id)
 
     yield created_tender
-    session.query(Tender).filter_by(id=created_tender.id).delete()
-    session.commit()
+    postgres_session.query(Tender).filter_by(id=created_tender.id).delete()
+    postgres_session.commit()

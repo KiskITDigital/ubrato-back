@@ -1,6 +1,6 @@
 from fastapi import Depends
-from repositories.database import get_db_connection
-from repositories.schemas import Logs
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.schemas import Logs
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session
 

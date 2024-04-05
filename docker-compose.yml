@@ -6,11 +6,20 @@ services:
     container_name: test-db
     ports:
       - "5432:5432"
-    # volumes:
-    #   - "./app/repositories/migration/:/docker-entrypoint-initdb.d/"
+    volumes:
+      - "./app/repositories/postgres/migration:/docker-entrypoint-initdb.d/"
     environment:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "12345"
-      POSTGRES_DB: "test"
+      POSTGRES_DB: "postgres"
 
     restart: "on-failure"
+
+  typesense:
+    image: typesense/typesense:26.0-amd64
+    restart: on-failure
+    ports:
+      - "8108:8108"
+    volumes:
+      - ./typesense-data:/data
+    command: '--data-dir /data --api-key=xyz --enable-cors'

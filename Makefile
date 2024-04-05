@@ -3,10 +3,10 @@ include .env
 .PHONY: install installdev run format docker_build docker_run docker_clean migration_up migration_down
 
 migration_up:
-	migrate -path ./app/repositories/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose up
+	migrate -path ./app/repositories/postgres/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose up
 
 migration_down:
-	migrate -path ./app/repositories/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose down
+	migrate -path ./app/repositories/postgres/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose down
 
 docker_build:
 	docker build --build-arg GIT_VERSION=$(git describe --long --tags --always) -t ubrato:0.1.0 .

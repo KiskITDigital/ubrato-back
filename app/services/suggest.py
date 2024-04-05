@@ -2,7 +2,7 @@ from typing import List
 
 import models
 from fastapi import Depends
-from repositories import CitiesRepository
+from repositories.postgres import CitiesRepository
 
 
 class SuggestService:

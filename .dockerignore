@@ -6,3 +6,4 @@ __pycache__
 .vscode
 .venv
 .env.example
+typesense-data/

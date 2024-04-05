@@ -6,8 +6,8 @@ from typing import List
 from config import get_config
 from dadata import Dadata
 from fastapi import Depends, status
-from repositories import OrganizationRepository
-from repositories.schemas import Document, Organization
+from repositories.postgres import OrganizationRepository
+from repositories.postgres.schemas import Document, Organization
 from services.exceptions import ServiceException
 
 

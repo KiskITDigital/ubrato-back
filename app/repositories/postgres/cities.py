@@ -2,9 +2,12 @@ from typing import List
 
 import models
 from fastapi import Depends, status
-from repositories.database import get_db_connection
-from repositories.exceptions import CITY_NOT_FOUNT, RepositoryException
-from repositories.schemas import City, Region
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import (
+    CITY_NOT_FOUNT,
+    RepositoryException,
+)
+from repositories.postgres.schemas import City, Region
 from sqlalchemy.orm import Session, scoped_session
 
 

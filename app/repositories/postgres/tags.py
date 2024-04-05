@@ -9,8 +9,8 @@ from models import (
     ServicesGroupsWithTypes,
     ServiceTypeModel,
 )
-from repositories.database import get_db_connection
-from repositories.schemas import (
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.schemas import (
     ObjectGroup,
     ObjectType,
     ServiceGroup,

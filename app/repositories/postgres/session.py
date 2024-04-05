@@ -1,7 +1,10 @@
 from fastapi import Depends, status
-from repositories.database import get_db_connection
-from repositories.exceptions import SESSION_NOT_FOUND, RepositoryException
-from repositories.schemas import Session
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import (
+    SESSION_NOT_FOUND,
+    RepositoryException,
+)
+from repositories.postgres.schemas import Session
 from sqlalchemy.orm import Session as SQLSession
 from sqlalchemy.orm import scoped_session
 

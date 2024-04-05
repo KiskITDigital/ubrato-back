@@ -1,5 +1,5 @@
 from models.user import UserPrivateDTO
-from repositories.schemas import Organization
+from repositories.postgres.schemas import Organization
 
 
 def test_create_user(user_service):

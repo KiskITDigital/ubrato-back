@@ -3,13 +3,13 @@ from typing import Any, List, Optional
 
 import models
 from fastapi import Depends, status
-from repositories.database import get_db_connection
-from repositories.exceptions import (
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import (
     SERVICE_NOT_FOUND,
     TENDERID_NOT_FOUND,
     RepositoryException,
 )
-from repositories.schemas import (
+from repositories.postgres.schemas import (
     City,
     ObjectGroup,
     ObjectType,
@@ -51,7 +51,6 @@ class TenderRepository:
 
         for key, value in tender.items():
             setattr(tender_to_update, key, value)
-            tender_to_update.active = False
             tender_to_update.verified = False
 
         self.db.commit()
@@ -68,8 +67,6 @@ class TenderRepository:
         floor_space_to: Optional[int],
         price_from: Optional[int],
         price_to: Optional[int],
-        text: Optional[str],
-        active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
     ) -> List[models.Tender]:
@@ -111,10 +108,6 @@ class TenderRepository:
 
         price_to_condition = (price_to is None) or (Tender.price <= price_to)
 
-        text_condition = (text is None) or Tender.document_tsv.match(text)
-
-        active_condition = (active is None) or (Tender.active == active)
-
         verified_condition = (verified is None) or (
             Tender.verified == verified
         )
@@ -137,8 +130,6 @@ class TenderRepository:
                     floor_space_to_condition,  # type: ignore
                     price_from_condition,  # type: ignore
                     price_to_condition,  # type: ignore
-                    text_condition,  # type: ignore
-                    active_condition,  # type: ignore
                     verified_condition,  # type: ignore
                     user_id_condition,  # type: ignore
                 )
@@ -205,23 +196,10 @@ class TenderRepository:
         tender.verified = verified
         self.db.commit()
 
-    def update_active_status(self, tender_id: int, active: bool) -> None:
-        tender = self.db.query(Tender).filter(Tender.id == tender_id).first()
-
-        if tender is None:
-            raise RepositoryException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=TENDERID_NOT_FOUND.format(tender_id),
-                sql_msg="",
-            )
-        tender.active = active
-        self.db.commit()
-
     def get_count_active_tenders(
         self, object_group_id: Optional[int], service_type_id: Optional[int]
     ) -> int:
         query = self.db.query(Tender).filter(
-            Tender.active,
             Tender.reception_end > datetime.now(),
             object_group_id is None  # type: ignore
             or Tender.object_group_id == object_group_id,
@@ -281,7 +259,6 @@ class TenderRepository:
             attachments=tender.attachments,
             services_groups=services_groups_names,
             services_types=services_type_names,
-            active=tender.active,
             reception_start=tender.reception_start,
             reception_end=tender.reception_end,
             work_start=tender.work_start,

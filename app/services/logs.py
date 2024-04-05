@@ -1,8 +1,8 @@
 import uuid
 
 from fastapi import Depends, Request
-from repositories import LogsRepository
-from repositories.schemas import Logs
+from repositories.postgres import LogsRepository
+from repositories.postgres.schemas import Logs
 
 
 class LogsService:

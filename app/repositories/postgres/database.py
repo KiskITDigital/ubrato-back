@@ -2,14 +2,19 @@ from typing import Generator
 
 from config import Config, get_config
 from fastapi import status
-from repositories.exceptions import DATA_ALREADY_EXIST, RepositoryException
+from repositories.postgres.exceptions import (
+    DATA_ALREADY_EXIST,
+    RepositoryException,
+)
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
 
 config: Config = get_config()
 
-engine = create_engine(config.Database.DB_DSN, pool_size=20, max_overflow=0)
+engine = create_engine(
+    config.Database.Postgres.DB_DSN, pool_size=20, max_overflow=0
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

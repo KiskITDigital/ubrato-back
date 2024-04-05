@@ -1,9 +1,9 @@
 from datetime import datetime
 
 from fastapi import Depends, status
-from repositories.database import get_db_connection
-from repositories.exceptions import ORG_NOT_FOUND, RepositoryException
-from repositories.schemas import Document, Organization
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import ORG_NOT_FOUND, RepositoryException
+from repositories.postgres.schemas import Document, Organization
 from sqlalchemy.orm import Session, scoped_session
 
 

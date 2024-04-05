@@ -55,8 +55,6 @@ async def get_page_tenders(
     floor_space_to: Optional[int] = None,
     price_from: Optional[int] = None,
     price_to: Optional[int] = None,
-    text: Optional[str] = None,
-    active: Optional[bool] = True,
     verified: Optional[bool] = True,
     user_id: Optional[str] = None,
     tender_service: TenderService = Depends(),
@@ -80,8 +78,6 @@ async def get_page_tenders(
         floor_space_to=floor_space_to,
         price_from=price_from,
         price_to=price_to,
-        text=text,
-        active=active,
         verified=verified,
         user_id=user_id,
     )

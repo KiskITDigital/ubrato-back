@@ -3,8 +3,8 @@ import uuid
 import bcrypt
 import models
 from fastapi import Depends
-from repositories import UserRepository
-from repositories.schemas import Organization, User
+from repositories.postgres import UserRepository
+from repositories.postgres.schemas import Organization, User
 
 
 class UserService:

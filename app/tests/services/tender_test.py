@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from repositories.schemas import Tender
+from repositories.postgres.schemas import Tender
 from schemas.create_tender import CreateTenderRequest
 
 
-def test_created_tender(tender_service, created_user, session):
+def test_created_tender(tender_service, created_user, postgres_session):
     tender = CreateTenderRequest(
         name="Office cleaning",
         price=100000,
@@ -25,8 +25,8 @@ def test_created_tender(tender_service, created_user, session):
     )
 
     created_tender = tender_service.create_tender(tender, created_user.id)
-    session.query(Tender).filter_by(id=created_tender.id).delete()
-    session.commit()
+    postgres_session.query(Tender).filter_by(id=created_tender.id).delete()
+    postgres_session.commit()
 
 
 def test_get_page_tenders(created_tender, tender_service):
@@ -41,8 +41,6 @@ def test_get_page_tenders(created_tender, tender_service):
         floor_space_to=300,
         price_from=50000,
         price_to=150000,
-        text="quick",
-        active=False,
         verified=False,
         user_id=created_tender.user_id,
     )

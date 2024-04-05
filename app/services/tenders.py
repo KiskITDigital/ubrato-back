@@ -3,8 +3,10 @@ from typing import List, Optional
 import models
 from fastapi import Depends
 from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
-from repositories import TagsRepository, TenderRepository
-from repositories.schemas import Tender
+from repositories.postgres import TagsRepository, TenderRepository
+from repositories.postgres.schemas import Tender
+from repositories.typesense.schemas import TypesenseTender
+from repositories.typesense.tender import TenderIndex
 from schemas.create_tender import CreateTenderRequest
 
 
@@ -16,15 +18,41 @@ class TenderService:
         self,
         tags_repository: TagsRepository = Depends(),
         tender_repository: TenderRepository = Depends(),
+        tender_index: TenderIndex = Depends(),
     ) -> None:
         self.tags_repository = tags_repository
         self.tender_repository = tender_repository
+        self.tender_index = tender_index
 
     def create_tender(
         self, tender: CreateTenderRequest, user_id: str
     ) -> models.Tender:
         created_tender = self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
+        )
+        self.tender_index.save(
+            tender=TypesenseTender(
+                id=str(created_tender.id),
+                name=created_tender.name,
+                price=created_tender.price,
+                is_contract_price=created_tender.is_contract_price,
+                city_id=created_tender.city_id,
+                floor_space=created_tender.floor_space,
+                description=created_tender.description,
+                wishes=created_tender.wishes,
+                services_groups=created_tender.services_groups,
+                services_types=created_tender.services_types,
+                reception_start=int(
+                    created_tender.reception_start.timestamp()
+                ),
+                reception_end=int(created_tender.reception_end.timestamp()),
+                work_start=int(created_tender.work_start.timestamp()),
+                work_end=int(created_tender.work_end.timestamp()),
+                object_group_id=created_tender.object_group_id,
+                object_type_id=created_tender.object_type_id,
+                verified=created_tender.verified,
+                created_at=int(created_tender.created_at.timestamp()),
+            )
         )
         return self.tender_repository.get_tender_by_id(
             tender_id=created_tender.id
@@ -42,8 +70,6 @@ class TenderService:
         floor_space_to: Optional[int],
         price_from: Optional[int],
         price_to: Optional[int],
-        text: Optional[str],
-        active: Optional[bool],
         verified: Optional[bool],
         user_id: Optional[str],
     ) -> List[models.Tender]:
@@ -58,8 +84,6 @@ class TenderService:
             floor_space_to=floor_space_to,
             price_from=price_from,
             price_to=price_to,
-            text=text,
-            active=active,
             verified=verified,
             user_id=user_id,
         )

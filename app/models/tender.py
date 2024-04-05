@@ -16,7 +16,6 @@ class Tender(BaseModel):
     attachments: List[str]
     services_groups: List[str]
     services_types: List[str]
-    active: bool
     reception_start: datetime
     reception_end: datetime
     work_start: datetime

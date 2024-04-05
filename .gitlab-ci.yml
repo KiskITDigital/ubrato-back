@@ -33,9 +33,21 @@ test:
     POSTGRES_PASSWORD: "12345"
     POSTGRES_DB: "test"
     DB_ADDR: "postgres"
+
+    TYPESENS_API_KEY: "xyz"
+    TYPESENS_HOST: "typesense"
+    TYPESENS_PORT: 8108
+    TYPESENS_PROTOCOL: "http"
   services:
     - name: postgres:16.2-alpine3.19
       alias: postgres
+    - name: typesense/typesense:26.0-amd64
+      alias: typesense
+  before_script:
+    - apt update
+    - apt install curl -y
+    - cd ./app/repositories/typesens/migration
+    - ./migration.sh
   script:
     - pip install poetry
     - poetry --version

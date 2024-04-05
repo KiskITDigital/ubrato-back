@@ -2,13 +2,13 @@ from typing import List
 
 import models
 from fastapi import Depends, status
-from repositories.database import get_db_connection
-from repositories.exceptions import (
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import (
     USER_EMAIL_NOT_FOUND,
     USERID_NOT_FOUND,
     RepositoryException,
 )
-from repositories.schemas import Organization, User
+from repositories.postgres.schemas import Organization, User
 from sqlalchemy.orm import Session, scoped_session
 
 

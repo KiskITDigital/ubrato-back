@@ -2,7 +2,7 @@ from typing import List
 
 import models
 from fastapi import Depends
-from repositories import TenderRepository, UserRepository
+from repositories.postgres import TenderRepository, UserRepository
 
 
 class ManagerService:
@@ -43,7 +43,4 @@ class ManagerService:
     ) -> None:
         self.tender_repository.update_verified_status(
             tender_id=tender_id, verified=status
-        )
-        self.tender_repository.update_active_status(
-            tender_id=tender_id, active=status
         )

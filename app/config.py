@@ -7,10 +7,17 @@ load_dotenv()
 
 class Config:
     class Database:
-        DB_DSN: str = os.getenv(
-            "DB_DSN",
-            "postgresql+psycopg2://postgres:12345@localhost:5432/postgres",
-        )
+        class Postgres:
+            DB_DSN: str = os.getenv(
+                "DB_DSN",
+                "postgresql+psycopg2://postgres:12345@localhost:5432/postgres",
+            )
+
+        class Typesense:
+            API_KEY: str = os.getenv("TYPESENS_API_KEY", "xyz")
+            HOST: str = os.getenv("TYPESENS_HOST", "localhost")
+            PORT: str = os.getenv("TYPESENS_PORT", "8081")
+            PROTOCOL: str = os.getenv("TYPESENS_PROTOCOL", "http")
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
