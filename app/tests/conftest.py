@@ -110,9 +110,9 @@ def tender_repository(postgres_session):
 def tender_index(typesense_session):
     folder_path = os.path.join("./app/repositories/typesense/migration")
     for file_name in os.listdir(folder_path):
-        if file_name.endswith('.json'):
+        if file_name.endswith(".json"):
             file_path = os.path.join(folder_path, file_name)
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 data = json.load(f)
                 typesense_session.collections.create(data)
 
@@ -165,7 +165,9 @@ def created_user(user_service, postgres_session):
     )
 
     yield created_user
-    postgres_session.query(Organization).filter_by(user_id=created_user.id).delete()
+    postgres_session.query(Organization).filter_by(
+        user_id=created_user.id
+    ).delete()
     postgres_session.flush()
     postgres_session.query(User).filter_by(id=created_user.id).delete()
     postgres_session.commit()
