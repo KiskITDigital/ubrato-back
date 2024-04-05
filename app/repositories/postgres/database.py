@@ -2,10 +2,7 @@ from typing import Generator
 
 from config import Config, get_config
 from fastapi import status
-from repositories.postgres.exceptions import (
-    DATA_ALREADY_EXIST,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import DATA_ALREADY_EXIST, RepositoryException
 from sqlalchemy import create_engine
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
@@ -21,6 +18,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def get_db_connection() -> Generator[scoped_session[Session], None, None]:
     db: scoped_session[Session] = scoped_session(SessionLocal)
     try:
+        db.begin()
         yield db
     except OperationalError:
         db.rollback()
