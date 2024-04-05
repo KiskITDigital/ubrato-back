@@ -3,9 +3,9 @@ apply_migration() {
   echo "Applying migration from $json_file"
   curl -X POST \
     -H "Content-Type: application/json" \
-    -H "X-TYPESENSE-API-KEY: ${TYPESENS_API_KEY}" \
+    -H "X-TYPESENSE-API-KEY: ${TYPESENSE_API_KEY}" \
     -d "@$json_file" \
-    "http://localhost:8108/collections"
+    "http://${TYPESENSE_HOST}:8108/collections"
 }
 
 for file in ./*.json; do

@@ -14,10 +14,10 @@ class Config:
             )
 
         class Typesense:
-            API_KEY: str = os.getenv("TYPESENS_API_KEY", "xyz")
-            HOST: str = os.getenv("TYPESENS_HOST", "localhost")
-            PORT: str = os.getenv("TYPESENS_PORT", "8081")
-            PROTOCOL: str = os.getenv("TYPESENS_PROTOCOL", "http")
+            API_KEY: str = os.getenv("TYPESENSE_API_KEY", "xyz")
+            HOST: str = os.getenv("TYPESENSE_HOST", "localhost")
+            PORT: str = os.getenv("TYPESENSE_PORT", "8081")
+            PROTOCOL: str = os.getenv("TYPESENSE_PROTOCOL", "http")
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")

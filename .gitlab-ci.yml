@@ -34,10 +34,10 @@ test:
     POSTGRES_DB: "test"
     DB_ADDR: "postgres"
 
-    TYPESENS_API_KEY: "xyz"
-    TYPESENS_HOST: "typesense"
-    TYPESENS_PORT: 8108
-    TYPESENS_PROTOCOL: "http"
+    TYPESENSE_API_KEY: "xyz"
+    TYPESENSE_HOST: "typesense"
+    TYPESENSE_PORT: 8108
+    TYPESENSE_PROTOCOL: "http"
   services:
     - name: postgres:16.2-alpine3.19
       alias: postgres
