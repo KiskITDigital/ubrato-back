@@ -44,7 +44,7 @@ test:
     - name: typesense/typesense:26.0-amd64
       alias: typesense
       entrypoint: ["/bin/sh"]
-      command: ["mkdir", "/data", "&&", "/opt/typesense-server", "--data-dir", "/data", "--api-key=xyz", "--enable-cors"]
+      command: ["-c", "mkdir /data && /opt/typesense-server --data-dir /data --api-key=xyz --enable-cors"]
   script:
     - pip install poetry
     - poetry --version
