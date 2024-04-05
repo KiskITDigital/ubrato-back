@@ -1,19 +1,21 @@
+from typing import List
+
+import models
 from fastapi import APIRouter, Depends
-from schemas.suggest import SuggestRespone
 from services import SuggestService
 
 router = APIRouter(
     prefix="/v1/suggest",
-    tags=["dadata"],
+    tags=["suggest"],
 )
 
 
 @router.get(
     "/city",
-    response_model=SuggestRespone,
+    response_model=List[models.City],
 )
 async def search_city(
     query: str,
     suggest_service: SuggestService = Depends(),
-) -> SuggestRespone:
-    return SuggestRespone(suggestions=suggest_service.search_city(query=query))
+) -> List[models.City]:
+    return suggest_service.search_city(query=query)

@@ -1,5 +1,6 @@
-from typing import List, Tuple
+from typing import List
 
+import models
 from fastapi import Depends, status
 from repositories.database import get_db_connection
 from repositories.exceptions import CITY_NOT_FOUNT, RepositoryException
@@ -26,11 +27,21 @@ class CitiesRepository:
             )
         return city
 
-    def search_by_name(self, name: str) -> List[Tuple[str, str]]:
+    def search_by_name(self, name: str) -> List[models.City]:
         results = (
             self.db.query(City, Region.name)
             .join(Region, City.region_id == Region.id)
             .filter(City.name.ilike(name + "%"))
             .limit(10)
         )
-        return [(city.name, region_name) for city, region_name in results]
+
+        cities: List[models.City] = []
+        for city, region_name in results:
+            city_model = models.City(
+                id=city.id,
+                name=city.name,
+                region=region_name,
+            )
+            cities.append(city_model)
+
+        return cities

@@ -12,8 +12,10 @@ __all__ = [
     "UserPrivateDTO",
     "UserMe",
     "OrganizationLiteDTO",
+    "City",
 ]
 
+from .city import City
 from .object_group import (
     ObjectGroupModel,
     ObjectGroupWithTypes,
