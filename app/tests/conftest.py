@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import sys
 
@@ -107,6 +108,14 @@ def tender_repository(postgres_session):
 
 @pytest.fixture(scope="module")
 def tender_index(typesense_session):
+    folder_path = os.path.join("./app/repositories/typesense/migration")
+    for file_name in os.listdir(folder_path):
+        if file_name.endswith('.json'):
+            file_path = os.path.join(folder_path, file_name)
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+                typesense_session.collections.create(data)
+
     yield TenderIndex(db=typesense_session)
 
 
