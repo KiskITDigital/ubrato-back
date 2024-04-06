@@ -1,6 +1,7 @@
 import pytest
 from repositories.postgres.schemas import Organization
-from tests.conftest import (
+
+from app.test.conftest import (
     generate_random_email,
     generate_random_number,
     generate_random_phone,
