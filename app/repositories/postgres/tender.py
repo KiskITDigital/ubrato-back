@@ -175,9 +175,7 @@ class TenderRepository:
                 sql_msg="",
             )
 
-        tender, object_group_name, object_type_name, city_name = (
-            found_tender
-        )
+        tender, object_group_name, object_type_name, city_name = found_tender
 
         return await self.format_tender(
             tender=tender,
@@ -289,4 +287,5 @@ class TenderRepository:
             user_id=tender.user_id,
             created_at=tender.created_at,
             verified=tender.verified,
+            active=tender.active,
         )

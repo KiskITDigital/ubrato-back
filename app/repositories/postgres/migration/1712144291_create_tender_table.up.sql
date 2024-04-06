@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS tender (
     services_groups     INTEGER[]       NULL,
     services_types      INTEGER[]       NULL,
     verified            BOOLEAN         NOT NULL DEFAULT FALSE,
+    active              BOOLEAN         NOT NULL DEFAULT FALSE,
     reception_start     TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,

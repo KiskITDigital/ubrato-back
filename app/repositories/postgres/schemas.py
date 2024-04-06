@@ -128,6 +128,9 @@ class Tender(Base):
     verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
+    active: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
 
     user = relationship("User", back_populates="tender")
     object_group = relationship("ObjectGroup", back_populates="tender")

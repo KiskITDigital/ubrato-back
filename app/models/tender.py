@@ -25,3 +25,4 @@ class Tender(BaseModel):
     user_id: str
     created_at: datetime
     verified: bool
+    active: bool

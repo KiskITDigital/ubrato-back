@@ -51,6 +51,7 @@ class TenderService:
                 object_group_id=created_tender.object_group_id,
                 object_type_id=created_tender.object_type_id,
                 verified=created_tender.verified,
+                active=created_tender.active,
                 created_at=int(created_tender.created_at.timestamp()),
             )
         )

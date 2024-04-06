@@ -17,7 +17,8 @@
     {"name": "work_end", "type": "int64"},
     {"name": "object_group_id", "type": "int32"},
     {"name": "object_type_id", "type": "int32"},
-    {"name": "verified", "type": "int32"},
+    {"name": "verified", "type": "bool"},
+    {"name": "active", "type": "bool"},
     {"name": "created_at", "type": "int64"}
   ],
   "default_sorting_field": "created_at",
