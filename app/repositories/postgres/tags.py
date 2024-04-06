@@ -29,18 +29,18 @@ class TagsRepository:
     async def get_all_objects_with_types(
         self,
     ) -> ObjectsGroupsWithTypes:
-        object_groups = await self.db.execute(select(ObjectGroup))
+        query = await self.db.execute(select(ObjectGroup))
 
         groups_data: List[ObjectGroupWithTypes] = []
 
-        for group in object_groups:
+        for group in query.scalars().all():
             query = await self.db.execute(
                 select(ObjectType).where(
                     ObjectType.object_group_id == group.id
                 )
             )
 
-            types_in_group = query.all()
+            types_in_group = query.scalars().all()
 
             types_list = [
                 ObjectTypeModel(id=obj_type.id, name=obj_type.name)
@@ -57,18 +57,18 @@ class TagsRepository:
     async def get_all_services_with_types(
         self,
     ) -> ServicesGroupsWithTypes:
-        service_groups = await self.db.execute(select(ServiceGroup))
+        query = await self.db.execute(select(ServiceGroup))
 
         groups_data: List[ServiceGroupWithTypes] = []
 
-        for group in service_groups:
+        for group in query.scalars().all():
             query = await self.db.execute(
                 select(ServiceType).where(
                     ServiceType.service_group_id == group.id
                 )
             )
 
-            types_in_group = query.all()
+            types_in_group = query.scalars().all()
 
             types_list = [
                 ServiceTypeModel(id=obj_type.id, name=obj_type.name)
