@@ -1,5 +1,6 @@
 from typing import Annotated
 
+import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
 from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
@@ -39,7 +40,7 @@ async def signup_user(
 ) -> SignUpResponse:
     org = org_service.get_organization_from_api(inn=user.inn)
 
-    created_user = user_service.create(
+    created_user, created_org = await user_service.create(
         email=user.email,
         phone=user.phone,
         password=user.password,
@@ -51,7 +52,7 @@ async def signup_user(
         org=org,
     )
 
-    session_id = session_service.create_session(created_user.id)
+    session_id = await session_service.create_session(created_user.id)
     response.set_cookie(
         key="session_id",
         value=session_id,
@@ -60,7 +61,9 @@ async def signup_user(
         secure=True,
     )
 
-    return SignUpResponse(access_token=jwt_service.generate_jwt(created_user))
+    return SignUpResponse(
+        access_token=jwt_service.generate_jwt(created_user, created_org)
+    )
 
 
 @router.post(
@@ -76,10 +79,13 @@ async def signin_user(
     response: Response,
     data: SignInRequest,
     user_service: UserService = Depends(),
+    org_service: OrganizationService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
 ) -> SignInResponse:
-    user = user_service.get_by_email(data.email)
+    user = await user_service.get_by_email(data.email)
+
+    org = await org_service.get_organization_by_user_id(user.id)
 
     if not user_service.password_valid(data.password, user.password):
         raise ServiceException(
@@ -87,7 +93,7 @@ async def signin_user(
             detail=INVALID_CREDENTIAL,
         )
 
-    session_id = session_service.create_session(user.id)
+    session_id = await session_service.create_session(user.id)
 
     response.set_cookie(
         key="session_id",
@@ -97,7 +103,9 @@ async def signin_user(
         secure=True,
     )
 
-    return SignInResponse(access_token=jwt_service.generate_jwt(user))
+    return SignInResponse(
+        access_token=jwt_service.generate_jwt(user=user, org=org)
+    )
 
 
 @router.get(
@@ -111,6 +119,7 @@ async def signin_user(
 )
 async def refresh_session(
     session_id: Annotated[str | None, Cookie()],
+    org_service: OrganizationService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
 ) -> SignInResponse:
@@ -119,6 +128,11 @@ async def refresh_session(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=NO_COOKIE,
         )
-    user = session_service.get_user_session_by_id(session_id=session_id)
+    user = await session_service.get_user_session_by_id(session_id=session_id)
+    org = await org_service.get_organization_by_user_id(user.id)
 
-    return SignInResponse(access_token=jwt_service.generate_jwt(user))
+    return SignInResponse(
+        access_token=jwt_service.generate_jwt(
+            user=user, org=models.Organization(**org.__dict__)
+        )
+    )

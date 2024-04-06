@@ -12,6 +12,7 @@ __all__ = [
     "UserPrivateDTO",
     "UserMe",
     "OrganizationLiteDTO",
+    "Organization",
     "City",
 ]
 
@@ -22,7 +23,7 @@ from .object_group import (
     ObjectsGroupsWithTypes,
     ObjectTypeModel,
 )
-from .organization import OrganizationLiteDTO
+from .organization import Organization, OrganizationLiteDTO
 from .service_group import (
     ServiceGroupModel,
     ServiceGroupWithTypes,

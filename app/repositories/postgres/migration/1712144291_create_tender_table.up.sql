@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS tender (
     services_groups     INTEGER[]       NULL,
     services_types      INTEGER[]       NULL,
     verified            BOOLEAN         NOT NULL DEFAULT FALSE,
-    reception_start     TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reception_end       TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    work_start          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    work_end            TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reception_start     TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    work_end            TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     object_group_id     INT             REFERENCES objects_groups(id),
     object_type_id      INT             REFERENCES objects_types(id),
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
-    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    created_at          TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
 );

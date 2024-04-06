@@ -36,7 +36,7 @@ class User(Base):
     role: Mapped[int] = mapped_column(SmallInteger, default=0)
     is_contractor: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, default=func.current_timestamp()
+        TIMESTAMP(timezone=True), default=func.current_timestamp()
     )
 
     organization = relationship("Organization", back_populates="user")
@@ -60,10 +60,11 @@ class Organization(Base):
         String(40), ForeignKey("users.id"), nullable=False
     )
     update_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True),
+        server_default=func.current_timestamp(),
     )
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
 
     user = relationship("User", back_populates="organization")
@@ -101,16 +102,16 @@ class Tender(Base):
     services_groups: Mapped[List[int]] = mapped_column(ARRAY(Integer))
     services_types: Mapped[List[int]] = mapped_column(ARRAY(Integer))
     reception_start: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     reception_end: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     work_start: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     work_end: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     object_group_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("objects_groups.id")
@@ -122,7 +123,7 @@ class Tender(Base):
         String(40), ForeignKey("users.id"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, server_default=func.current_timestamp()
+        TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
     verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
@@ -188,7 +189,7 @@ class Logs(Base):
     code: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     msg: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, default=func.current_timestamp()
+        TIMESTAMP(timezone=True), default=func.current_timestamp()
     )
 
 
@@ -199,9 +200,11 @@ class Session(Base):
     user_id: Mapped[str] = mapped_column(
         String(40), ForeignKey("users.id"), nullable=False
     )
-    expires_at: Mapped[datetime] = mapped_column(TIMESTAMP, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP, default=func.current_timestamp()
+        TIMESTAMP(timezone=True), default=func.current_timestamp()
     )
 
     user = relationship("User", back_populates="session")

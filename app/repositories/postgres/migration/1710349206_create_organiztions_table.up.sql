@@ -9,6 +9,6 @@ CREATE TABLE IF NOT EXISTS organizations (
     tax_code            INT             NOT NULL,
     address             VARCHAR(255)    NOT NULL,
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
-    update_at           TIMESTAMP       DEFAULT CURRENT_TIMESTAMP,
-    created_at          TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    update_at           TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP,
+    created_at          TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
 );

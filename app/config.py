@@ -10,7 +10,7 @@ class Config:
         class Postgres:
             DB_DSN: str = os.getenv(
                 "DB_DSN",
-                "postgresql+psycopg2://postgres:12345@localhost:5432/postgres",
+                "postgresql+asyncpg://postgres:12345@localhost:5432/postgres",
             )
 
         class Typesense:

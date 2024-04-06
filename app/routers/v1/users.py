@@ -27,7 +27,7 @@ async def user_requires_verification(
     data: VerifyRequest,
     org_service: OrganizationService = Depends(),
 ) -> SuccessResponse:
-    org_service.save_docs(links=data.documents, org_id=data.org_id)
+    await org_service.save_docs(links=data.documents, org_id=data.org_id)
 
     return SuccessResponse()
 
@@ -43,12 +43,17 @@ async def user_requires_verification(
 )
 async def get_me(
     user_service: UserService = Depends(),
-    org_service: OrganizationService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> models.UserMe:
-    dto_user = user_service.get_by_id(user.id)
+    dto_user = await user_service.get_by_id(user.id)
+
     dto_org = models.OrganizationLiteDTO(
-        **org_service.get_organization_by_user_id(user_id=dto_user.id).__dict__
+        id=user.org_id,
+        short_name=user.org_short_name,
+        inn=user.org_inn,
+        okpo=user.org_okpo,
+        ogrn=user.org_ogrn,
+        kpp=user.org_kpp,
     )
 
     return models.UserMe(organiztion=dto_org, **dto_user.__dict__)
@@ -68,5 +73,5 @@ async def upd_avatar(
     user_service: UserService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    user_service.upd_avatar(user_id=user.id, avatar=avatar.avatar)
+    await user_service.upd_avatar(user_id=user.id, avatar=avatar.avatar)
     return SuccessResponse()

@@ -5,5 +5,5 @@ CREATE TABLE IF NOT EXISTS logs (
     body        TEXT            DEFAULT NULL,
     code        SMALLINT        DEFAULT NULL,
     msg         TEXT            DEFAULT NULL,
-    created_at  TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
 );

@@ -14,5 +14,5 @@ class SuggestService:
     ) -> None:
         self.cities_repository = cities_repository
 
-    def search_city(self, query: str) -> List[models.City]:
-        return self.cities_repository.search_by_name(name=query)
+    async def search_city(self, query: str) -> List[models.City]:
+        return await self.cities_repository.search_by_name(name=query)

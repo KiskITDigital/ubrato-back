@@ -33,6 +33,7 @@ test:
     POSTGRES_PASSWORD: "12345"
     POSTGRES_DB: "test"
     DB_ADDR: "postgres"
+    DB_DSN: "postgresql+asyncpg://postgres:12345@postgres:5432/test?sslmode=disable"
 
     TYPESENSE_API_KEY: "xyz"
     TYPESENSE_HOST: "typesense"

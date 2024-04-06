@@ -3,6 +3,7 @@ import hashlib
 import uuid
 from typing import List
 
+import models
 from config import get_config
 from dadata import Dadata
 from fastapi import Depends, status
@@ -40,32 +41,36 @@ class OrganizationService:
             okpo=result[0]["data"]["okpo"],
             ogrn=result[0]["data"]["ogrn"],
             kpp=result[0]["data"]["kpp"],
-            tax_code=result[0]["data"]["address"]["data"]["tax_office"],
+            tax_code=int(result[0]["data"]["address"]["data"]["tax_office"]),
             address=result[0]["data"]["address"]["unrestricted_value"],
         )
 
         return org
 
-    def get_organization_by_id(self, org_id: str) -> Organization:
-        org = self.org_repository.get_organization_by_id(org_id=org_id)
+    async def get_organization_by_id(self, org_id: str) -> Organization:
+        org = await self.org_repository.get_organization_by_id(org_id=org_id)
         if org.update_at < datetime.datetime.now() + datetime.timedelta(
             days=30
         ):
             upd_org = self.get_organization_from_api(org.inn)
-            org = self.org_repository.update_org(upd_org=upd_org)
+            org = await self.org_repository.update_org(upd_org=upd_org)
 
         return org
 
-    def get_organization_by_user_id(self, user_id: str) -> Organization:
-        org = self.org_repository.get_organization_by_user_id(user_id=user_id)
+    async def get_organization_by_user_id(
+        self, user_id: str
+    ) -> models.Organization:
+        org = await self.org_repository.get_organization_by_user_id(
+            user_id=user_id
+        )
 
         return org
 
-    def save_docs(self, links: List[str], org_id: str) -> None:
+    async def save_docs(self, links: List[str], org_id: str) -> None:
         for link in links:
             document = Document(
                 id=f"doc_{uuid.uuid4()}",
                 url=link,
                 organization_id=org_id,
             )
-            self.org_repository.save_docs(document)
+            await self.org_repository.save_docs(document)

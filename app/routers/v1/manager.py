@@ -27,7 +27,7 @@ async def update_user_verify_status(
     data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
 ) -> SuccessResponse:
-    manager_service.update_user_verified_status(user_id, data.status)
+    await manager_service.update_user_verified_status(user_id, data.status)
     return SuccessResponse()
 
 
@@ -42,7 +42,7 @@ async def update_user_verify_status(
 async def get_users(
     manager_service: ManagerService = Depends(),
 ) -> List[models.UserPrivateDTO]:
-    users = manager_service.get_all_users()
+    users = await manager_service.get_all_users()
     return users
 
 
@@ -59,7 +59,7 @@ async def update_tender_verified_status(
     data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
 ) -> SuccessResponse:
-    manager_service.update_tender_verified_status(
+    await manager_service.update_tender_verified_status(
         tender_id=tender_id, status=data.status
     )
     return SuccessResponse()

@@ -24,19 +24,26 @@ class JWTService:
         self.time_live = int(config.JWT.time_live)
         self.algorithm = "HS256"
 
-    def generate_jwt(self, user: models.User) -> str:
+    def generate_jwt(self, user: models.User, org: models.Organization) -> str:
         exp = datetime.datetime.now(tz=timezone.utc) + datetime.timedelta(
             minutes=self.time_live
         )
 
         jwt_user = JWTUser(
-            user.id,
-            user.first_name,
-            user.middle_name,
-            user.last_name,
-            user.role,
-            user.verified,
-            int(exp.timestamp()),
+            id=user.id,
+            first_name=user.first_name,
+            middle_name=user.middle_name,
+            last_name=user.last_name,
+            role=user.role,
+            verified=user.verified,
+            is_contractor=user.is_contractor,
+            org_id=org.id,
+            org_short_name=org.short_name,
+            org_inn=org.inn,
+            org_okpo=org.okpo,
+            org_ogrn=org.ogrn,
+            org_kpp=org.kpp,
+            exp=int(exp.timestamp()),
         )
 
         encoded_data = jwt.encode(

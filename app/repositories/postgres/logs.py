@@ -2,20 +2,18 @@ from fastapi import Depends
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.schemas import Logs
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class LogsRepository:
-    db: scoped_session[Session]
+    db: AsyncSession
 
-    def __init__(
-        self, db: scoped_session[Session] = Depends(get_db_connection)
-    ) -> None:
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    def save(self, logs: Logs) -> None:
+    async def save(self, logs: Logs) -> None:
         try:
             self.db.add(logs)
-            self.db.commit()
+            await self.db.commit()
         except SQLAlchemyError as err:
             print(err._message())

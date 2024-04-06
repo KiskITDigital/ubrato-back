@@ -29,5 +29,5 @@ class LogsService:
             code=status_code,
             msg=msg,
         )
-        self.logs_repository.save(logs)
+        await self.logs_repository.save(logs)
         return id

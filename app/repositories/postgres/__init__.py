@@ -6,9 +6,12 @@ __all__ = [
     "TenderRepository",
     "UserRepository",
     "CitiesRepository",
+    "get_db_connection",
+    "async_session_maker",
 ]
 
 from .cities import CitiesRepository
+from .database import async_session_maker, get_db_connection
 from .logs import LogsRepository
 from .organization import OrganizationRepository
 from .session import SessionRepository

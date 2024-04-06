@@ -1,4 +1,5 @@
 import uuid
+from typing import Tuple
 
 import bcrypt
 import models
@@ -13,7 +14,7 @@ class UserService:
     def __init__(self, user_repository: UserRepository = Depends()) -> None:
         self.user_repository = user_repository
 
-    def create(
+    async def create(
         self,
         email: str,
         phone: str,
@@ -24,7 +25,7 @@ class UserService:
         is_contractor: bool,
         avatar: str,
         org: Organization,
-    ) -> models.User:
+    ) -> Tuple[models.User, models.Organization]:
         id = "usr_" + str(uuid.uuid4())
 
         password = bcrypt.hashpw(
@@ -43,17 +44,19 @@ class UserService:
             avatar=avatar,
         )
 
-        created_user = self.user_repository.create(user=user, org=org)
+        created_user, created_org = await self.user_repository.create(
+            user=user, org=org
+        )
 
-        return created_user
+        return created_user, created_org
 
-    def get_by_email(self, email: str) -> models.User:
-        user = self.user_repository.get_by_email(email)
+    async def get_by_email(self, email: str) -> models.User:
+        user = await self.user_repository.get_by_email(email)
 
         return user
 
-    def get_by_id(self, id: str) -> models.UserPrivateDTO:
-        user = self.user_repository.get_by_id(id)
+    async def get_by_id(self, id: str) -> models.UserPrivateDTO:
+        user = await self.user_repository.get_by_id(id)
 
         return models.UserPrivateDTO(**user.__dict__)
 
@@ -62,5 +65,7 @@ class UserService:
             password.encode("utf-8"), hashed_password.encode("utf-8")
         )
 
-    def upd_avatar(self, user_id: str, avatar: str) -> None:
-        self.user_repository.update_avatar(user_id=user_id, avatar=avatar)
+    async def upd_avatar(self, user_id: str, avatar: str) -> None:
+        await self.user_repository.update_avatar(
+            user_id=user_id, avatar=avatar
+        )

@@ -16,30 +16,32 @@ from repositories.postgres.schemas import (
     ServiceGroup,
     ServiceType,
 )
-from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class TagsRepository:
-    db: scoped_session[Session]
+    db: AsyncSession
 
-    def __init__(
-        self, db: scoped_session[Session] = Depends(get_db_connection)
-    ) -> None:
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    def get_all_objects_with_types(
+    async def get_all_objects_with_types(
         self,
     ) -> ObjectsGroupsWithTypes:
-        object_groups = self.db.query(ObjectGroup)
+        object_groups = await self.db.execute(select(ObjectGroup))
 
         groups_data: List[ObjectGroupWithTypes] = []
 
         for group in object_groups:
-            types_in_group = (
-                self.db.query(ObjectType)
-                .filter(ObjectType.object_group_id == group.id)
-                .all()
+            query = await self.db.execute(
+                select(ObjectType).where(
+                    ObjectType.object_group_id == group.id
+                )
             )
+
+            types_in_group = query.all()
+
             types_list = [
                 ObjectTypeModel(id=obj_type.id, name=obj_type.name)
                 for obj_type in types_in_group
@@ -52,19 +54,22 @@ class TagsRepository:
 
         return ObjectsGroupsWithTypes(groups=groups_data)
 
-    def get_all_services_with_types(
+    async def get_all_services_with_types(
         self,
     ) -> ServicesGroupsWithTypes:
-        service_groups = self.db.query(ServiceGroup)
+        service_groups = await self.db.execute(select(ServiceGroup))
 
         groups_data: List[ServiceGroupWithTypes] = []
 
         for group in service_groups:
-            types_in_group = (
-                self.db.query(ServiceType)
-                .filter(ServiceType.service_group_id == group.id)
-                .all()
+            query = await self.db.execute(
+                select(ServiceType).where(
+                    ServiceType.service_group_id == group.id
+                )
             )
+
+            types_in_group = query.all()
+
             types_list = [
                 ServiceTypeModel(id=obj_type.id, name=obj_type.name)
                 for obj_type in types_in_group

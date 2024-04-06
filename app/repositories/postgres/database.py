@@ -1,42 +1,48 @@
-from typing import Generator
+from typing import AsyncGenerator
 
 from config import Config, get_config
 from fastapi import status
-from repositories.postgres.exceptions import DATA_ALREADY_EXIST, RepositoryException
-from sqlalchemy import create_engine
+from repositories.postgres.exceptions import (
+    DATA_ALREADY_EXIST,
+    RepositoryException,
+)
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from sqlalchemy.orm import Session, scoped_session, sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 config: Config = get_config()
 
-engine = create_engine(
-    config.Database.Postgres.DB_DSN, pool_size=20, max_overflow=0
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(config.Database.Postgres.DB_DSN)
+async_session_maker = async_sessionmaker(autocommit=False, bind=engine)
 
 
-def get_db_connection() -> Generator[scoped_session[Session], None, None]:
-    db: scoped_session[Session] = scoped_session(SessionLocal)
-    try:
-        db.begin()
-        yield db
-    except OperationalError:
-        db.rollback()
-        raise Exception("Can't access the database")
-    except IntegrityError:
-        db.rollback()
-        raise RepositoryException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=DATA_ALREADY_EXIST,
-            sql_msg="",
-        )
-    except SQLAlchemyError as err:
-        db.rollback()
-        raise RepositoryException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=err.code,
-            sql_msg=err._message(),
-        )
+async def get_db_connection() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session_maker() as session:
+        try:
+            session.begin()
+            yield session
+        except OperationalError:
+            await session.rollback()
+            raise Exception("Can't access the database")
+        except IntegrityError:
+            await session.rollback()
+            raise RepositoryException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=DATA_ALREADY_EXIST,
+                sql_msg="",
+            )
+        except SQLAlchemyError as err:
+            await session.rollback()
+            print(err._sql_message())
+            print(err._message())
+            raise RepositoryException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=err.code,
+                sql_msg=err._message(),
+            )
 
-    finally:
-        db.close()
+        finally:
+            await session.close()

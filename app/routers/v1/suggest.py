@@ -18,4 +18,4 @@ async def search_city(
     query: str,
     suggest_service: SuggestService = Depends(),
 ) -> List[models.City]:
-    return suggest_service.search_city(query=query)
+    return await suggest_service.search_city(query=query)

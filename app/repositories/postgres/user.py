@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import models
 from fastapi import Depends, status
@@ -9,31 +9,35 @@ from repositories.postgres.exceptions import (
     RepositoryException,
 )
 from repositories.postgres.schemas import Organization, User
-from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class UserRepository:
-    db: scoped_session[Session]
+    db: AsyncSession
 
-    def __init__(
-        self, db: scoped_session[Session] = Depends(get_db_connection)
-    ) -> None:
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    def create(self, user: User, org: Organization) -> models.User:
+    async def create(
+        self, user: User, org: Organization
+    ) -> Tuple[models.User, models.Organization]:
         self.db.add(user)
-        self.db.flush()
+        await self.db.flush()
         org.user_id = user.id
         self.db.add(org)
-        self.db.commit()
+        await self.db.commit()
 
-        self.db.refresh(user)
+        await self.db.refresh(user)
+        await self.db.refresh(org)
 
-        return models.User(**user.__dict__)
+        return models.User(**user.__dict__), models.Organization(
+            **org.__dict__
+        )
 
-    def get_by_email(self, email: str) -> models.User:
-        query = self.db.query(User).filter(User.email == email)
-        user = query.first()
+    async def get_by_email(self, email: str) -> models.User:
+        query = await self.db.execute(select(User).where(User.email == email))
+        user = query.scalar()
         if user is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -43,8 +47,12 @@ class UserRepository:
 
         return models.User(**user.__dict__)
 
-    def update_verified_status(self, user_id: str, verified: bool) -> None:
-        user = self.db.query(User).filter_by(id=user_id).first()
+    async def update_verified_status(
+        self, user_id: str, verified: bool
+    ) -> None:
+        query = await self.db.execute(select(User).where(User.id == user_id))
+
+        user = query.scalar()
 
         if user is None:
             raise RepositoryException(
@@ -54,12 +62,12 @@ class UserRepository:
             )
 
         user.verified = verified
-        self.db.commit()
+        await self.db.commit()
 
-    def get_all_users(
+    async def get_all_users(
         self,
     ) -> List[models.User]:
-        query = self.db.query(User)
+        query = await self.db.execute(select(User))
         users: List[models.User] = []
 
         for user in query:
@@ -67,20 +75,24 @@ class UserRepository:
 
         return users
 
-    def get_by_id(self, user_id: str) -> models.User:
-        user = self.db.query(User).filter_by(id=user_id).first()
+    async def get_by_id(self, user_id: str) -> models.User:
+        query = await self.db.execute(select(User).where(User.id == user_id))
 
-        if user is None:
+        users = query.one_or_none()
+
+        if users is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=USERID_NOT_FOUND.format(user_id),
                 sql_msg="",
             )
 
-        return models.User(**user.__dict__)
+        return models.User(**users._tuple()[0].__dict__)
 
-    def update_avatar(self, user_id: str, avatar: str) -> None:
-        user = self.db.query(User).filter_by(id=user_id).first()
+    async def update_avatar(self, user_id: str, avatar: str) -> None:
+        query = await self.db.execute(select(User).where(User.id == user_id))
+
+        user = query.first()
 
         if user is None:
             raise RepositoryException(
@@ -90,4 +102,4 @@ class UserRepository:
             )
 
         user.avatar = avatar
-        self.db.commit()
+        await self.db.commit()

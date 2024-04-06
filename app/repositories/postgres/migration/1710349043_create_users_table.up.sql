@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS users (
     verified        BOOLEAN         DEFAULT FALSE,
     role            SMALLINT        DEFAULT 0,
     is_contractor   BOOLEAN         DEFAULT FALSE,
-    created_at      TIMESTAMP       DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
 );

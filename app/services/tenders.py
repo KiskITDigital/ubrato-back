@@ -24,10 +24,10 @@ class TenderService:
         self.tender_repository = tender_repository
         self.tender_index = tender_index
 
-    def create_tender(
+    async def create_tender(
         self, tender: CreateTenderRequest, user_id: str
     ) -> models.Tender:
-        created_tender = self.tender_repository.create_tender(
+        created_tender = await self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
         self.tender_index.save(
@@ -54,11 +54,11 @@ class TenderService:
                 created_at=int(created_tender.created_at.timestamp()),
             )
         )
-        return self.tender_repository.get_tender_by_id(
+        return await self.tender_repository.get_tender_by_id(
             tender_id=created_tender.id
         )
 
-    def get_page_tenders(
+    async def get_page_tenders(
         self,
         page: int,
         page_size: int,
@@ -73,7 +73,7 @@ class TenderService:
         verified: Optional[bool],
         user_id: Optional[str],
     ) -> List[models.Tender]:
-        return self.tender_repository.get_page_tenders(
+        return await self.tender_repository.get_page_tenders(
             page=page,
             page_size=page_size,
             object_group_id=object_group_id,
@@ -88,16 +88,16 @@ class TenderService:
             user_id=user_id,
         )
 
-    def get_all_objects_with_types(
+    async def get_all_objects_with_types(
         self,
     ) -> ObjectsGroupsWithTypes:
-        objects = self.tags_repository.get_all_objects_with_types()
+        objects = await self.tags_repository.get_all_objects_with_types()
 
         for group in objects.groups:
             total = 0
             for type in group.types:
-                count = self.tender_repository.get_count_active_tenders(
-                    object_group_id=type.id, service_type_id=None
+                count = await self.tender_repository.get_count_active_tenders(
+                    object_group_id=type.id, service_type_ids=None
                 )
                 type.count = count
                 total += count
@@ -105,16 +105,16 @@ class TenderService:
 
         return objects
 
-    def get_all_services_with_types(
+    async def get_all_services_with_types(
         self,
     ) -> ServicesGroupsWithTypes:
-        services = self.tags_repository.get_all_services_with_types()
+        services = await self.tags_repository.get_all_services_with_types()
 
         for group in services.groups:
             total = 0
             for type in group.types:
-                count = self.tender_repository.get_count_active_tenders(
-                    object_group_id=None, service_type_id=type.id
+                count = await self.tender_repository.get_count_active_tenders(
+                    object_group_id=None, service_type_ids=type.id
                 )
                 type.count = count
                 total += count
@@ -122,22 +122,24 @@ class TenderService:
 
         return services
 
-    def get_count_active_tenders(
+    async def get_count_active_tenders(
         self,
         object_group_id: Optional[int],
         service_type_id: Optional[int],
     ) -> int:
-        return self.tender_repository.get_count_active_tenders(
-            object_group_id=object_group_id, service_type_id=service_type_id
+        return await self.tender_repository.get_count_active_tenders(
+            object_group_id=object_group_id, service_type_ids=service_type_id
         )
 
-    def get_by_id(self, tender_id: int) -> models.Tender:
-        return self.tender_repository.get_tender_by_id(tender_id=tender_id)
+    async def get_by_id(self, tender_id: int) -> models.Tender:
+        return await self.tender_repository.get_tender_by_id(
+            tender_id=tender_id
+        )
 
-    def update_tender(
+    async def update_tender(
         self, tender: CreateTenderRequest, tender_id: int
     ) -> None:
-        self.tender_repository.update_tender(
+        await self.tender_repository.update_tender(
             tender=tender.__dict__,
             tender_id=tender_id,
         )

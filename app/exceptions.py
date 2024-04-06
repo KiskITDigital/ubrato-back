@@ -2,24 +2,22 @@ from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from repositories.postgres import LogsRepository
-from repositories.postgres.database import SessionLocal
+from repositories.postgres.database import async_session_maker
 from repositories.postgres.exceptions import RepositoryException
+from repositories.postgres.logs import LogsRepository
 from services.exceptions import AuthException, ServiceException
 from services.logs import LogsService
-from sqlalchemy.orm import scoped_session
 
 __all__ = ["AuthException", "ServiceException"]
 
 
 class LogsDependency:
     def __init__(self) -> None:
-        self.logs_service = LogsService(
-            logs_repository=LogsRepository(scoped_session(SessionLocal))
-        )
+        pass
 
-    async def __call__(self) -> LogsService:
-        return self.logs_service
+    async def _init(self):
+        async with async_session_maker() as session:
+            return LogsService(logs_repository=LogsRepository(session))
 
 
 logs_dependency = LogsDependency()
@@ -49,7 +47,7 @@ async def service_exception_handler(
     request: Request,
     exc: ServiceException,
 ) -> JSONResponse:
-    logs_service: LogsService = await logs_dependency()
+    logs_service: LogsService = await logs_dependency._init()
     id = await logs_service.save_logs(
         request=request,
         status_code=exc.status_code,
@@ -64,7 +62,7 @@ async def repository_exception_handler(
     request: Request,
     exc: RepositoryException,
 ) -> JSONResponse:
-    logs_service: LogsService = await logs_dependency()
+    logs_service: LogsService = await logs_dependency._init()
     id = await logs_service.save_logs(
         request=request,
         status_code=exc.status_code,

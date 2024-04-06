@@ -8,19 +8,20 @@ from repositories.postgres.exceptions import (
     RepositoryException,
 )
 from repositories.postgres.schemas import City, Region
-from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class CitiesRepository:
-    db: scoped_session[Session]
+    db: AsyncSession
 
-    def __init__(
-        self, db: scoped_session[Session] = Depends(get_db_connection)
-    ) -> None:
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    def get_by_id(self, city_id: int) -> City:
-        city = self.db.query(City).filter_by(id=city_id).first()
+    async def get_by_id(self, city_id: int) -> City:
+        query = await self.db.execute(select(City).where(City.id == city_id))
+
+        city = query.scalar()
 
         if city is None:
             raise RepositoryException(
@@ -30,16 +31,17 @@ class CitiesRepository:
             )
         return city
 
-    def search_by_name(self, name: str) -> List[models.City]:
-        results = (
-            self.db.query(City, Region.name)
+    async def search_by_name(self, name: str) -> List[models.City]:
+        query = await self.db.execute(
+            select(City, Region.name)
             .join(Region, City.region_id == Region.id)
-            .filter(City.name.ilike(name + "%"))
+            .where(City.name.ilike(name + "%"))
             .limit(10)
         )
 
         cities: List[models.City] = []
-        for city, region_name in results:
+        for found_city in query.all():
+            city, region_name = found_city._tuple()
             city_model = models.City(
                 id=city.id,
                 name=city.name,

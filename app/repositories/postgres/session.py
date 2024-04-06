@@ -5,24 +5,26 @@ from repositories.postgres.exceptions import (
     RepositoryException,
 )
 from repositories.postgres.schemas import Session
-from sqlalchemy.orm import Session as SQLSession
-from sqlalchemy.orm import scoped_session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class SessionRepository:
-    db: scoped_session[SQLSession]
+    db: AsyncSession
 
-    def __init__(
-        self, db: scoped_session[SQLSession] = Depends(get_db_connection)
-    ) -> None:
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    def create(self, session: Session) -> None:
+    async def create(self, session: Session) -> None:
         self.db.add(session)
-        self.db.commit()
+        await self.db.commit()
 
-    def get_by_id(self, session_id: str) -> Session:
-        session = self.db.query(Session).filter_by(id=session_id).first()
+    async def get_by_id(self, session_id: str) -> Session:
+        query = await self.db.execute(
+            select(Session).where(Session.id == session_id)
+        )
+
+        session = query.scalar()
 
         if session is None:
             raise RepositoryException(

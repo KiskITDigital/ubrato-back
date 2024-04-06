@@ -31,7 +31,7 @@ async def create_tender(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> models.Tender:
-    created_tender = tender_service.create_tender(
+    created_tender = await tender_service.create_tender(
         tender=tender, user_id=user.id
     )
     return created_tender
@@ -67,7 +67,7 @@ async def get_page_tenders(
     if service_group_ids_str is not None:
         service_group_ids = [int(x) for x in service_group_ids_str.split(",")]
 
-    tenders = tender_service.get_page_tenders(
+    tenders = await tender_service.get_page_tenders(
         page=page,
         page_size=page_size,
         object_group_id=object_group_id,
@@ -95,7 +95,7 @@ async def get_tender(
     tender_id: int,
     tender_service: TenderService = Depends(),
 ) -> models.Tender:
-    tender = tender_service.get_by_id(tender_id=tender_id)
+    tender = await tender_service.get_by_id(tender_id=tender_id)
     return tender
 
 
@@ -113,11 +113,11 @@ async def update_tender(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    original_tender = tender_service.get_by_id(tender_id=tender_id)
+    original_tender = await tender_service.get_by_id(tender_id=tender_id)
 
     await is_creator_or_manager(user_id=original_tender.user_id, user=user)
 
-    tender_service.update_tender(tender=tender, tender_id=tender_id)
+    await tender_service.update_tender(tender=tender, tender_id=tender_id)
     return SuccessResponse()
 
 
@@ -131,7 +131,7 @@ async def update_tender(
 async def get_all_objects_types(
     tender_service: TenderService = Depends(),
 ) -> ObjectsGroupsWithTypes:
-    objects = tender_service.get_all_objects_with_types()
+    objects = await tender_service.get_all_objects_with_types()
     return objects
 
 
@@ -145,7 +145,7 @@ async def get_all_objects_types(
 async def get_all_services_types(
     tender_service: TenderService = Depends(),
 ) -> ServicesGroupsWithTypes:
-    objects = tender_service.get_all_services_with_types()
+    objects = await tender_service.get_all_services_with_types()
     return objects
 
 
@@ -161,7 +161,7 @@ async def get_count_active_tenders(
     service_type_id: Optional[int] = None,
     tender_service: TenderService = Depends(),
 ) -> TenderCountResponse:
-    count = tender_service.get_count_active_tenders(
+    count = await tender_service.get_count_active_tenders(
         object_group_id=object_group_id, service_type_id=service_type_id
     )
 
