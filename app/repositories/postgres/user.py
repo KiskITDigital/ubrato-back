@@ -92,7 +92,7 @@ class UserRepository:
     async def update_avatar(self, user_id: str, avatar: str) -> None:
         query = await self.db.execute(select(User).where(User.id == user_id))
 
-        user = query.first()
+        user = query.scalar()
 
         if user is None:
             raise RepositoryException(
