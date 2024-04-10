@@ -259,22 +259,32 @@ class TenderRepository:
         await self.db.commit()
 
     async def get_count_active_tenders(
-        self, object_group_id: Optional[int], service_type_ids: Optional[int]
+        self, object_type_id: Optional[int], service_type_ids: Optional[int]
     ) -> int:
-        stmn = select(func.count(Tender.id))
-        if object_group_id:
-            stmn.where(Tender.object_group_id == object_group_id)
+        service_object_condition = (
+            object_type_id is None or Tender.object_type_id == object_type_id
+        )
+        service_type_condition = (
+            service_type_ids is None
+            or TenderServiceType.service_type_id == service_type_ids
+        )
 
-        if service_type_ids:
-            stmn.join(Tender.id == TenderServiceGroup.tender_id).where(
-                TenderServiceGroup.service_group_id == service_type_ids
+        query = await self.db.execute(
+            select(func.count(Tender.id))
+            .join(TenderServiceType, Tender.id == TenderServiceType.tender_id)
+            .where(
+                and_(
+                    service_type_condition,
+                    service_object_condition,  # type: ignore
+                    Tender.active,  # type: ignore
+                )
             )
-
-        query = await self.db.execute(stmn)
+        )
         result = query.scalar()
-        if result is None:
-            result = 0
-        return result
+        if result:
+            return result
+
+        return 0
 
     async def format_tender(
         self,

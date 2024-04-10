@@ -96,7 +96,7 @@ class TenderService:
             total = 0
             for type in group.types:
                 count = await self.tender_repository.get_count_active_tenders(
-                    object_group_id=type.id, service_type_ids=None
+                    object_type_id=type.id, service_type_ids=None
                 )
                 type.count = count
                 total += count
@@ -113,7 +113,7 @@ class TenderService:
             total = 0
             for type in group.types:
                 count = await self.tender_repository.get_count_active_tenders(
-                    object_group_id=None, service_type_ids=type.id
+                    object_type_id=None, service_type_ids=type.id
                 )
                 type.count = count
                 total += count
@@ -123,11 +123,11 @@ class TenderService:
 
     async def get_count_active_tenders(
         self,
-        object_group_id: Optional[int],
+        object_type_id: Optional[int],
         service_type_id: Optional[int],
     ) -> int:
         return await self.tender_repository.get_count_active_tenders(
-            object_group_id=object_group_id, service_type_ids=service_type_id
+            object_type_id=object_type_id, service_type_ids=service_type_id
         )
 
     async def get_by_id(self, tender_id: int) -> models.Tender:
