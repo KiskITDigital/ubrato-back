@@ -1,4 +1,4 @@
-from repositories.postgres.schemas import Base
+from repositories.postgres.schemas.base import Base
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

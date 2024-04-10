@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from repositories.postgres.schemas import Base
+from repositories.postgres.schemas.base import Base
 from sqlalchemy import TIMESTAMP, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

@@ -1,16 +1,8 @@
 from datetime import datetime
 from typing import List
 
-from repositories.postgres.schemas import Base
-from sqlalchemy import (
-    ARRAY,
-    TIMESTAMP,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    func,
-)
+from repositories.postgres.schemas.base import Base
+from sqlalchemy import ARRAY, TIMESTAMP, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 

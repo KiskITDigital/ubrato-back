@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from repositories.postgres.schemas import Base
+from repositories.postgres.schemas.base import Base
 from repositories.typesense.schemas import TypesenseTender
 from sqlalchemy import (
     ARRAY,
