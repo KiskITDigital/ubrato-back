@@ -1,5 +1,3 @@
-from sqlalchemy.orm import DeclarativeBase
-
 __all__ = [
     "City",
     "Document",
@@ -19,9 +17,7 @@ __all__ = [
 ]
 
 
-class Base(DeclarativeBase):
-    pass
-
+from sqlalchemy.orm import DeclarativeBase
 
 from .city import City
 from .document import Document
@@ -39,3 +35,7 @@ from .tender_service import (
     TenderServiceType,
 )
 from .user import User
+
+
+class Base(DeclarativeBase):
+    pass

@@ -34,9 +34,7 @@ class TenderServiceGroup(Base):
     __tablename__ = "tender_services_groups"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    tender_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey('tender.id')
-    )
+    tender_id: Mapped[int] = mapped_column(Integer, ForeignKey("tender.id"))
     service_group_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("services_groups.id")
     )
@@ -51,9 +49,7 @@ class TenderServiceType(Base):
     __tablename__ = "tender_services_types"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    tender_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("tender.id")
-    )
+    tender_id: Mapped[int] = mapped_column(Integer, ForeignKey("tender.id"))
     service_type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("services_types.id")
     )

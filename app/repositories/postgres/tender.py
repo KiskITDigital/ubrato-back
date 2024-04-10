@@ -4,7 +4,10 @@ from typing import Any, List, Optional
 import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import (
+    TENDERID_NOT_FOUND,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
