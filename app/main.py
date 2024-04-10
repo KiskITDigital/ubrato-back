@@ -11,7 +11,16 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from repositories.postgres.exceptions import RepositoryException
-from routers.v1 import auth, health, manager, role, suggest, tender, users
+from routers.v1 import (
+    auth,
+    health,
+    manager,
+    questionnaire,
+    role,
+    suggest,
+    tender,
+    users,
+)
 
 app = FastAPI(
     title="Ubrato API",
@@ -49,6 +58,7 @@ app.include_router(role.router)
 app.include_router(manager.router)
 app.include_router(tender.router)
 app.include_router(suggest.router)
+app.include_router(questionnaire.router)
 
 app.add_exception_handler(
     RequestValidationError,

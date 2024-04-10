@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from models.organization import OrganizationLiteDTO
+from models import OrganizationLiteDTO
 from pydantic import BaseModel, EmailStr
 from pydantic_extra_types.phone_numbers import PhoneNumber
 

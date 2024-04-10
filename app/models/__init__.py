@@ -14,6 +14,7 @@ __all__ = [
     "OrganizationLiteDTO",
     "Organization",
     "City",
+    "QuestionnaireAnswer",
 ]
 
 from .city import City
@@ -24,6 +25,7 @@ from .object_group import (
     ObjectTypeModel,
 )
 from .organization import Organization, OrganizationLiteDTO
+from .questionnaire_answer import QuestionnaireAnswer
 from .service_group import (
     ServiceGroupModel,
     ServiceGroupWithTypes,
