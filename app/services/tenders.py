@@ -27,9 +27,32 @@ class TenderService:
         self, tender: CreateTenderRequest, user_id: str
     ) -> models.Tender:
         created_tender = await self.tender_repository.create_tender(
-            Tender(**tender.__dict__, user_id=user_id)
+            tender=Tender(
+                name=tender.name,
+                price=tender.price,
+                is_contract_price=tender.is_contract_price,
+                city_id=tender.city_id,
+                floor_space=tender.floor_space,
+                description=tender.description,
+                wishes=tender.wishes,
+                attachments=tender.attachments,
+                reception_start=tender.reception_start,
+                reception_end=tender.reception_end,
+                work_start=tender.work_start,
+                work_end=tender.work_end,
+                object_group_id=tender.object_group_id,
+                object_type_id=tender.object_type_id,
+                user_id=user_id,
+            ),
+            service_type_ids=tender.services_types,
+            service_group_ids=tender.services_groups,
         )
-        self.tender_index.save(created_tender.ConvertToIndexSchema())
+        self.tender_index.save(
+            created_tender.ConvertToIndexSchema(
+                services_groups=tender.services_groups,
+                services_types=tender.services_types,
+            )
+        )
         return await self.tender_repository.get_tender_by_id(
             tender_id=created_tender.id
         )
@@ -120,4 +143,9 @@ class TenderService:
             tender_id=tender_id,
         )
 
-        self.tender_index.update(updated_tender.ConvertToIndexSchema())
+        self.tender_index.update(
+            updated_tender.ConvertToIndexSchema(
+                services_groups=tender.services_groups,
+                services_types=tender.services_types,
+            )
+        )

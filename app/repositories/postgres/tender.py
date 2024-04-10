@@ -4,11 +4,7 @@ from typing import Any, List, Optional
 import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    SERVICE_NOT_FOUND,
-    TENDERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -16,8 +12,10 @@ from repositories.postgres.schemas import (
     ServiceGroup,
     ServiceType,
     Tender,
+    TenderServiceGroup,
+    TenderServiceType,
 )
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -27,8 +25,30 @@ class TenderRepository:
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
 
-    async def create_tender(self, tender: Tender) -> Tender:
+    async def create_tender(
+        self,
+        tender: Tender,
+        service_type_ids: List[int],
+        service_group_ids: List[int],
+    ) -> Tender:
         self.db.add(tender)
+        await self.db.flush()
+        for id in service_type_ids:
+            self.db.add(
+                TenderServiceType(
+                    tender_id=tender.id,
+                    service_type_id=id,
+                )
+            )
+            await self.db.flush()
+        for id in service_group_ids:
+            self.db.add(
+                TenderServiceGroup(
+                    tender_id=tender.id,
+                    service_group_id=id,
+                )
+            )
+            await self.db.flush()
         await self.db.commit()
 
         await self.db.refresh(tender)
@@ -54,6 +74,36 @@ class TenderRepository:
         for key, value in tender.items():
             setattr(tender_to_update, key, value)
             tender_to_update.verified = False
+
+        await self.db.execute(
+            delete(TenderServiceGroup).where(
+                TenderServiceGroup.tender_id == tender_to_update.id,
+            )
+        )
+
+        await self.db.execute(
+            delete(TenderServiceType).where(
+                TenderServiceType.tender_id == tender_to_update.id,
+            )
+        )
+
+        await self.db.flush()
+
+        for id in tender["services_types"]:
+            self.db.add(
+                TenderServiceType(
+                    tender_id=tender_to_update.id,
+                    service_type_id=id,
+                )
+            )
+
+        for id in tender["services_groups"]:
+            self.db.add(
+                TenderServiceGroup(
+                    tender_id=tender_to_update.id,
+                    service_group_id=id,
+                )
+            )
 
         await self.db.commit()
         await self.db.refresh(tender_to_update)
@@ -208,20 +258,16 @@ class TenderRepository:
     async def get_count_active_tenders(
         self, object_group_id: Optional[int], service_type_ids: Optional[int]
     ) -> int:
-        query = await self.db.execute(
-            select(func.count(Tender.id)).where(
-                and_(
-                    Tender.reception_end < datetime.now(),
-                    object_group_id is None
-                    or Tender.object_group_id
-                    == object_group_id,  # type: ignore
-                    service_type_ids is None
-                    or Tender.services_types.any(
-                        service_type_ids  # type: ignore
-                    ),
-                )
+        stmn = select(func.count(Tender.id))
+        if object_group_id:
+            stmn.where(Tender.object_group_id == object_group_id)
+
+        if service_type_ids:
+            stmn.join(Tender.id == TenderServiceGroup.tender_id).where(
+                TenderServiceGroup.service_group_id == service_type_ids
             )
-        )
+
+        query = await self.db.execute(stmn)
         result = query.scalar()
         if result is None:
             result = 0
@@ -236,37 +282,35 @@ class TenderRepository:
     ) -> models.Tender:
         services_groups_names: List[str] = []
 
-        for service_group_id in tender.services_groups:
-            query = await self.db.execute(
-                select(ServiceGroup).where(ServiceGroup.id == service_group_id)
+        query = await self.db.execute(
+            select(ServiceGroup.name)
+            .join(
+                TenderServiceGroup,
+                TenderServiceGroup.service_group_id == ServiceGroup.id,
             )
+            .where(TenderServiceGroup.tender_id == tender.id)
+        )
 
-            service_group = query.scalar()
+        services_groups = query.scalars()
 
-            if service_group is None:
-                raise RepositoryException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=SERVICE_NOT_FOUND.format(service_group_id),
-                    sql_msg="",
-                )
-            services_groups_names.append(service_group.name)
+        for name in services_groups:
+            services_groups_names.append(name)
 
         services_type_names: List[str] = []
 
-        for service_type_id in tender.services_types:
-            query = await self.db.execute(
-                select(ServiceType).where(ServiceType.id == service_type_id)
+        query = await self.db.execute(
+            select(ServiceType.name)
+            .join(
+                TenderServiceType,
+                TenderServiceType.service_type_id == ServiceType.id,
             )
+            .where(TenderServiceType.tender_id == tender.id)
+        )
 
-            service_type = query.scalar()
+        services_types = query.scalars()
 
-            if service_type is None:
-                raise RepositoryException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=SERVICE_NOT_FOUND.format(service_type),
-                    sql_msg="",
-                )
-            services_type_names.append(service_type.name)
+        for name in services_types:
+            services_type_names.append(name)
 
         return models.Tender(
             id=tender.id,

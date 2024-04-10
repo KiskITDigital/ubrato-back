@@ -2,16 +2,9 @@ from typing import AsyncGenerator
 
 from config import Config, get_config
 from fastapi import status
-from repositories.postgres.exceptions import (
-    DATA_ALREADY_EXIST,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import DATA_ALREADY_EXIST, RepositoryException
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 config: Config = get_config()
 
@@ -27,12 +20,13 @@ async def get_db_connection() -> AsyncGenerator[AsyncSession, None]:
         except OperationalError:
             await session.rollback()
             raise Exception("Can't access the database")
-        except IntegrityError:
+        except IntegrityError as err:
             await session.rollback()
+            print(err._message())
             raise RepositoryException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=DATA_ALREADY_EXIST,
-                sql_msg="",
+                sql_msg=err._message(),
             )
         except SQLAlchemyError as err:
             await session.rollback()
