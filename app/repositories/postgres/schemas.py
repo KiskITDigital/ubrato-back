@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from repositories.typesense.schemas import TypesenseTender
 from sqlalchemy import (
     ARRAY,
     TIMESTAMP,
@@ -136,6 +137,29 @@ class Tender(Base):
     object_group = relationship("ObjectGroup", back_populates="tender")
     object_type = relationship("ObjectType", back_populates="tender")
     city = relationship("City")
+
+    def ConvertToIndexSchema(self) -> TypesenseTender:
+        return TypesenseTender(
+            id=str(self.id),
+            name=self.name,
+            price=self.price,
+            is_contract_price=self.is_contract_price,
+            city_id=self.city_id,
+            floor_space=self.floor_space,
+            description=self.description,
+            wishes=self.wishes,
+            services_groups=self.services_groups,
+            services_types=self.services_types,
+            reception_start=int(self.reception_start.timestamp()),
+            reception_end=int(self.reception_end.timestamp()),
+            work_start=int(self.work_start.timestamp()),
+            work_end=int(self.work_end.timestamp()),
+            object_group_id=self.object_group_id,
+            object_type_id=self.object_type_id,
+            verified=self.verified,
+            active=self.active,
+            created_at=int(self.created_at.timestamp()),
+        )
 
 
 class ObjectGroup(Base):

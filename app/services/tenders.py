@@ -5,7 +5,6 @@ from fastapi import Depends
 from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from repositories.postgres import TagsRepository, TenderRepository
 from repositories.postgres.schemas import Tender
-from repositories.typesense.schemas import TypesenseTender
 from repositories.typesense.tender import TenderIndex
 from schemas.create_tender import CreateTenderRequest
 
@@ -30,31 +29,7 @@ class TenderService:
         created_tender = await self.tender_repository.create_tender(
             Tender(**tender.__dict__, user_id=user_id)
         )
-        self.tender_index.save(
-            tender=TypesenseTender(
-                id=str(created_tender.id),
-                name=created_tender.name,
-                price=created_tender.price,
-                is_contract_price=created_tender.is_contract_price,
-                city_id=created_tender.city_id,
-                floor_space=created_tender.floor_space,
-                description=created_tender.description,
-                wishes=created_tender.wishes,
-                services_groups=created_tender.services_groups,
-                services_types=created_tender.services_types,
-                reception_start=int(
-                    created_tender.reception_start.timestamp()
-                ),
-                reception_end=int(created_tender.reception_end.timestamp()),
-                work_start=int(created_tender.work_start.timestamp()),
-                work_end=int(created_tender.work_end.timestamp()),
-                object_group_id=created_tender.object_group_id,
-                object_type_id=created_tender.object_type_id,
-                verified=created_tender.verified,
-                active=created_tender.active,
-                created_at=int(created_tender.created_at.timestamp()),
-            )
-        )
+        self.tender_index.save(created_tender.ConvertToIndexSchema())
         return await self.tender_repository.get_tender_by_id(
             tender_id=created_tender.id
         )
@@ -140,7 +115,9 @@ class TenderService:
     async def update_tender(
         self, tender: CreateTenderRequest, tender_id: int
     ) -> None:
-        await self.tender_repository.update_tender(
+        updated_tender = await self.tender_repository.update_tender(
             tender=tender.__dict__,
             tender_id=tender_id,
         )
+
+        self.tender_index.update(updated_tender.ConvertToIndexSchema())

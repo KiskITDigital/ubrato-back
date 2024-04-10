@@ -37,7 +37,7 @@ class TenderRepository:
 
     async def update_tender(
         self, tender: dict[str, Any], tender_id: int
-    ) -> None:
+    ) -> Tender:
         query = await self.db.execute(
             select(Tender).where(Tender.id == tender_id)
         )
@@ -56,6 +56,8 @@ class TenderRepository:
             tender_to_update.verified = False
 
         await self.db.commit()
+        await self.db.refresh(tender_to_update)
+        return tender_to_update
 
     async def get_page_tenders(
         self,
