@@ -17,8 +17,6 @@ __all__ = [
 ]
 
 
-from sqlalchemy.orm import DeclarativeBase
-
 from .city import City
 from .document import Document
 from .logs import Logs
@@ -35,7 +33,3 @@ from .tender_service import (
     TenderServiceType,
 )
 from .user import User
-
-
-class Base(DeclarativeBase):
-    pass
