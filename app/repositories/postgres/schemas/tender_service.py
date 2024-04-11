@@ -33,10 +33,11 @@ class ServiceType(Base):
 class TenderServiceGroup(Base):
     __tablename__ = "tender_services_groups"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    tender_id: Mapped[int] = mapped_column(Integer, ForeignKey("tender.id"))
+    tender_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("tender.id"), primary_key=True
+    )
     service_group_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("services_groups.id")
+        Integer, ForeignKey("services_groups.id"), primary_key=True
     )
 
     tender_service_group = relationship(
@@ -48,10 +49,11 @@ class TenderServiceGroup(Base):
 class TenderServiceType(Base):
     __tablename__ = "tender_services_types"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    tender_id: Mapped[int] = mapped_column(Integer, ForeignKey("tender.id"))
+    tender_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("tender.id"), primary_key=True
+    )
     service_type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("services_types.id")
+        Integer, ForeignKey("services_types.id"), primary_key=True
     )
 
     tender_service_type = relationship(
