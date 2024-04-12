@@ -40,7 +40,6 @@ class TenderService:
                 reception_end=tender.reception_end,
                 work_start=tender.work_start,
                 work_end=tender.work_end,
-                object_group_id=tender.object_group_id,
                 object_type_id=tender.object_type_id,
                 user_id=user_id,
             ),
@@ -49,6 +48,7 @@ class TenderService:
         )
         self.tender_index.save(
             created_tender.ConvertToIndexSchema(
+                object_group_id=tender.object_group_id,
                 services_groups=tender.services_groups,
                 services_types=tender.services_types,
             )
@@ -145,6 +145,7 @@ class TenderService:
 
         self.tender_index.update(
             updated_tender.ConvertToIndexSchema(
+                object_group_id=tender.object_group_id,
                 services_groups=tender.services_groups,
                 services_types=tender.services_types,
             )

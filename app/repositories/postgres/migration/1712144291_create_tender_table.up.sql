@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS tender (
     reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_end            TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    object_group_id     INT             REFERENCES objects_groups(id),
     object_type_id      INT             REFERENCES objects_types(id),
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
     created_at          TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP

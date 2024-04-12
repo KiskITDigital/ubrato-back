@@ -4,10 +4,7 @@ from typing import Any, List, Optional
 import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    TENDERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -129,10 +126,6 @@ class TenderRepository:
     ) -> List[models.Tender]:
         reception_end_condition = Tender.reception_end > datetime.now()
 
-        object_group_condition = (object_group_id is None) or (
-            Tender.object_group_id == object_group_id
-        )
-
         object_type_condition = (object_type_id is None) or (
             Tender.object_type_id == object_type_id
         )
@@ -173,13 +166,12 @@ class TenderRepository:
 
         query = await self.db.execute(
             select(Tender, ObjectGroup.name, ObjectType.name, City.name)
-            .join(ObjectGroup, Tender.object_group_id == ObjectGroup.id)
             .join(ObjectType, Tender.object_type_id == ObjectType.id)
+            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
             .join(City, Tender.city_id == City.id)
             .where(
                 and_(
                     reception_end_condition,
-                    object_group_condition,  # type: ignore
                     object_type_condition,  # type: ignore
                     service_type_condition,  # type: ignore
                     service_group_condition,  # type: ignore
@@ -216,8 +208,8 @@ class TenderRepository:
         query = await self.db.execute(
             select(Tender, ObjectGroup.name, ObjectType.name, City.name)
             .join(City)
-            .join(ObjectGroup)
             .join(ObjectType)
+            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
             .where(Tender.id == tender_id)
         )
 

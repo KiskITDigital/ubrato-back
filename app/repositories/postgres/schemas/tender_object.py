@@ -10,7 +10,6 @@ class ObjectGroup(Base):
     name: Mapped[str] = mapped_column(String(40))
 
     object_type = relationship("ObjectType", back_populates="object_group")
-    tender = relationship("Tender", back_populates="object_group")
 
 
 class ObjectType(Base):

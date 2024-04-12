@@ -45,9 +45,6 @@ class Tender(Base):
     work_end: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
-    object_group_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("objects_groups.id")
-    )
     object_type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("objects_types.id")
     )
@@ -65,7 +62,6 @@ class Tender(Base):
     )
 
     user = relationship("User", back_populates="tender")
-    object_group = relationship("ObjectGroup", back_populates="tender")
     object_type = relationship("ObjectType", back_populates="tender")
     city = relationship("City")
     tender_service_group = relationship(
@@ -76,7 +72,10 @@ class Tender(Base):
     )
 
     def ConvertToIndexSchema(
-        self, services_groups: List[int], services_types: List[int]
+        self,
+        object_group_id: int,
+        services_groups: List[int],
+        services_types: List[int],
     ) -> TypesenseTender:
         return TypesenseTender(
             id=str(self.id),
@@ -93,7 +92,7 @@ class Tender(Base):
             reception_end=int(self.reception_end.timestamp()),
             work_start=int(self.work_start.timestamp()),
             work_end=int(self.work_end.timestamp()),
-            object_group_id=self.object_group_id,
+            object_group_id=object_group_id,
             object_type_id=self.object_type_id,
             verified=self.verified,
             active=self.active,

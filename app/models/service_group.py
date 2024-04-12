@@ -17,8 +17,8 @@ class ServiceTypeModel(BaseModel):
 class ServiceGroupWithTypes(BaseModel):
     id: int
     name: str
-    types: List[ServiceTypeModel]
     total: int = 0
+    types: List[ServiceTypeModel]
 
 
 class ServicesGroupsWithTypes(BaseModel):
