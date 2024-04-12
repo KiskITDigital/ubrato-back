@@ -1,5 +1,6 @@
 import models
 from fastapi import APIRouter, Depends, status
+from repositories.postgres.exceptions import RepositoryException
 from routers.v1.dependencies import authorized, get_user
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
@@ -7,6 +8,7 @@ from schemas.success import SuccessResponse
 from schemas.upd_avatar import UpdAvatarRequest
 from schemas.verify_request import VerifyRequest
 from services import OrganizationService, UserService
+from services.questionnaire import QuestionnaireService
 
 router = APIRouter(
     prefix="/v1/users",
@@ -75,3 +77,25 @@ async def upd_avatar(
 ) -> SuccessResponse:
     await user_service.upd_avatar(user_id=user.id, avatar=avatar.avatar)
     return SuccessResponse()
+
+
+@router.get(
+    "/me/pass-questionnaire",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def pass_questionnaire(
+    questionnaire_service: QuestionnaireService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    try:
+        await questionnaire_service.get_by_user_id(user_id=user.id)
+        return SuccessResponse()
+    except RepositoryException as err:
+        if err.status_code == status.HTTP_404_NOT_FOUND:
+            return SuccessResponse(status=False)
+        raise err

@@ -26,6 +26,9 @@ class QuestionnaireService:
             page=page, page_size=page_size
         )
 
+    async def get_by_user_id(self, user_id: str) -> models.QuestionnaireAnswer:
+        return await self.questionnaire_repository.get_by_user_id(user_id=user_id)
+
     async def export_csv(self) -> str:
         answers = await self.questionnaire_repository.get_all()
         dict_answers = [answer.model_dump() for answer in answers]
