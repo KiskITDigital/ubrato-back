@@ -1,10 +1,10 @@
 from datetime import datetime
 
-import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.exceptions import ORG_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import Document, Organization
+from schemas import models
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

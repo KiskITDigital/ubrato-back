@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-import models
 from fastapi import Depends
-from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from repositories.postgres import TagsRepository, TenderRepository
 from repositories.postgres.schemas import Tender
 from repositories.typesense.tender import TenderIndex
+from schemas import models
 from schemas.create_tender import CreateTenderRequest
+from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 
 
 class TenderService:

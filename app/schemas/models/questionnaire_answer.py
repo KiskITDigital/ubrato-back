@@ -1,7 +1,8 @@
 from typing import List
 
-from models.user import UserMe
 from pydantic import BaseModel
+
+from .user import UserMe
 
 
 class QuestionnaireAnswer(BaseModel):

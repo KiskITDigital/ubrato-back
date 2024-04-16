@@ -1,8 +1,8 @@
 from typing import List
 
-import models
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import is_admin
+from schemas import models
 from schemas.exception import ExceptionResponse
 from schemas.success import SuccessResponse
 from schemas.verify_status_set import VerifyStatusSet

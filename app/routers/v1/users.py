@@ -1,13 +1,13 @@
-import models
 from fastapi import APIRouter, Depends, status
 from repositories.postgres.exceptions import RepositoryException
 from routers.v1.dependencies import authorized, get_user
+from schemas import models
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.upd_avatar import UpdAvatarRequest
 from schemas.verify_request import VerifyRequest
-from services import OrganizationService, UserService
+from services import NoticeService, OrganizationService, UserService
 from services.questionnaire import QuestionnaireService
 
 router = APIRouter(
@@ -99,3 +99,18 @@ async def pass_questionnaire(
         if err.status_code == status.HTTP_404_NOT_FOUND:
             return SuccessResponse(status=False)
         raise err
+
+
+@router.get(
+    "/me/notice",
+    response_model=models.Notifications,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def get_notice(
+    notice_service: NoticeService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> models.Notifications:
+    return await notice_service.get_user_notice(user_id=user.id)

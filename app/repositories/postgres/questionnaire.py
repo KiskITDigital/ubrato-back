@@ -1,6 +1,5 @@
 from typing import List
 
-import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.exceptions import (
@@ -8,6 +7,7 @@ from repositories.postgres.exceptions import (
     RepositoryException,
 )
 from repositories.postgres.schemas import Organization, Questionnaire, User
+from schemas import models
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -83,9 +83,7 @@ class QuestionnaireRepository:
 
         return answers
 
-    async def get_by_user_id(
-        self, user_id: str
-    ) -> models.QuestionnaireAnswer:
+    async def get_by_user_id(self, user_id: str) -> models.QuestionnaireAnswer:
         query = await self.db.execute(
             select(Questionnaire, User, Organization)
             .join(User, Questionnaire.user_id == User.id)
@@ -109,7 +107,7 @@ class QuestionnaireRepository:
         user_model = models.UserMe(organiztion=org_model, **user.__dict__)
 
         return models.QuestionnaireAnswer(
-                    id=answer.id,
-                    answers=answer.answers,
-                    user=user_model,
-                )
+            id=answer.id,
+            answers=answer.answers,
+            user=user_model,
+        )

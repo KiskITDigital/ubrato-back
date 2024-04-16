@@ -1,14 +1,15 @@
 from typing import Annotated
 
-import models
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
 from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
+from schemas import models
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
 from services import (
     JWTService,
+    NoticeService,
     OrganizationService,
     SessionService,
     UserService,
@@ -37,6 +38,7 @@ async def signup_user(
     org_service: OrganizationService = Depends(),
     jwt_service: JWTService = Depends(),
     session_service: SessionService = Depends(),
+    notice_service: NoticeService = Depends(),
 ) -> SignUpResponse:
     org = org_service.get_organization_from_api(inn=user.inn)
 
@@ -59,6 +61,10 @@ async def signup_user(
         httponly=True,
         samesite="none",
         secure=True,
+    )
+
+    await notice_service.add_notice(
+        user_id=created_user.id, msg="Welcome to ubrato!", href=None
     )
 
     return SignUpResponse(

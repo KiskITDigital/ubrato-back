@@ -2,9 +2,9 @@ import datetime
 from datetime import timezone
 
 import jwt
-import models
 from config import Config, get_config
 from fastapi import Depends, status
+from schemas import models
 from schemas.jwt_user import JWTUser
 from services.exceptions import (
     INVALID_BARRIER,

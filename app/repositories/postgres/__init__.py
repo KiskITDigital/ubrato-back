@@ -7,6 +7,7 @@ __all__ = [
     "UserRepository",
     "CitiesRepository",
     "QuestionnaireRepository",
+    "NotificationRepository",
     "get_db_connection",
     "async_session_maker",
 ]
@@ -14,6 +15,7 @@ __all__ = [
 from .cities import CitiesRepository
 from .database import async_session_maker, get_db_connection
 from .logs import LogsRepository
+from .notifications import NotificationRepository
 from .organization import OrganizationRepository
 from .questionnaire import QuestionnaireRepository
 from .session import SessionRepository

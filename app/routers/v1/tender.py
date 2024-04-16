@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-import models
 from fastapi import APIRouter, Depends, status
-from models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from routers.v1.dependencies import authorized, get_user, is_creator_or_manager
+from schemas import models
 from schemas.create_tender import CreateTenderRequest
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
+from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
 from services import TenderService

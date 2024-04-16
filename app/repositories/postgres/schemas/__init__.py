@@ -14,12 +14,14 @@ __all__ = [
     "TenderServiceType",
     "Tender",
     "User",
+    "Notification",
 ]
 
 
 from .city import City
 from .document import Document
 from .logs import Logs
+from .notifications import Notification
 from .organiztion import Organization
 from .questionnaire import Questionnaire
 from .region import Region

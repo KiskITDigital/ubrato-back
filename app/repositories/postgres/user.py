@@ -1,6 +1,5 @@
 from typing import List, Tuple
 
-import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.exceptions import (
@@ -9,6 +8,7 @@ from repositories.postgres.exceptions import (
     RepositoryException,
 )
 from repositories.postgres.schemas import Organization, User
+from schemas import models
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 

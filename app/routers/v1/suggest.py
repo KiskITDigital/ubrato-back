@@ -1,7 +1,7 @@
 from typing import List
 
-import models
 from fastapi import APIRouter, Depends
+from schemas import models
 from services import SuggestService
 
 router = APIRouter(

@@ -3,12 +3,12 @@ import hashlib
 import uuid
 from typing import List
 
-import models
 from config import get_config
 from dadata import Dadata
 from fastapi import Depends, status
 from repositories.postgres import OrganizationRepository
 from repositories.postgres.schemas import Document, Organization
+from schemas import models
 from services.exceptions import ServiceException
 
 

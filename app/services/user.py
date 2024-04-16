@@ -2,10 +2,10 @@ import uuid
 from typing import Tuple
 
 import bcrypt
-import models
 from fastapi import Depends
 from repositories.postgres import UserRepository
 from repositories.postgres.schemas import Organization, User
+from schemas import models
 
 
 class UserService:

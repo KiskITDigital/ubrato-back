@@ -1,10 +1,10 @@
 from typing import List
 
 from fastapi import APIRouter, Depends, Response, status
-from models.questionnaire_answer import QuestionnaireAnswer
 from routers.v1.dependencies import authorized, get_user, is_admin
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
+from schemas.models.questionnaire_answer import QuestionnaireAnswer
 from schemas.questionnaire import QuestionnaireRequest
 from schemas.success import SuccessResponse
 from services.questionnaire import QuestionnaireService

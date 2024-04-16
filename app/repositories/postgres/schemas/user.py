@@ -28,3 +28,4 @@ class User(Base):
     tender = relationship("Tender", back_populates="user")
     session = relationship("Session", back_populates="user")
     questionnaire = relationship("Questionnaire", back_populates="user")
+    notification = relationship("Notification", back_populates="user")

@@ -1,8 +1,8 @@
 from typing import List
 
-import models
 from fastapi import Depends
 from repositories.postgres import QuestionnaireRepository
+from schemas import models
 from tools import convert_json_to_csv
 
 
@@ -27,7 +27,9 @@ class QuestionnaireService:
         )
 
     async def get_by_user_id(self, user_id: str) -> models.QuestionnaireAnswer:
-        return await self.questionnaire_repository.get_by_user_id(user_id=user_id)
+        return await self.questionnaire_repository.get_by_user_id(
+            user_id=user_id
+        )
 
     async def export_csv(self) -> str:
         answers = await self.questionnaire_repository.get_all()

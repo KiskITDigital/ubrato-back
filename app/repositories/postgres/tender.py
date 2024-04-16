@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
-import models
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import (
+    TENDERID_NOT_FOUND,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -15,6 +17,7 @@ from repositories.postgres.schemas import (
     TenderServiceGroup,
     TenderServiceType,
 )
+from schemas import models
 from sqlalchemy import and_, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 

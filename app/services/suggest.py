@@ -1,8 +1,8 @@
 from typing import List
 
-import models
 from fastapi import Depends
 from repositories.postgres import CitiesRepository
+from schemas import models
 
 
 class SuggestService:

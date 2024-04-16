@@ -1,11 +1,11 @@
 import datetime
 import secrets
 
-import models
 from config import Config, get_config
 from fastapi import Depends, status
 from repositories.postgres import SessionRepository, UserRepository
 from repositories.postgres.schemas import Session
+from schemas import models
 from services.exceptions import SESSION_EXPIRED, ServiceException
 
 

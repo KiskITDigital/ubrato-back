@@ -15,9 +15,12 @@ __all__ = [
     "Organization",
     "City",
     "QuestionnaireAnswer",
+    "Notification",
+    "Notifications",
 ]
 
 from .city import City
+from .notification import Notification, Notifications
 from .object_group import (
     ObjectGroupModel,
     ObjectGroupWithTypes,

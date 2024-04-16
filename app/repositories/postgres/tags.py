@@ -1,20 +1,20 @@
 from typing import List
 
 from fastapi import Depends
-from models import (
-    ObjectGroupWithTypes,
-    ObjectsGroupsWithTypes,
-    ObjectTypeModel,
-    ServiceGroupWithTypes,
-    ServicesGroupsWithTypes,
-    ServiceTypeModel,
-)
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.schemas import (
     ObjectGroup,
     ObjectType,
     ServiceGroup,
     ServiceType,
+)
+from schemas.models import (
+    ObjectGroupWithTypes,
+    ObjectsGroupsWithTypes,
+    ObjectTypeModel,
+    ServiceGroupWithTypes,
+    ServicesGroupsWithTypes,
+    ServiceTypeModel,
 )
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

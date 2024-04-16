@@ -1,8 +1,8 @@
 from typing import List
 
-import models
 from fastapi import Depends
 from repositories.postgres import TenderRepository, UserRepository
+from schemas import models
 
 
 class ManagerService:
