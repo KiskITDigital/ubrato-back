@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tender (
     wishes              VARCHAR(400)    NULL,
     attachments         TEXT[]          NULL,
     verified            BOOLEAN         NOT NULL DEFAULT FALSE,
-    active              BOOLEAN         NOT NULL DEFAULT FALSE,
+    active              BOOLEAN         NOT NULL DEFAULT TRUE,
     reception_start     TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,

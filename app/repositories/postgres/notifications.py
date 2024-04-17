@@ -15,11 +15,16 @@ class NotificationRepository:
         self.db = db
 
     async def add_notice(
-        self, user_id: str, msg: str, href: Optional[str]
+        self,
+        user_id: str,
+        header: Optional[str],
+        msg: Optional[str],
+        href: Optional[str],
     ) -> None:
         self.db.add(
             Notification(
                 user_id=user_id,
+                header=header,
                 msg=msg,
                 href=href,
             )

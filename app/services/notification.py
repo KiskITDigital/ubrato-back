@@ -15,10 +15,14 @@ class NoticeService:
         self.notification_repository = notification_repository
 
     async def add_notice(
-        self, user_id: str, msg: str, href: Optional[str]
+        self,
+        user_id: str,
+        header: Optional[str],
+        msg: Optional[str],
+        href: Optional[str],
     ) -> None:
         return await self.notification_repository.add_notice(
-            user_id=user_id, msg=msg, href=href
+            user_id=user_id, header=header, msg=msg, href=href
         )
 
     async def get_user_notice(self, user_id: str) -> models.Notifications:

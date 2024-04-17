@@ -58,7 +58,7 @@ class Tender(Base):
         Boolean, default=False, nullable=False
     )
     active: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=False
+        Boolean, default=True, nullable=False
     )
 
     user = relationship("User", back_populates="tender")

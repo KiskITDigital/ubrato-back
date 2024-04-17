@@ -4,7 +4,9 @@ from pydantic import BaseModel
 
 
 class Notification(BaseModel):
-    msg: str
+    id: int
+    header: Optional[str]
+    msg: Optional[str]
     href: Optional[str]
 
 

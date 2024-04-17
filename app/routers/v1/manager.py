@@ -6,7 +6,7 @@ from schemas import models
 from schemas.exception import ExceptionResponse
 from schemas.success import SuccessResponse
 from schemas.verify_status_set import VerifyStatusSet
-from services import ManagerService
+from services import ManagerService, NoticeService
 
 router = APIRouter(
     prefix="/v1/manager",
@@ -26,8 +26,12 @@ async def update_user_verify_status(
     user_id: str,
     data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
+    notice_service: NoticeService = Depends(),
 ) -> SuccessResponse:
     await manager_service.update_user_verified_status(user_id, data.status)
+    await notice_service.add_notice(
+        user_id=user_id, header="Verification", msg=data.message, href=None
+    )
     return SuccessResponse()
 
 

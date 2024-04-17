@@ -64,7 +64,10 @@ async def signup_user(
     )
 
     await notice_service.add_notice(
-        user_id=created_user.id, msg="Welcome to ubrato!", href=None
+        user_id=created_user.id,
+        header="Registration is complete",
+        msg="Welcome to ubrato!",
+        href=None,
     )
 
     return SignUpResponse(
