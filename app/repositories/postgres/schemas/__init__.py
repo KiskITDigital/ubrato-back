@@ -10,16 +10,19 @@ __all__ = [
     "ObjectType",
     "ServiceGroup",
     "ServiceType",
-    "TenderServiceGroup",
     "TenderServiceType",
     "Tender",
     "User",
     "Notification",
+    "DraftTender",
+    "DraftTenderServiceType",
 ]
 
 
 from .city import City
 from .document import Document
+from .draft_tender import DraftTender
+from .draft_tender_service import DraftTenderServiceType
 from .logs import Logs
 from .notifications import Notification
 from .organiztion import Organization
@@ -28,10 +31,5 @@ from .region import Region
 from .session import Session
 from .tender import Tender
 from .tender_object import ObjectGroup, ObjectType
-from .tender_service import (
-    ServiceGroup,
-    ServiceType,
-    TenderServiceGroup,
-    TenderServiceType,
-)
+from .tender_service import ServiceGroup, ServiceType, TenderServiceType
 from .user import User

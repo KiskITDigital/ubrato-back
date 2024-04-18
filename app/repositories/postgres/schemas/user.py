@@ -27,6 +27,7 @@ class User(Base):
 
     organization = relationship("Organization", back_populates="user")
     tender = relationship("Tender", back_populates="user")
+    draft_tender = relationship("DraftTender", back_populates="user")
     session = relationship("Session", back_populates="user")
     questionnaire = relationship("Questionnaire", back_populates="user")
     notification = relationship("Notification", back_populates="user")

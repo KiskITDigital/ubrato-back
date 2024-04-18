@@ -1,0 +1,188 @@
+from datetime import datetime
+from typing import Any, List
+
+from fastapi import Depends, status
+from repositories.postgres.database import get_db_connection
+from repositories.postgres.exceptions import RepositoryException
+from repositories.postgres.schemas import (
+    City,
+    DraftTender,
+    DraftTenderServiceType,
+    ObjectGroup,
+    ObjectType,
+    ServiceGroup,
+    ServiceType,
+)
+from schemas import models
+from sqlalchemy import and_, delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+
+class DraftTenderRepository:
+    db: AsyncSession
+
+    def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
+        self.db = db
+
+    async def create_tender(
+        self,
+        tender: DraftTender,
+        service_type_ids: List[int],
+    ) -> DraftTender:
+        self.db.add(tender)
+        await self.db.flush()
+        for id in service_type_ids:
+            self.db.add(
+                DraftTenderServiceType(
+                    tender_id=tender.id,
+                    service_type_id=id,
+                )
+            )
+
+        await self.db.commit()
+
+        await self.db.refresh(tender)
+
+        return tender
+
+    async def update_draft_tender(
+        self, tender: dict[str, Any], id: str
+    ) -> DraftTender:
+        query = await self.db.execute(
+            select(DraftTender).where(DraftTender.id == id)
+        )
+
+        tender_to_update = query.scalar()
+
+        if tender_to_update is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="",
+                sql_msg="",
+            )
+
+        for key, value in tender.items():
+            setattr(tender_to_update, key, value)
+
+        tender_to_update.update_at = datetime.now()
+
+        await self.db.execute(
+            delete(DraftTenderServiceType).where(
+                DraftTenderServiceType.tender_id == tender_to_update.id,
+            )
+        )
+
+        await self.db.flush()
+
+        for id in tender["services_types"]:
+            self.db.add(
+                DraftTenderServiceType(
+                    tender_id=tender_to_update.id,
+                    service_type_id=id,
+                )
+            )
+
+        await self.db.commit()
+        await self.db.refresh(tender_to_update)
+        return tender_to_update
+
+    async def get_draft_tender_by_id(self, id: str) -> models.DraftTender:
+        query = await self.db.execute(
+            select(DraftTender, ObjectGroup.name, ObjectType.name, City.name)
+            .join(City)
+            .join(ObjectType)
+            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
+            .where(DraftTender.id == id)
+        )
+
+        found_tender = query.tuples().first()
+
+        if found_tender is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="",
+                sql_msg="",
+            )
+
+        tender, object_group_name, object_type_name, city_name = found_tender
+
+        return await self.format_draft_tender(
+            tender=tender,
+            object_group_name=object_group_name,
+            object_type_name=object_type_name,
+            city_name=city_name,
+        )
+
+    async def delete_draft_tender(self, id: str) -> None:
+        await self.db.execute(
+            delete(DraftTenderServiceType).where(
+                DraftTenderServiceType.tender_id == id,
+            )
+        )
+
+        await self.db.execute(delete(DraftTender).where(DraftTender.id == id))
+
+        await self.db.commit()
+
+    async def format_draft_tender(
+        self,
+        tender: DraftTender,
+        object_group_name: str,
+        object_type_name: str,
+        city_name: str,
+    ) -> models.DraftTender:
+        services_type_names: List[str] = []
+
+        query = await self.db.execute(
+            select(ServiceType.name)
+            .join(
+                DraftTenderServiceType,
+                DraftTenderServiceType.service_type_id == ServiceType.id,
+            )
+            .where(DraftTenderServiceType.tender_id == tender.id)
+        )
+
+        services_types = query.scalars()
+
+        for name in services_types:
+            services_type_names.append(name)
+
+        services_groups_names: dict[str, None] = {}
+
+        query = await self.db.execute(
+            select(ServiceGroup.name).select_from(ServiceType)
+            .join(
+                ServiceGroup,
+                ServiceType.service_group_id == ServiceGroup.id,
+            )
+            .where(and_(
+                DraftTenderServiceType.service_type_id == ServiceType.id,
+                DraftTenderServiceType.tender_id == tender.id
+            ))
+        )
+
+        services_groups = query.scalars()
+
+        for name in services_groups:
+            services_groups_names[name] = None
+
+        return models.DraftTender(
+            id=tender.id,
+            name=tender.name,
+            price=tender.price,
+            is_contract_price=tender.is_contract_price,
+            location=city_name,
+            floor_space=tender.floor_space,
+            description=tender.description,
+            wishes=tender.wishes,
+            attachments=tender.attachments,
+            services_groups=list(services_groups_names.keys()),
+            services_types=services_type_names,
+            reception_start=tender.reception_start,
+            reception_end=tender.reception_end,
+            work_start=tender.work_start,
+            work_end=tender.work_end,
+            object_group_id=object_group_name,
+            object_type_id=object_type_name,
+            update_at=tender.update_at,
+        )

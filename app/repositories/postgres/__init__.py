@@ -8,12 +8,14 @@ __all__ = [
     "CitiesRepository",
     "QuestionnaireRepository",
     "NotificationRepository",
+    "DraftTenderRepository",
     "get_db_connection",
     "async_session_maker",
 ]
 
 from .cities import CitiesRepository
 from .database import async_session_maker, get_db_connection
+from .draft_tender import DraftTenderRepository
 from .logs import LogsRepository
 from .notifications import NotificationRepository
 from .organization import OrganizationRepository

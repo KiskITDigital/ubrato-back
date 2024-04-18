@@ -17,6 +17,7 @@ __all__ = [
     "QuestionnaireAnswer",
     "Notification",
     "Notifications",
+    "DraftTender",
 ]
 
 from .city import City
@@ -35,5 +36,5 @@ from .service_group import (
     ServicesGroupsWithTypes,
     ServiceTypeModel,
 )
-from .tender import Tender
+from .tender import DraftTender, Tender
 from .user import User, UserMe, UserPrivateDTO

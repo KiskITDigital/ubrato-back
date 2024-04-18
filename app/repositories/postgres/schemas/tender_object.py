@@ -23,3 +23,4 @@ class ObjectType(Base):
 
     object_group = relationship("ObjectGroup", back_populates="object_type")
     tender = relationship("Tender", back_populates="object_type")
+    draft_tender = relationship("DraftTender", back_populates="object_type")

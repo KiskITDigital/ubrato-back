@@ -45,10 +45,9 @@ class NotificationRepository:
 
     async def mark_read(self, ids: List[int], user_id: str) -> None:
         query = await self.db.execute(
-            select(Notification).where(and_(
-                Notification.user_id == user_id,
-                Notification.id.in_(ids)
-            ))
+            select(Notification).where(
+                and_(Notification.user_id == user_id, Notification.id.in_(ids))
+            )
         )
 
         for notice in query.scalars():

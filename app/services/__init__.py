@@ -9,8 +9,10 @@ __all__ = [
     "AuthException",
     "SuggestService",
     "NoticeService",
+    "DraftTenderService",
 ]
 
+from .draft_tender import DraftTenderService
 from .jwt import JWTService
 from .logs import LogsService
 from .manager import ManagerService

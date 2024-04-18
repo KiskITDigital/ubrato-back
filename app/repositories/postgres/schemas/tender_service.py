@@ -10,9 +10,6 @@ class ServiceGroup(Base):
     name: Mapped[str] = mapped_column(String(40))
 
     service_type = relationship("ServiceType", back_populates="service_group")
-    tender_service_group = relationship(
-        "TenderServiceGroup", back_populates="tender_service_group"
-    )
 
 
 class ServiceType(Base):
@@ -28,22 +25,9 @@ class ServiceType(Base):
     tender_service_type = relationship(
         "TenderServiceType", back_populates="tender_service_type"
     )
-
-
-class TenderServiceGroup(Base):
-    __tablename__ = "tender_services_groups"
-
-    tender_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("tender.id"), primary_key=True
+    draft_service_group = relationship(
+        "DraftTenderServiceType", back_populates="service_type"
     )
-    service_group_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("services_groups.id"), primary_key=True
-    )
-
-    tender_service_group = relationship(
-        "ServiceGroup", back_populates="tender_service_group"
-    )
-    tender = relationship("Tender", back_populates="tender_service_group")
 
 
 class TenderServiceType(Base):

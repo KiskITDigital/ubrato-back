@@ -3,10 +3,7 @@ from typing import Any, List, Optional
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    TENDERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -14,7 +11,6 @@ from repositories.postgres.schemas import (
     ServiceGroup,
     ServiceType,
     Tender,
-    TenderServiceGroup,
     TenderServiceType,
 )
 from schemas import models
@@ -32,7 +28,6 @@ class TenderRepository:
         self,
         tender: Tender,
         service_type_ids: List[int],
-        service_group_ids: List[int],
     ) -> Tender:
         self.db.add(tender)
         await self.db.flush()
@@ -43,15 +38,7 @@ class TenderRepository:
                     service_type_id=id,
                 )
             )
-            await self.db.flush()
-        for id in service_group_ids:
-            self.db.add(
-                TenderServiceGroup(
-                    tender_id=tender.id,
-                    service_group_id=id,
-                )
-            )
-            await self.db.flush()
+
         await self.db.commit()
 
         await self.db.refresh(tender)
@@ -79,12 +66,6 @@ class TenderRepository:
             tender_to_update.verified = False
 
         await self.db.execute(
-            delete(TenderServiceGroup).where(
-                TenderServiceGroup.tender_id == tender_to_update.id,
-            )
-        )
-
-        await self.db.execute(
             delete(TenderServiceType).where(
                 TenderServiceType.tender_id == tender_to_update.id,
             )
@@ -97,14 +78,6 @@ class TenderRepository:
                 TenderServiceType(
                     tender_id=tender_to_update.id,
                     service_type_id=id,
-                )
-            )
-
-        for id in tender["services_groups"]:
-            self.db.add(
-                TenderServiceGroup(
-                    tender_id=tender_to_update.id,
-                    service_group_id=id,
                 )
             )
 
@@ -281,6 +254,35 @@ class TenderRepository:
 
         return 0
 
+    async def get_object_group(self, object_type_id: int) -> int:
+        query = await self.db.execute(
+            select(ObjectGroup.id).select_from(ObjectGroup)
+            .join(ObjectType, ObjectGroup.id == ObjectType.id)
+            .where(ObjectType.id == object_type_id)
+        )
+
+        result = query.scalar()
+        if result:
+            return result
+
+        return 0
+
+    async def get_services_groups(
+        self, service_type_ids: List[int]
+    ) -> List[int]:
+        query = await self.db.execute(
+            select(ServiceGroup.id).select_from(ServiceGroup)
+            .join(ServiceType, ServiceGroup.id == ServiceType.id)
+            .where(ServiceType.id.in_(service_type_ids))
+        )
+
+        result = query.scalars()
+        groups: List[int] = []
+        for v in result.all():
+            groups.append(v)
+
+        return groups
+
     async def format_tender(
         self,
         tender: Tender,
@@ -288,22 +290,6 @@ class TenderRepository:
         object_type_name: str,
         city_name: str,
     ) -> models.Tender:
-        services_groups_names: List[str] = []
-
-        query = await self.db.execute(
-            select(ServiceGroup.name)
-            .join(
-                TenderServiceGroup,
-                TenderServiceGroup.service_group_id == ServiceGroup.id,
-            )
-            .where(TenderServiceGroup.tender_id == tender.id)
-        )
-
-        services_groups = query.scalars()
-
-        for name in services_groups:
-            services_groups_names.append(name)
-
         services_type_names: List[str] = []
 
         query = await self.db.execute(
@@ -320,6 +306,25 @@ class TenderRepository:
         for name in services_types:
             services_type_names.append(name)
 
+        services_groups_names: dict[str, None] = {}
+
+        query = await self.db.execute(
+            select(ServiceGroup.name).select_from(ServiceType)
+            .join(
+                ServiceGroup,
+                ServiceType.service_group_id == ServiceGroup.id,
+            )
+            .where(and_(
+                TenderServiceType.service_type_id == ServiceType.id,
+                TenderServiceType.tender_id == tender.id
+            ))
+        )
+
+        services_groups = query.scalars()
+
+        for name in services_groups:
+            services_groups_names[name] = None
+
         return models.Tender(
             id=tender.id,
             name=tender.name,
@@ -330,7 +335,7 @@ class TenderRepository:
             description=tender.description,
             wishes=tender.wishes,
             attachments=tender.attachments,
-            services_groups=services_groups_names,
+            services_groups=list(services_groups_names.keys()),
             services_types=services_type_names,
             reception_start=tender.reception_start,
             reception_end=tender.reception_end,

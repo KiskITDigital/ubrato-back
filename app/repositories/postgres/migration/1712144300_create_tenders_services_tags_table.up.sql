@@ -9,14 +9,6 @@ CREATE TABLE IF NOT EXISTS services_types (
     service_group_id    INT         REFERENCES services_groups(id)
 );
 
-CREATE TABLE IF NOT EXISTS tender_services_groups (
-    tender_id           INT     REFERENCES tender(id),
-    service_group_id    INT     REFERENCES services_groups(id),
-    PRIMARY KEY (tender_id, service_group_id)
-);
-CREATE INDEX IF NOT EXISTS tender_services_groups_index
-ON tender_services_groups (tender_id, service_group_id);
-
 CREATE TABLE IF NOT EXISTS tender_services_types (
     tender_id           INT     NOT NULL REFERENCES tender(id),
     service_type_id     INT     NOT NULL REFERENCES services_types(id),

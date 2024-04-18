@@ -57,16 +57,11 @@ class Tender(Base):
     verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    active: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False
-    )
+    active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     user = relationship("User", back_populates="tender")
     object_type = relationship("ObjectType", back_populates="tender")
     city = relationship("City")
-    tender_service_group = relationship(
-        "TenderServiceGroup", back_populates="tender"
-    )
     tender_service_type = relationship(
         "TenderServiceType", back_populates="tender"
     )

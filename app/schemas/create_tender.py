@@ -12,12 +12,10 @@ class CreateTenderRequest(BaseModel):
     description: str
     wishes: str
     attachments: List[str]
-    services_groups: List[int]
     services_types: List[int]
+    object_type_id: int
     reception_start: datetime
     reception_end: datetime
     work_start: datetime
     work_end: datetime
     city_id: int
-    object_group_id: int
-    object_type_id: int

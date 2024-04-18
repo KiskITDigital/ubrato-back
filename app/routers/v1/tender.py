@@ -9,7 +9,7 @@ from schemas.jwt_user import JWTUser
 from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
-from services import TenderService
+from services import DraftTenderService, TenderService
 
 router = APIRouter(
     prefix="/v1/tenders",
@@ -166,3 +166,71 @@ async def get_count_active_tenders(
     )
 
     return TenderCountResponse(count=count)
+
+
+@router.post(
+    "/draft",
+    response_model=models.DraftTender,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def create_draft_tender(
+    tender: CreateTenderRequest,
+    tender_service: DraftTenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> models.DraftTender:
+    created_tender = await tender_service.create_tender(
+        tender=tender, user_id=user.id
+    )
+    return created_tender
+
+
+@router.put(
+    "/draft",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def update_draft_tender(
+    tender: CreateTenderRequest,
+    tender_service: DraftTenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await tender_service.update_tender(tender=tender, id=user.id)
+    return SuccessResponse()
+
+
+@router.delete(
+    "/draft",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def delete_draft_tender(
+    tender_service: DraftTenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await tender_service.delete_tender(id=user.id)
+    return SuccessResponse()
+
+
+@router.get(
+    "/draft",
+    response_model=models.DraftTender,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def get_draft_tender(
+    tender_service: DraftTenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> models.DraftTender:
+    return await tender_service.get_by_id(id=user.id)

@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS draft_tender (
+    id                  VARCHAR(40)     NOT NULL REFERENCES users(id),
+    name                VARCHAR(255)    NOT NULL,
+    price               INT             NOT NULL,
+    is_contract_price   BOOLEAN         NOT NULL DEFAULT FALSE,
+    city_id             INT             NOT NULL REFERENCES cities(id),
+    floor_space         INT             NOT NULL,
+    description         VARCHAR(400)    NULL,
+    wishes              VARCHAR(400)    NULL,
+    attachments         TEXT[]          NULL,
+    reception_start     TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    work_end            TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    object_type_id      INT             REFERENCES objects_types(id),
+    update_at          TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(id)
+);
