@@ -123,6 +123,7 @@ async def get_notice(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    description="many values example usage: /me/notice/read?ids_str=1,2,3"
 )
 async def mark_read_notice(
     ids_str: str,

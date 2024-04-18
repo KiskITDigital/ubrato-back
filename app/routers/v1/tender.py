@@ -176,6 +176,7 @@ async def get_count_active_tenders(
         status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    tags=["draft"],
 )
 async def create_draft_tender(
     tender: CreateTenderRequest,
@@ -195,6 +196,7 @@ async def create_draft_tender(
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    tags=["draft"],
 )
 async def update_draft_tender(
     tender: CreateTenderRequest,
@@ -212,6 +214,7 @@ async def update_draft_tender(
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    tags=["draft"],
 )
 async def delete_draft_tender(
     tender_service: DraftTenderService = Depends(),
@@ -228,6 +231,7 @@ async def delete_draft_tender(
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    tags=["draft"],
 )
 async def get_draft_tender(
     tender_service: DraftTenderService = Depends(),
