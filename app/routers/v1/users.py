@@ -114,3 +114,22 @@ async def get_notice(
     user: JWTUser = Depends(get_user),
 ) -> models.Notifications:
     return await notice_service.get_user_notice(user_id=user.id)
+
+
+@router.put(
+    "/me/notice/read",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def mark_read_notice(
+    ids_str: str,
+    notice_service: NoticeService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    ids = [int(x) for x in ids_str.split(",")]
+
+    await notice_service.mark_read(ids=ids, user_id=user.id)
+    return SuccessResponse()

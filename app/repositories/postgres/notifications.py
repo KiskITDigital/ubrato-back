@@ -4,7 +4,7 @@ from fastapi import Depends
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.schemas import Notification
 from schemas import models
-from sqlalchemy import select
+from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -42,3 +42,16 @@ class NotificationRepository:
             notifications.append(models.Notification(**notice.__dict__))
 
         return notifications
+
+    async def mark_read(self, ids: List[int], user_id: str) -> None:
+        query = await self.db.execute(
+            select(Notification).where(and_(
+                Notification.user_id == user_id,
+                Notification.id.in_(ids)
+            ))
+        )
+
+        for notice in query.scalars():
+            notice.read = True
+
+        await self.db.commit()

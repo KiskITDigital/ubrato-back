@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import Depends
 from repositories.postgres import NotificationRepository
@@ -34,3 +34,6 @@ class NoticeService:
             total=len(notifications),
             notifications=notifications,
         )
+
+    async def mark_read(self, ids: List[int], user_id: str) -> None:
+        await self.notification_repository.mark_read(ids=ids, user_id=user_id)

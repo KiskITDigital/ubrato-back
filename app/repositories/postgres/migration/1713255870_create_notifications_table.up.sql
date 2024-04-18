@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id VARCHAR(40) NOT NULL REFERENCES users(id),
     header  TEXT        DEFAULT NULL,
     msg     TEXT        DEFAULT NULL,
-    href    TEXT        DEFAULT NULL
+    href    TEXT        DEFAULT NULL,
+    read    BOOLEAN     DEFAULT FALSE
 );
