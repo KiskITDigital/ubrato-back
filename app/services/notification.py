@@ -30,8 +30,10 @@ class NoticeService:
             user_id=user_id
         )
 
+        total = sum(1 for i in notifications if not i.read)
+
         return models.Notifications(
-            total=len(notifications),
+            total=total,
             notifications=notifications,
         )
 
