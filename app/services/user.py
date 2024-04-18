@@ -1,3 +1,4 @@
+import secrets
 import uuid
 from typing import Tuple
 
@@ -32,11 +33,14 @@ class UserService:
             password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
 
+        totp_salt = secrets.token_hex(8)
+
         user = User(
             id=id,
             email=email,
             phone=phone,
             password=password,
+            totp_salt=totp_salt,
             first_name=first_name,
             middle_name=middle_name,
             last_name=last_name,
