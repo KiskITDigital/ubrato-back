@@ -18,6 +18,7 @@ __all__ = [
     "Notification",
     "Notifications",
     "DraftTender",
+    "EgrulCompany",
 ]
 
 from .city import City
@@ -28,7 +29,7 @@ from .object_group import (
     ObjectsGroupsWithTypes,
     ObjectTypeModel,
 )
-from .organization import Organization, OrganizationLiteDTO
+from .organization import EgrulCompany, Organization, OrganizationLiteDTO
 from .questionnaire_answer import QuestionnaireAnswer
 from .service_group import (
     ServiceGroupModel,

@@ -3,6 +3,7 @@ from typing import List
 from fastapi import Depends
 from repositories.postgres import CitiesRepository
 from schemas import models
+from tools.egrul import get_org_by_query
 
 
 class SuggestService:
@@ -16,3 +17,6 @@ class SuggestService:
 
     async def search_city(self, query: str) -> List[models.City]:
         return await self.cities_repository.search_by_name(name=query)
+
+    async def search_company(self, query: str) -> List[models.EgrulCompany]:
+        return get_org_by_query(query=query)

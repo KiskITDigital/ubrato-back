@@ -19,3 +19,14 @@ async def search_city(
     suggest_service: SuggestService = Depends(),
 ) -> List[models.City]:
     return await suggest_service.search_city(query=query)
+
+
+@router.get(
+    "/company",
+    response_model=List[models.EgrulCompany],
+)
+async def search_company(
+    query: str,
+    suggest_service: SuggestService = Depends(),
+) -> List[models.EgrulCompany]:
+    return await suggest_service.search_company(query=query)

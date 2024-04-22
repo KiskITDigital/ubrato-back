@@ -25,3 +25,13 @@ class OrganizationLiteDTO(BaseModel):
     okpo: str
     ogrn: str
     kpp: str
+
+
+class EgrulCompany(BaseModel):
+    name: str
+    director: str
+    inn: str
+    kpp: str
+    ogrn: str
+    registration_date: str
+    region: str
