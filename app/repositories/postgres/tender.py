@@ -3,7 +3,10 @@ from typing import Any, List, Optional
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import (
+    TENDERID_NOT_FOUND,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -256,7 +259,8 @@ class TenderRepository:
 
     async def get_object_group(self, object_type_id: int) -> int:
         query = await self.db.execute(
-            select(ObjectGroup.id).select_from(ObjectGroup)
+            select(ObjectGroup.id)
+            .select_from(ObjectGroup)
             .join(ObjectType, ObjectGroup.id == ObjectType.id)
             .where(ObjectType.id == object_type_id)
         )
@@ -271,7 +275,8 @@ class TenderRepository:
         self, service_type_ids: List[int]
     ) -> List[int]:
         query = await self.db.execute(
-            select(ServiceGroup.id).select_from(ServiceGroup)
+            select(ServiceGroup.id)
+            .select_from(ServiceGroup)
             .join(ServiceType, ServiceGroup.id == ServiceType.id)
             .where(ServiceType.id.in_(service_type_ids))
         )
@@ -309,15 +314,18 @@ class TenderRepository:
         services_groups_names: dict[str, None] = {}
 
         query = await self.db.execute(
-            select(ServiceGroup.name).select_from(ServiceType)
+            select(ServiceGroup.name)
+            .select_from(ServiceType)
             .join(
                 ServiceGroup,
                 ServiceType.service_group_id == ServiceGroup.id,
             )
-            .where(and_(
-                TenderServiceType.service_type_id == ServiceType.id,
-                TenderServiceType.tender_id == tender.id
-            ))
+            .where(
+                and_(
+                    TenderServiceType.service_type_id == ServiceType.id,
+                    TenderServiceType.tender_id == tender.id,
+                )
+            )
         )
 
         services_groups = query.scalars()

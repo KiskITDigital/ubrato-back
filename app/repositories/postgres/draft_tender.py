@@ -150,15 +150,18 @@ class DraftTenderRepository:
         services_groups_names: dict[str, None] = {}
 
         query = await self.db.execute(
-            select(ServiceGroup.name).select_from(ServiceType)
+            select(ServiceGroup.name)
+            .select_from(ServiceType)
             .join(
                 ServiceGroup,
                 ServiceType.service_group_id == ServiceGroup.id,
             )
-            .where(and_(
-                DraftTenderServiceType.service_type_id == ServiceType.id,
-                DraftTenderServiceType.tender_id == tender.id
-            ))
+            .where(
+                and_(
+                    DraftTenderServiceType.service_type_id == ServiceType.id,
+                    DraftTenderServiceType.tender_id == tender.id,
+                )
+            )
         )
 
         services_groups = query.scalars()

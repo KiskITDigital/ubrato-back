@@ -20,9 +20,16 @@ class NoticeService:
         header: Optional[str],
         msg: Optional[str],
         href: Optional[str],
+        href_text: Optional[str],
+        href_color: Optional[int],
     ) -> None:
         return await self.notification_repository.add_notice(
-            user_id=user_id, header=header, msg=msg, href=href
+            user_id=user_id,
+            header=header,
+            msg=msg,
+            href=href,
+            href_text=href_text,
+            href_color=href_color,
         )
 
     async def get_user_notice(self, user_id: str) -> models.Notifications:

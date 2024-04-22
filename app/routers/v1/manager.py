@@ -30,7 +30,12 @@ async def update_user_verify_status(
 ) -> SuccessResponse:
     await manager_service.update_user_verified_status(user_id, data.status)
     await notice_service.add_notice(
-        user_id=user_id, header="Verification", msg=data.message, href=None
+        user_id=user_id,
+        header="Verification",
+        msg=data.message,
+        href=None,
+        href_text=None,
+        href_color=None,
     )
     return SuccessResponse()
 

@@ -20,6 +20,8 @@ class NotificationRepository:
         header: Optional[str],
         msg: Optional[str],
         href: Optional[str],
+        href_text: Optional[str],
+        href_color: Optional[int],
     ) -> None:
         self.db.add(
             Notification(
@@ -27,6 +29,8 @@ class NotificationRepository:
                 header=header,
                 msg=msg,
                 href=href,
+                href_text=href_text,
+                href_color=href_color,
             )
         )
 

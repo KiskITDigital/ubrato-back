@@ -68,6 +68,8 @@ async def signup_user(
         header="Registration is complete",
         msg="Welcome to ubrato!",
         href=None,
+        href_text=None,
+        href_color=None,
     )
 
     return SignUpResponse(

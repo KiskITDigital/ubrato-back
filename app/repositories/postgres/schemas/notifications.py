@@ -13,6 +13,8 @@ class Notification(Base):
     header: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
     msg: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
     href: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
+    href_text: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
+    href_color: Mapped[Tuple[int, None]] = mapped_column(Integer, default=0)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user = relationship("User", back_populates="notification")

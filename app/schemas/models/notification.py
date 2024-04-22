@@ -8,6 +8,8 @@ class Notification(BaseModel):
     header: Optional[str]
     msg: Optional[str]
     href: Optional[str]
+    href_text: Optional[str]
+    href_color: Optional[int]
     read: bool
 
 
