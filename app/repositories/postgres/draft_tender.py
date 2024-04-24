@@ -180,6 +180,9 @@ class DraftTenderRepository:
             )
         )
 
+        for name in query.scalars():
+            services_groups_names[name] = None
+
         objects_type_names: List[str] = []
 
         query = await self.db.execute(
@@ -209,7 +212,14 @@ class DraftTenderRepository:
             )
         )
 
-        object_group_name = query.scalar_one()
+        object_group_name = query.scalars().first()
+
+        if object_group_name is None:
+            raise RepositoryException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="",
+                sql_msg="failed format tender",
+            )
 
         return models.DraftTender(
             id=tender.id,

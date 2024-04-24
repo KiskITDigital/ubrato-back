@@ -22,7 +22,7 @@ class LogsService:
         url = str(request.url)
         id = "err_" + str(uuid.uuid4())
         logs = Logs(
-            id="err_" + str(uuid.uuid4()),
+            id=id,
             method=method,
             url=url,
             body=body.decode("utf-8"),
