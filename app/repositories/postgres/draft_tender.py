@@ -7,6 +7,7 @@ from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     City,
     DraftTender,
+    DraftTenderObjectType,
     DraftTenderServiceType,
     ObjectGroup,
     ObjectType,
@@ -28,6 +29,7 @@ class DraftTenderRepository:
         self,
         tender: DraftTender,
         service_type_ids: List[int],
+        object_type_ids: List[int],
     ) -> DraftTender:
         self.db.add(tender)
         await self.db.flush()
@@ -36,6 +38,14 @@ class DraftTenderRepository:
                 DraftTenderServiceType(
                     tender_id=tender.id,
                     service_type_id=id,
+                )
+            )
+
+        for id in object_type_ids:
+            self.db.add(
+                DraftTenderObjectType(
+                    tender_id=tender.id,
+                    object_type_id=id,
                 )
             )
 
@@ -72,6 +82,12 @@ class DraftTenderRepository:
             )
         )
 
+        await self.db.execute(
+            delete(DraftTenderObjectType).where(
+                DraftTenderObjectType.tender_id == tender_to_update.id,
+            )
+        )
+
         await self.db.flush()
 
         for id in tender["services_types"]:
@@ -82,16 +98,22 @@ class DraftTenderRepository:
                 )
             )
 
+        for id in tender["objects_types"]:
+            self.db.add(
+                DraftTenderObjectType(
+                    tender_id=tender_to_update.id,
+                    object_type_id=id,
+                )
+            )
+
         await self.db.commit()
         await self.db.refresh(tender_to_update)
         return tender_to_update
 
     async def get_draft_tender_by_id(self, id: str) -> models.DraftTender:
         query = await self.db.execute(
-            select(DraftTender, ObjectGroup.name, ObjectType.name, City.name)
+            select(DraftTender, City.name)
             .join(City)
-            .join(ObjectType)
-            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
             .where(DraftTender.id == id)
         )
 
@@ -104,12 +126,10 @@ class DraftTenderRepository:
                 sql_msg="",
             )
 
-        tender, object_group_name, object_type_name, city_name = found_tender
+        tender, city_name = found_tender
 
         return await self.format_draft_tender(
             tender=tender,
-            object_group_name=object_group_name,
-            object_type_name=object_type_name,
             city_name=city_name,
         )
 
@@ -127,8 +147,6 @@ class DraftTenderRepository:
     async def format_draft_tender(
         self,
         tender: DraftTender,
-        object_group_name: str,
-        object_type_name: str,
         city_name: str,
     ) -> models.DraftTender:
         services_type_names: List[str] = []
@@ -142,9 +160,7 @@ class DraftTenderRepository:
             .where(DraftTenderServiceType.tender_id == tender.id)
         )
 
-        services_types = query.scalars()
-
-        for name in services_types:
+        for name in query.scalars():
             services_type_names.append(name)
 
         services_groups_names: dict[str, None] = {}
@@ -164,10 +180,36 @@ class DraftTenderRepository:
             )
         )
 
-        services_groups = query.scalars()
+        objects_type_names: List[str] = []
 
-        for name in services_groups:
-            services_groups_names[name] = None
+        query = await self.db.execute(
+            select(ObjectType.name)
+            .join(
+                DraftTenderObjectType,
+                DraftTenderObjectType.object_type_id == ObjectType.id,
+            )
+            .where(DraftTenderObjectType.tender_id == tender.id)
+        )
+
+        for name in query.scalars():
+            objects_type_names.append(name)
+
+        query = await self.db.execute(
+            select(ObjectGroup.name)
+            .select_from(ObjectType)
+            .join(
+                ObjectGroup,
+                ObjectType.object_group_id == ObjectGroup.id,
+            )
+            .where(
+                and_(
+                    DraftTenderObjectType.object_type_id == ObjectType.id,
+                    DraftTenderObjectType.tender_id == tender.id,
+                )
+            )
+        )
+
+        object_group_name = query.scalar_one()
 
         return models.DraftTender(
             id=tender.id,
@@ -185,7 +227,7 @@ class DraftTenderRepository:
             reception_end=tender.reception_end,
             work_start=tender.work_start,
             work_end=tender.work_end,
-            object_group_id=object_group_name,
-            object_type_id=object_type_name,
+            object_group=object_group_name,
+            objects_types=objects_type_names,
             update_at=tender.update_at,
         )

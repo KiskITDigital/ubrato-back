@@ -13,7 +13,7 @@ class CreateTenderRequest(BaseModel):
     wishes: str
     attachments: List[str]
     services_types: List[int]
-    object_type_id: int
+    objects_types: List[int]
     reception_start: datetime
     reception_end: datetime
     work_start: datetime

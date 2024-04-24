@@ -4,6 +4,7 @@ include .env
 
 migration_up:
 	migrate -path ./app/repositories/postgres/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose up
+	cd ./app/repositories/typesense/migration && TYPESENSE_HOST=$(TYPESENSE_HOST) TYPESENSE_API_KEY=$(TYPESENSE_API_KEY) ./migration.sh
 
 migration_down:
 	migrate -path ./app/repositories/postgres/migration/ -database "postgresql://postgres:12345@localhost:5432/postgres?sslmode=disable" -verbose down

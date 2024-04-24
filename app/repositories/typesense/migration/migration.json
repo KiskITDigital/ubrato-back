@@ -16,7 +16,7 @@
     {"name": "work_start", "type": "int64"},
     {"name": "work_end", "type": "int64"},
     {"name": "object_group_id", "type": "int32"},
-    {"name": "object_type_id", "type": "int32"},
+    {"name": "object_type_id", "type": "string*"},
     {"name": "verified", "type": "bool"},
     {"name": "active", "type": "bool"},
     {"name": "created_at", "type": "int64"}

@@ -20,8 +20,8 @@ class Tender(BaseModel):
     reception_end: datetime
     work_start: datetime
     work_end: datetime
-    object_group_id: str
-    object_type_id: str
+    object_group: str
+    objects_types: List[str]
     user_id: str
     created_at: datetime
     verified: bool
@@ -44,6 +44,6 @@ class DraftTender(BaseModel):
     reception_end: datetime
     work_start: datetime
     work_end: datetime
-    object_group_id: str
-    object_type_id: str
+    object_group: str
+    objects_types: List[str]
     update_at: datetime

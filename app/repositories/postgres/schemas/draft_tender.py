@@ -43,16 +43,15 @@ class DraftTender(Base):
     work_end: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
-    object_type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("objects_types.id")
-    )
     update_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()
     )
 
     user = relationship("User", back_populates="draft_tender")
-    object_type = relationship("ObjectType", back_populates="draft_tender")
     city = relationship("City")
     draft_tender_service_type = relationship(
         "DraftTenderServiceType", back_populates="draft_tender"
+    )
+    draft_tender_object_type = relationship(
+        "DraftTenderObjectType", back_populates="draft_tender"
     )

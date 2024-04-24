@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS draft_tender (
     reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_end            TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    object_type_id      INT             REFERENCES objects_types(id),
     update_at          TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 );

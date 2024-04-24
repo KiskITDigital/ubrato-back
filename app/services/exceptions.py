@@ -6,6 +6,8 @@ USER_NOT_FOUND = "User not found."
 SESSION_EXPIRED = "Session expired"
 NO_BARRIER_TOKEN = "No barrier token"
 INVALID_BARRIER = "Bearer token is invalid"
+INVALID_SERVICES_COUNT = "Tender cannot be without services"
+INVALID_OBJECTS_COUNT = "Tender cannot be without objects"
 
 
 class ServiceException(HTTPException):

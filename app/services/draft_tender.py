@@ -35,9 +35,9 @@ class DraftTenderService:
                 reception_end=tender.reception_end,
                 work_start=tender.work_start,
                 work_end=tender.work_end,
-                object_type_id=tender.object_type_id,
             ),
             service_type_ids=tender.services_types,
+            object_type_ids=tender.objects_types,
         )
 
         return await self.tender_repository.get_draft_tender_by_id(

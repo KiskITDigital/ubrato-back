@@ -19,7 +19,7 @@ class TypesenseTender(BaseModel):
     work_start: int
     work_end: int
     object_group_id: int
-    object_type_id: int
+    object_type_id: List[int]
     verified: bool
     active: bool
     created_at: int

@@ -1,12 +1,17 @@
 from typing import List, Optional
 
-from fastapi import Depends
+from fastapi import Depends, status
 from repositories.postgres import TagsRepository, TenderRepository
 from repositories.postgres.schemas import Tender
 from repositories.typesense.tender import TenderIndex
 from schemas import models
 from schemas.create_tender import CreateTenderRequest
 from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
+from services.exceptions import (
+    INVALID_OBJECTS_COUNT,
+    INVALID_SERVICES_COUNT,
+    ServiceException,
+)
 
 
 class TenderService:
@@ -26,6 +31,18 @@ class TenderService:
     async def create_tender(
         self, tender: CreateTenderRequest, user_id: str
     ) -> models.Tender:
+        if len(tender.services_types) == 0:
+            raise ServiceException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=INVALID_SERVICES_COUNT,
+            )
+
+        if len(tender.objects_types) == 0:
+            raise ServiceException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=INVALID_OBJECTS_COUNT,
+            )
+
         created_tender = await self.tender_repository.create_tender(
             tender=Tender(
                 name=tender.name,
@@ -40,14 +57,14 @@ class TenderService:
                 reception_end=tender.reception_end,
                 work_start=tender.work_start,
                 work_end=tender.work_end,
-                object_type_id=tender.object_type_id,
                 user_id=user_id,
             ),
             service_type_ids=tender.services_types,
+            object_type_ids=tender.objects_types,
         )
 
-        object_group_ids = await self.tender_repository.get_object_group(
-            object_type_id=tender.object_type_id
+        object_group_id = await self.tender_repository.get_object_group(
+            object_type_id=tender.objects_types[0]
         )
 
         services_groups_ids = await self.tender_repository.get_services_groups(
@@ -56,7 +73,8 @@ class TenderService:
 
         self.tender_index.save(
             created_tender.ConvertToIndexSchema(
-                object_group_id=object_group_ids,
+                object_group_id=object_group_id,
+                objects_types=tender.objects_types,
                 services_groups=services_groups_ids,
                 services_types=tender.services_types,
             )
@@ -151,8 +169,8 @@ class TenderService:
             tender_id=tender_id,
         )
 
-        object_group_ids = await self.tender_repository.get_object_group(
-            object_type_id=tender.object_type_id
+        object_group_id = await self.tender_repository.get_object_group(
+            object_type_id=tender.objects_types[0]
         )
 
         services_groups_ids = await self.tender_repository.get_services_groups(
@@ -161,7 +179,8 @@ class TenderService:
 
         self.tender_index.update(
             updated_tender.ConvertToIndexSchema(
-                object_group_id=object_group_ids,
+                object_group_id=object_group_id,
+                objects_types=tender.objects_types,
                 services_groups=services_groups_ids,
                 services_types=tender.services_types,
             )

@@ -3,10 +3,7 @@ from typing import Any, List, Optional
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    TENDERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -14,6 +11,7 @@ from repositories.postgres.schemas import (
     ServiceGroup,
     ServiceType,
     Tender,
+    TenderObjectType,
     TenderServiceType,
 )
 from schemas import models
@@ -31,6 +29,7 @@ class TenderRepository:
         self,
         tender: Tender,
         service_type_ids: List[int],
+        object_type_ids: List[int],
     ) -> Tender:
         self.db.add(tender)
         await self.db.flush()
@@ -39,6 +38,14 @@ class TenderRepository:
                 TenderServiceType(
                     tender_id=tender.id,
                     service_type_id=id,
+                )
+            )
+
+        for id in object_type_ids:
+            self.db.add(
+                TenderObjectType(
+                    tender_id=tender.id,
+                    object_type_id=id,
                 )
             )
 
@@ -74,6 +81,12 @@ class TenderRepository:
             )
         )
 
+        await self.db.execute(
+            delete(TenderObjectType).where(
+                TenderObjectType.tender_id == tender_to_update.id,
+            )
+        )
+
         await self.db.flush()
 
         for id in tender["services_types"]:
@@ -81,6 +94,14 @@ class TenderRepository:
                 TenderServiceType(
                     tender_id=tender_to_update.id,
                     service_type_id=id,
+                )
+            )
+
+        for id in tender["objects_types"]:
+            self.db.add(
+                TenderObjectType(
+                    tender_id=tender_to_update.id,
+                    object_type_id=id,
                 )
             )
 
@@ -104,10 +125,6 @@ class TenderRepository:
         user_id: Optional[str],
     ) -> List[models.Tender]:
         reception_end_condition = Tender.reception_end > datetime.now()
-
-        object_type_condition = (object_type_id is None) or (
-            Tender.object_type_id == object_type_id
-        )
 
         service_type_condition = (service_type_ids is None) or and_(
             *(
@@ -144,14 +161,11 @@ class TenderRepository:
         user_id_condition = (user_id is None) or (Tender.user_id == user_id)
 
         query = await self.db.execute(
-            select(Tender, ObjectGroup.name, ObjectType.name, City.name)
-            .join(ObjectType, Tender.object_type_id == ObjectType.id)
-            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
+            select(Tender, City.name)
             .join(City, Tender.city_id == City.id)
             .where(
                 and_(
                     reception_end_condition,
-                    object_type_condition,  # type: ignore
                     service_type_condition,  # type: ignore
                     service_group_condition,  # type: ignore
                     floor_space_from_condition,  # type: ignore
@@ -169,14 +183,10 @@ class TenderRepository:
         tenders: List[models.Tender] = []
 
         for found_tender in query.all():
-            tender, object_group_name, object_type_name, city_name = (
-                found_tender._tuple()
-            )
+            tender, city_name = found_tender._tuple()
 
             tender_model = await self.format_tender(
                 tender=tender,
-                object_group_name=object_group_name,
-                object_type_name=object_type_name,
                 city_name=city_name,
             )
             tenders.append(tender_model)
@@ -185,11 +195,7 @@ class TenderRepository:
 
     async def get_tender_by_id(self, tender_id: int) -> models.Tender:
         query = await self.db.execute(
-            select(Tender, ObjectGroup.name, ObjectType.name, City.name)
-            .join(City)
-            .join(ObjectType)
-            .join(ObjectGroup, ObjectGroup.id == ObjectType.object_group_id)
-            .where(Tender.id == tender_id)
+            select(Tender, City.name).join(City).where(Tender.id == tender_id)
         )
 
         found_tender = query.tuples().first()
@@ -201,12 +207,10 @@ class TenderRepository:
                 sql_msg="",
             )
 
-        tender, object_group_name, object_type_name, city_name = found_tender
+        tender, city_name = found_tender
 
         return await self.format_tender(
             tender=tender,
-            object_group_name=object_group_name,
-            object_type_name=object_type_name,
             city_name=city_name,
         )
 
@@ -233,7 +237,8 @@ class TenderRepository:
         self, object_type_id: Optional[int], service_type_ids: Optional[int]
     ) -> int:
         service_object_condition = (
-            object_type_id is None or Tender.object_type_id == object_type_id
+            object_type_id is None
+            or TenderObjectType.object_type_id == object_type_id
         )
         service_type_condition = (
             service_type_ids is None
@@ -243,6 +248,7 @@ class TenderRepository:
         query = await self.db.execute(
             select(func.count(Tender.id))
             .join(TenderServiceType, Tender.id == TenderServiceType.tender_id)
+            .join(TenderObjectType, Tender.id == TenderObjectType.tender_id)
             .where(
                 and_(
                     service_type_condition,
@@ -291,8 +297,6 @@ class TenderRepository:
     async def format_tender(
         self,
         tender: Tender,
-        object_group_name: str,
-        object_type_name: str,
         city_name: str,
     ) -> models.Tender:
         services_type_names: List[str] = []
@@ -306,9 +310,7 @@ class TenderRepository:
             .where(TenderServiceType.tender_id == tender.id)
         )
 
-        services_types = query.scalars()
-
-        for name in services_types:
+        for name in query.scalars():
             services_type_names.append(name)
 
         services_groups_names: dict[str, None] = {}
@@ -328,10 +330,46 @@ class TenderRepository:
             )
         )
 
-        services_groups = query.scalars()
-
-        for name in services_groups:
+        for name in query.scalars():
             services_groups_names[name] = None
+
+        object_type_names: List[str] = []
+
+        query = await self.db.execute(
+            select(ObjectType.name)
+            .join(
+                TenderObjectType,
+                TenderObjectType.object_type_id == ObjectType.id,
+            )
+            .where(TenderObjectType.tender_id == tender.id)
+        )
+
+        for name in query.scalars():
+            object_type_names.append(name)
+
+        query = await self.db.execute(
+            select(ObjectGroup.name)
+            .select_from(ObjectType)
+            .join(
+                ObjectGroup,
+                ObjectType.object_group_id == ObjectGroup.id,
+            )
+            .where(
+                and_(
+                    TenderObjectType.object_type_id == ObjectType.id,
+                    TenderObjectType.tender_id == tender.id,
+                )
+            )
+        )
+
+        object_group_name = query.scalars().first()
+
+        if object_group_name is None:
+            raise RepositoryException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="",
+                sql_msg="failed format tender",
+            )
 
         return models.Tender(
             id=tender.id,
@@ -349,8 +387,8 @@ class TenderRepository:
             reception_end=tender.reception_end,
             work_start=tender.work_start,
             work_end=tender.work_end,
-            object_group_id=object_group_name,
-            object_type_id=object_type_name,
+            object_group=object_group_name,
+            objects_types=object_type_names,
             user_id=tender.user_id,
             created_at=tender.created_at,
             verified=tender.verified,
