@@ -25,15 +25,14 @@ def get_org_by_query(query: str) -> List[models.EgrulCompany]:
 
     for company_data in response.json()["rows"]:
         company = models.EgrulCompany(
-            name=company_data["c"],
-            director=company_data["g"],
-            inn=company_data["i"],
-            kpp=company_data["p"],
-            ogrn=company_data["o"],
-            registration_date=company_data["r"],
-            region=company_data["rn"],
+            name=company_data.get("c", ""),
+            director=company_data.get("g", ""),
+            inn=company_data.get("i", ""),
+            kpp=company_data.get("p", ""),
+            ogrn=company_data.get("o", ""),
+            registration_date=company_data.get("r", ""),
+            region=company_data.get("rn", ""),
         )
-
         companies.append(company)
 
     return companies
