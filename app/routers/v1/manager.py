@@ -21,7 +21,7 @@ router = APIRouter(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
     dependencies=[Depends(is_admin)],
-    tags=["verification"]
+    tags=["verification"],
 )
 async def user_verification_response(
     verification_id: str,

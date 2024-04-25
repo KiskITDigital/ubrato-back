@@ -10,6 +10,7 @@ from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
 from services import DraftTenderService, TenderService
+from tools.cache import redis_cache
 
 router = APIRouter(
     prefix="/v1/tenders",
@@ -130,6 +131,7 @@ async def update_tender(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
 )
+@redis_cache(key="objects-types")
 async def get_all_objects_types(
     tender_service: TenderService = Depends(),
 ) -> ObjectsGroupsWithTypes:
@@ -144,6 +146,7 @@ async def get_all_objects_types(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
 )
+@redis_cache(key="services-types")
 async def get_all_services_types(
     tender_service: TenderService = Depends(),
 ) -> ServicesGroupsWithTypes:

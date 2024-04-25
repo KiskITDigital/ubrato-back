@@ -19,6 +19,10 @@ class Config:
             PORT: str = os.getenv("TYPESENSE_PORT", "8108")
             PROTOCOL: str = os.getenv("TYPESENSE_PROTOCOL", "http")
 
+        class Redis:
+            DSN: str = os.getenv("REDIS_HOST", "redis://localhost")
+            PASSWORD: str = os.getenv("REDIS_PASSWORD", "12345")
+
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
         time_live: int = int(os.getenv("JWT_TTL", 20))

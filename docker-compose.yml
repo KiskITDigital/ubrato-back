@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  db:
+  postgres:
     image: postgres
-    container_name: test-db
+    container_name: ubrato-postgres
     ports:
       - "5432:5432"
     volumes:
@@ -15,8 +15,18 @@ services:
 
     restart: "on-failure"
 
+  redis:
+    image: redis:6.2-alpine
+    container_name: ubrato-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass 12345
+    volumes: 
+      - ./redis-data:/data
+
   typesense:
     image: typesense/typesense:26.0-amd64
+    container_name: ubrato-typesense
     restart: on-failure
     ports:
       - "8108:8108"

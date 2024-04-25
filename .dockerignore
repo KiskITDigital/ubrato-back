@@ -7,3 +7,4 @@ __pycache__
 .venv
 .env.example
 typesense-data/
+redis-data/
