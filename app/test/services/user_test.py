@@ -13,6 +13,7 @@ async def test_create_user(user_service):
     org = Organization(
         id="org_" + str(generate_random_number()),
         brand_name="test",
+        full_name="ooo full test",
         short_name="ooo test",
         inn=str(generate_random_number()),
         okpo=str(generate_random_number()),
@@ -20,6 +21,8 @@ async def test_create_user(user_service):
         kpp=str(generate_random_number()),
         tax_code=123,
         address="st. test",
+        email=generate_random_email(),
+        phone=generate_random_phone(),
     )
 
     created_user, created_org = await user_service.create(

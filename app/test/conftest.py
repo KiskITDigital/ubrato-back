@@ -163,6 +163,7 @@ async def created_user(user_service, postgres_session):
     org = Organization(
         id="org_" + str(uuid.uuid4()),
         brand_name="foobar",
+        full_name="ooo full foobar",
         short_name="ooo foobar",
         inn=str(generate_random_number()),
         okpo=str(generate_random_number()),
@@ -170,6 +171,8 @@ async def created_user(user_service, postgres_session):
         kpp=str(generate_random_number()),
         tax_code=456,
         address="st. foobar",
+        email="mail@foo.bar",
+        phone="+79998989999",
     )
 
     created_user = await user_service.create(
@@ -198,14 +201,12 @@ async def created_tender(tender_service, created_user, postgres_session):
         description="I need to clean office in Moscow city.",
         attachments=["some.link", "foo.bar"],
         wishes="As quickly as possible",
-        services_groups=[1],
         services_types=[1],
         reception_start=datetime.datetime.now(),
         reception_end=datetime.datetime.now() + datetime.timedelta(days=30),
         work_start=datetime.datetime.now(),
         work_end=datetime.datetime.now(),
-        object_group_id=1,
-        object_type_id=1,
+        objects_types=[1],
     )
 
     created_tender = await tender_service.create_tender(
