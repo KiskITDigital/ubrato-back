@@ -5,6 +5,7 @@
     {"name": "name", "type": "string"},
     {"name": "price", "type": "int32"},
     {"name": "is_contract_price", "type": "bool"},
+    {"name": "is_nds_price", "type": "bool"},
     {"name": "city_id", "type": "int32"},
     {"name": "floor_space", "type": "int32"},
     {"name": "description", "type": "string"},

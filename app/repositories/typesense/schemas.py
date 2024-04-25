@@ -8,6 +8,7 @@ class TypesenseTender(BaseModel):
     name: str
     price: int
     is_contract_price: bool
+    is_nds_price: bool
     city_id: int
     floor_space: int
     description: str

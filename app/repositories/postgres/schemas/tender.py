@@ -78,6 +78,7 @@ class Tender(Base):
             name=self.name,
             price=self.price,
             is_contract_price=self.is_contract_price,
+            is_nds_price=self.is_nds_price,
             city_id=self.city_id,
             floor_space=self.floor_space,
             description=self.description,
