@@ -43,6 +43,8 @@ async def create_tender(
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
+    deprecated=True,
+    description="Migrate to: https://search.ubrato.ru | https://typesense.org/docs/",
 )
 async def get_page_tenders(
     page: int = 1,
