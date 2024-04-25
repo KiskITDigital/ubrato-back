@@ -4,7 +4,7 @@ from redis import asyncio as aioredis
 config: Config = get_config()
 
 redis: aioredis.Redis = aioredis.from_url(
-    "redis://localhost", password=config.Database.Redis.PASSWORD
+    config.Database.Redis.DSN, password=config.Database.Redis.PASSWORD
 )
 
 
