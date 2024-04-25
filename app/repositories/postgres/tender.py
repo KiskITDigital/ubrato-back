@@ -3,10 +3,7 @@ from typing import Any, List, Optional
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    TENDERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -379,6 +376,7 @@ class TenderRepository:
             name=tender.name,
             price=tender.price,
             is_contract_price=tender.is_contract_price,
+            is_nds_price=tender.is_nds_price,
             location=city_name,
             floor_space=tender.floor_space,
             description=tender.description,

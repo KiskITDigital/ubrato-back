@@ -9,6 +9,7 @@ class Tender(BaseModel):
     name: str
     price: int
     is_contract_price: bool
+    is_nds_price: bool
     location: str
     floor_space: int
     description: str
@@ -33,6 +34,7 @@ class DraftTender(BaseModel):
     name: str
     price: int
     is_contract_price: bool
+    is_nds_price: bool
     location: str
     floor_space: int
     description: str

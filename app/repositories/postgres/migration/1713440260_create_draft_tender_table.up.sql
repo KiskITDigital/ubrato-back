@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS draft_tender (
     name                VARCHAR(255)    NOT NULL,
     price               INT             NOT NULL,
     is_contract_price   BOOLEAN         NOT NULL DEFAULT FALSE,
+    is_nds_price        BOOLEAN         NOT NULL DEFAULT FALSE,
     city_id             INT             NOT NULL REFERENCES cities(id),
     floor_space         INT             NOT NULL,
     description         VARCHAR(400)    NULL,

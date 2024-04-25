@@ -8,6 +8,7 @@ class CreateTenderRequest(BaseModel):
     name: str
     price: int
     is_contract_price: bool
+    is_nds_price: bool
     floor_space: int
     description: str
     wishes: str
