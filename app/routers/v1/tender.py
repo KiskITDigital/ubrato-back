@@ -131,7 +131,7 @@ async def update_tender(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
 )
-@redis_cache(key="objects-types")
+@redis_cache(ignore_classes=[TenderService])
 async def get_all_objects_types(
     tender_service: TenderService = Depends(),
 ) -> ObjectsGroupsWithTypes:
@@ -146,7 +146,7 @@ async def get_all_objects_types(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
 )
-@redis_cache(key="services-types")
+@redis_cache(ignore_classes=[TenderService])
 async def get_all_services_types(
     tender_service: TenderService = Depends(),
 ) -> ServicesGroupsWithTypes:

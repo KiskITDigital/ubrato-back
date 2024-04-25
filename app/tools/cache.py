@@ -1,23 +1,36 @@
 import pickle
 from functools import wraps
-from typing import Any, Awaitable, Callable, Optional
+from hashlib import sha256
+from typing import Any, Awaitable, Callable, List, Optional, Type
 
 from repositories import redis
 
 
-# TODO: подмумать о том как убрать костыль key. Сейчас он связан с тем
-# что каждый раз генерируется сессия в get_db и классы генерится заново :(
 def redis_cache(
     ttl: int = 3600,
     key: Optional[str] = None,
+    ignore_classes: Optional[List[Type[Any]]] = None,
 ) -> Callable[[Callable[..., Awaitable[Any]]], Callable[..., Awaitable[Any]]]:
+    if ignore_classes is None:
+        ignore_classes = []
+
     def decorator(
         func: Callable[..., Awaitable[Any]]
     ) -> Callable[..., Awaitable[Any]]:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
             redis_client = redis.get_db_connection()
-            hash_key = key if key else f"{func.__name__}:{args}:{kwargs}"
+            filtered_kwargs = {
+                k: v
+                for k, v in kwargs.items()
+                if not any(isinstance(v, cls) for cls in ignore_classes)
+            }
+            hash_sum = sha256()
+            for _, value in filtered_kwargs.items():
+                hash_sum.update(str(value).encode())
+
+            hash_key = key if key else f"{func.__name__}:{hash_sum.hexdigest()}"
+
             cached_result = await redis_client.get(hash_key)
             if cached_result is not None:
                 return pickle.loads(cached_result)
