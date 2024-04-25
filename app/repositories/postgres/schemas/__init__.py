@@ -18,11 +18,14 @@ __all__ = [
     "DraftTenderServiceType",
     "TenderObjectType",
     "DraftTenderObjectType",
+    "VerificationRequest",
+    "Document",
+    "DocumentType",
 ]
 
 
 from .city import City
-from .document import Document
+from .document import Document, DocumentType
 from .draft_tender import DraftTender
 from .draft_tender_object import DraftTenderObjectType
 from .draft_tender_service import DraftTenderServiceType
@@ -36,3 +39,4 @@ from .tender import Tender
 from .tender_object import ObjectGroup, ObjectType, TenderObjectType
 from .tender_service import ServiceGroup, ServiceType, TenderServiceType
 from .user import User
+from .verification_requests import VerificationRequest

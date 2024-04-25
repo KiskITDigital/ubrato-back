@@ -19,6 +19,9 @@ __all__ = [
     "Notifications",
     "DraftTender",
     "EgrulCompany",
+    "VerificationDocType",
+    "VerificationDoc",
+    "VerificationInfo",
 ]
 
 from .city import City
@@ -39,3 +42,6 @@ from .service_group import (
 )
 from .tender import DraftTender, Tender
 from .user import User, UserMe, UserPrivateDTO
+from .verification import VerificationInfo
+from .verification_doc import VerificationDoc
+from .verification_doc_type import VerificationDocType

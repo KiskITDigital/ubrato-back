@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional
 
 from repositories.postgres.schemas.base import Base
 from sqlalchemy import Boolean, ForeignKey, Integer, String
@@ -10,11 +10,11 @@ class Notification(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[str] = mapped_column(String(40), ForeignKey("users.id"))
-    header: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
-    msg: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
-    href: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
-    href_text: Mapped[Tuple[str, None]] = mapped_column(String, nullable=True)
-    href_color: Mapped[Tuple[int, None]] = mapped_column(Integer, default=0)
+    header: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    msg: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    href: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    href_text: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    href_color: Mapped[Optional[int]] = mapped_column(Integer, default=0)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user = relationship("User", back_populates="notification")

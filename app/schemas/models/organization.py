@@ -6,6 +6,7 @@ from pydantic import BaseModel
 class Organization(BaseModel):
     id: str
     brand_name: str
+    full_name: str
     short_name: str
     inn: str
     okpo: str
@@ -13,6 +14,8 @@ class Organization(BaseModel):
     kpp: str
     tax_code: int
     address: str
+    email: str
+    phone: str
     user_id: str
     update_at: datetime
     created_at: datetime

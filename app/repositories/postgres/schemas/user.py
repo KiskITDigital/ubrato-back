@@ -25,9 +25,13 @@ class User(Base):
         TIMESTAMP(timezone=True), default=func.current_timestamp()
     )
 
+    documents = relationship("Document", back_populates="user")
     organization = relationship("Organization", back_populates="user")
     tender = relationship("Tender", back_populates="user")
     draft_tender = relationship("DraftTender", back_populates="user")
     session = relationship("Session", back_populates="user")
     questionnaire = relationship("Questionnaire", back_populates="user")
     notification = relationship("Notification", back_populates="user")
+    verification_requests = relationship(
+        "VerificationRequest", back_populates="user"
+    )

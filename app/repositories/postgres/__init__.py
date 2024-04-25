@@ -9,6 +9,7 @@ __all__ = [
     "QuestionnaireRepository",
     "NotificationRepository",
     "DraftTenderRepository",
+    "VerificationRepository",
     "get_db_connection",
     "async_session_maker",
 ]
@@ -24,3 +25,4 @@ from .session import SessionRepository
 from .tags import TagsRepository
 from .tender import TenderRepository
 from .user import UserRepository
+from .verification import VerificationRepository

@@ -1,28 +1,44 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import Depends
-from repositories.postgres import TenderRepository, UserRepository
+from repositories.postgres import (
+    TenderRepository,
+    UserRepository,
+    VerificationRepository,
+)
+from repositories.postgres.schemas import VerificationRequest
 from schemas import models
 
 
 class ManagerService:
     user_repository: UserRepository
     tender_repository: TenderRepository
+    verf_repository: VerificationRepository
 
     def __init__(
         self,
         user_repository: UserRepository = Depends(),
         tender_repository: TenderRepository = Depends(),
+        verf_repository: VerificationRepository = Depends(),
     ) -> None:
         self.user_repository = user_repository
         self.tender_repository = tender_repository
+        self.verf_repository = verf_repository
 
-    async def update_user_verified_status(
-        self, user_id: str, status: bool
+    async def response_user_verification_request(
+        self, user_id: str, status: bool, verf_id: str, msg: Optional[str]
     ) -> None:
+        await self.verf_repository.response_verification_requests(
+            verf_id=verf_id, is_verified=status, msg=msg
+        )
         await self.user_repository.update_verified_status(
             user_id=user_id, verified=status
         )
+
+    async def get_verfication_request(
+        self, verf_id: str
+    ) -> VerificationRequest:
+        return await self.verf_repository.get_verf_by_id(verf_id=verf_id)
 
     async def get_all_users(
         self,

@@ -1,13 +1,11 @@
 import datetime
 import hashlib
-import uuid
-from typing import List
 
 from config import get_config
 from dadata import Dadata
 from fastapi import Depends, status
 from repositories.postgres import OrganizationRepository
-from repositories.postgres.schemas import Document, Organization
+from repositories.postgres.schemas import Organization
 from schemas import models
 from services.exceptions import ServiceException
 
@@ -33,9 +31,13 @@ class OrganizationService:
         hash = hashlib.md5(result[0]["data"]["name"]["full_with_opf"].encode())
         id = "org_" + hash.hexdigest()
 
+        email = result[0]["data"]["emails"]
+        phone = result[0]["data"]["phones"]
+
         org = Organization(
             id=id,
-            brand_name=result[0]["data"]["name"]["full_with_opf"],
+            brand_name=result[0]["data"]["name"]["short"],
+            full_name=result[0]["data"]["name"]["full_with_opf"],
             short_name=result[0]["data"]["name"]["short_with_opf"],
             inn=inn,
             okpo=result[0]["data"]["okpo"],
@@ -43,6 +45,8 @@ class OrganizationService:
             kpp=result[0]["data"]["kpp"],
             tax_code=int(result[0]["data"]["address"]["data"]["tax_office"]),
             address=result[0]["data"]["address"]["unrestricted_value"],
+            email=email[0]["source"] if email else "not found",
+            phone=phone[0]["source"] if phone else "not found",
         )
 
         return org
@@ -65,12 +69,3 @@ class OrganizationService:
         )
 
         return org
-
-    async def save_docs(self, links: List[str], org_id: str) -> None:
-        for link in links:
-            document = Document(
-                id=f"doc_{uuid.uuid4()}",
-                url=link,
-                organization_id=org_id,
-            )
-            await self.org_repository.save_docs(document)

@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, status
 from repositories.postgres.exceptions import RepositoryException
 from routers.v1.dependencies import authorized, get_user
@@ -6,9 +8,12 @@ from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.upd_avatar import UpdAvatarRequest
-from schemas.verify_request import VerifyRequest
-from services import NoticeService, OrganizationService, UserService
-from services.questionnaire import QuestionnaireService
+from services import (
+    NoticeService,
+    QuestionnaireService,
+    UserService,
+    VerificationService,
+)
 
 router = APIRouter(
     prefix="/v1/users",
@@ -16,7 +21,7 @@ router = APIRouter(
 )
 
 
-@router.post(
+@router.get(
     "/me/verify",
     response_model=SuccessResponse,
     responses={
@@ -24,14 +29,31 @@ router = APIRouter(
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
+    tags=["users", "verification"],
 )
 async def user_requires_verification(
-    data: VerifyRequest,
-    org_service: OrganizationService = Depends(),
+    verf_service: VerificationService = Depends(),
+    user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await org_service.save_docs(links=data.documents, org_id=data.org_id)
-
+    await verf_service.create_verification_requests(user_id=user.id)
     return SuccessResponse()
+
+
+@router.get(
+    "/me/verification/history",
+    response_model=List[models.VerificationInfo],
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+    tags=["users", "verification"],
+)
+async def user_verification_history(
+    verf_service: VerificationService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.VerificationInfo]:
+    return await verf_service.get_verification_history(user_id=user.id)
 
 
 @router.get(

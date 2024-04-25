@@ -20,6 +20,7 @@ from routers.v1 import (
     suggest,
     tender,
     users,
+    verification,
 )
 
 app = FastAPI(
@@ -59,6 +60,7 @@ app.include_router(manager.router)
 app.include_router(tender.router)
 app.include_router(suggest.router)
 app.include_router(questionnaire.router)
+app.include_router(verification.router)
 
 app.add_exception_handler(
     RequestValidationError,

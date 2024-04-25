@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.exceptions import ORG_NOT_FOUND, RepositoryException
-from repositories.postgres.schemas import Document, Organization
+from repositories.postgres.schemas import Organization
 from schemas import models
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,13 +20,6 @@ class OrganizationRepository:
         org: Organization,
     ) -> None:
         self.db.add(org)
-        await self.db.commit()
-
-    async def save_docs(
-        self,
-        document: Document,
-    ) -> None:
-        self.db.add(document)
         await self.db.commit()
 
     async def get_organization_by_id(

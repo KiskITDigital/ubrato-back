@@ -10,6 +10,7 @@ class Organization(Base):
 
     id: Mapped[str] = mapped_column(String(40), primary_key=True)
     brand_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
     short_name: Mapped[str] = mapped_column(String(50), nullable=False)
     inn: Mapped[str] = mapped_column(String(10), nullable=False)
     okpo: Mapped[str] = mapped_column(String(8), nullable=False)
@@ -17,6 +18,8 @@ class Organization(Base):
     kpp: Mapped[str] = mapped_column(String(12), nullable=False)
     tax_code: Mapped[int] = mapped_column(Integer, nullable=False)
     address: Mapped[str] = mapped_column(String(255), nullable=False)
+    email: Mapped[str] = mapped_column(String(255), nullable=False)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
     user_id: Mapped[str] = mapped_column(
         String(40), ForeignKey("users.id"), nullable=False
     )
@@ -29,4 +32,3 @@ class Organization(Base):
     )
 
     user = relationship("User", back_populates="organization")
-    documents = relationship("Document", back_populates="organization")

@@ -15,20 +15,31 @@ router = APIRouter(
 
 
 @router.put(
-    "/users/{user_id}/verify_status",
+    "/verification/{verification_id}",
     response_model=SuccessResponse,
     responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
     },
     dependencies=[Depends(is_admin)],
+    tags=["verification"]
 )
-async def update_user_verify_status(
-    user_id: str,
+async def user_verification_response(
+    verification_id: str,
     data: VerifyStatusSet,
     manager_service: ManagerService = Depends(),
     notice_service: NoticeService = Depends(),
 ) -> SuccessResponse:
-    await manager_service.update_user_verified_status(user_id, data.status)
+    verf = await manager_service.get_verfication_request(
+        verf_id=verification_id
+    )
+    user_id = verf.user_id
+    await manager_service.response_user_verification_request(
+        user_id=user_id,
+        status=data.status,
+        verf_id=verification_id,
+        msg=data.message,
+    )
+
     await notice_service.add_notice(
         user_id=user_id,
         header="Verification",
