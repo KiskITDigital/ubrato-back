@@ -10,6 +10,7 @@ from exceptions import (
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from repositories.postgres.exceptions import RepositoryException
 from routers.v1 import (
     auth,
@@ -33,6 +34,8 @@ app = FastAPI(
         },
     ],
 )
+
+Instrumentator().instrument(app).expose(app)
 
 origins = [
     "http://ubrato.ru",
