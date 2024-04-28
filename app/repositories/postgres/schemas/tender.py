@@ -55,7 +55,6 @@ class Tender(Base):
     verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     user = relationship("User", back_populates="tender")
     city = relationship("City")
@@ -92,6 +91,5 @@ class Tender(Base):
             object_group_id=object_group_id,
             object_type_id=objects_types,
             verified=self.verified,
-            active=self.active,
             created_at=int(self.created_at.timestamp()),
         )
