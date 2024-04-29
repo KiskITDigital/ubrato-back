@@ -13,6 +13,7 @@ class User(BaseModel):
     email: EmailStr
     phone: PhoneNumber
     password: str
+    totp_salt: str
     first_name: str
     middle_name: str
     last_name: str

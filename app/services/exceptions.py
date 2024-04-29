@@ -8,6 +8,7 @@ NO_BARRIER_TOKEN = "No barrier token"
 INVALID_BARRIER = "Bearer token is invalid"
 INVALID_SERVICES_COUNT = "Tender cannot be without services"
 INVALID_OBJECTS_COUNT = "Tender cannot be without objects"
+EXPIRED_RESET_CODE = "This reset code has expired"
 
 
 class ServiceException(HTTPException):

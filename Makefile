@@ -1,4 +1,8 @@
 include .env
+include ./proto/proto.mk
+
+PROTO_PATH = ./proto
+PROTO_OUT = ./app/schemas/pb
 
 .PHONY: install installdev run format docker_build docker_run docker_clean migration_up migration_down
 

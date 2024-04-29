@@ -4,9 +4,11 @@ from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
 from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
 from schemas import models
+from schemas.change_password import ChangePasswordRequest
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
+from schemas.success import SuccessResponse
 from services import (
     JWTService,
     NoticeService,
@@ -147,3 +149,37 @@ async def refresh_session(
             user=user, org=models.Organization(**org.__dict__)
         )
     )
+
+
+@router.get(
+    "/reset-password",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
+    },
+)
+async def ask_reset_password(
+    email: str,
+    user_service: UserService = Depends(),
+) -> SuccessResponse:
+    await user_service.ask_reset_pass(email=email)
+    return SuccessResponse()
+
+
+@router.post(
+    "/reset-password",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
+    },
+)
+async def reset_password(
+    data: ChangePasswordRequest,
+    user_service: UserService = Depends(),
+) -> SuccessResponse:
+    await user_service.reset_password(
+        email=data.email, password=data.password, code=data.code
+    )
+    return SuccessResponse()

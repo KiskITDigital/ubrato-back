@@ -29,7 +29,9 @@ def redis_cache(
             for _, value in filtered_kwargs.items():
                 hash_sum.update(str(value).encode())
 
-            hash_key = key if key else f"{func.__name__}:{hash_sum.hexdigest()}"
+            hash_key = (
+                key if key else f"{func.__name__}:{hash_sum.hexdigest()}"
+            )
 
             cached_result = await redis_client.get(hash_key)
             if cached_result is not None:

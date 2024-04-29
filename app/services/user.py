@@ -1,19 +1,30 @@
-import secrets
 import uuid
+from hashlib import md5
 from typing import Tuple
 
 import bcrypt
-from fastapi import Depends
+import pyotp
+from broker.nats import NatsClient, get_nats_connection
+from broker.topic import EMAIL_RESET_PASS_TOPIC
+from fastapi import Depends, status
 from repositories.postgres import UserRepository
 from repositories.postgres.schemas import Organization, User
 from schemas import models
+from schemas.pb.models.v1.password_recovery_pb2 import EmailPasswordRecovery
+from services.exceptions import EXPIRED_RESET_CODE, ServiceException
 
 
 class UserService:
     user_repository: UserRepository
+    nats_client: NatsClient
 
-    def __init__(self, user_repository: UserRepository = Depends()) -> None:
+    def __init__(
+        self,
+        user_repository: UserRepository = Depends(),
+        nats_client: NatsClient = Depends(get_nats_connection),
+    ) -> None:
         self.user_repository = user_repository
+        self.nats_client = nats_client
 
     async def create(
         self,
@@ -33,7 +44,7 @@ class UserService:
             password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
 
-        totp_salt = secrets.token_hex(8)
+        totp_salt = pyotp.random_base32()
 
         user = User(
             id=id,
@@ -72,4 +83,44 @@ class UserService:
     async def upd_avatar(self, user_id: str, avatar: str) -> None:
         await self.user_repository.update_avatar(
             user_id=user_id, avatar=avatar
+        )
+
+    async def ask_reset_pass(self, email: str) -> None:
+        user = await self.get_by_email(email=email)
+
+        totp = pyotp.TOTP(user.totp_salt, interval=1800)
+
+        salt = md5()
+        salt.update(totp.now().encode())
+
+        payload = EmailPasswordRecovery(
+            email=user.email, salt=salt.hexdigest(), name=user.first_name
+        )
+
+        await self.nats_client.pub(
+            EMAIL_RESET_PASS_TOPIC, payload=payload.SerializeToString()
+        )
+
+    async def reset_password(
+        self, email: str, password: str, code: str
+    ) -> None:
+        user = await self.get_by_email(email=email)
+
+        totp = pyotp.TOTP(user.totp_salt, interval=1800)
+
+        salt = md5()
+        salt.update(totp.now().encode())
+
+        if salt.hexdigest() != code:
+            raise ServiceException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=EXPIRED_RESET_CODE,
+            )
+
+        password = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
+
+        await self.user_repository.update_password(
+            email=email, password=password
         )

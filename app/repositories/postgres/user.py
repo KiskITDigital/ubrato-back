@@ -9,7 +9,7 @@ from repositories.postgres.exceptions import (
 )
 from repositories.postgres.schemas import Organization, User
 from schemas import models
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -78,7 +78,7 @@ class UserRepository:
     async def get_by_id(self, user_id: str) -> models.User:
         query = await self.db.execute(select(User).where(User.id == user_id))
 
-        users = query.one_or_none()
+        users = query.scalar()
 
         if users is None:
             raise RepositoryException(
@@ -87,7 +87,7 @@ class UserRepository:
                 sql_msg="",
             )
 
-        return models.User(**users._tuple()[0].__dict__)
+        return models.User(**users.__dict__)
 
     async def update_avatar(self, user_id: str, avatar: str) -> None:
         query = await self.db.execute(select(User).where(User.id == user_id))
@@ -102,4 +102,11 @@ class UserRepository:
             )
 
         user.avatar = avatar
+        await self.db.commit()
+
+    async def update_password(self, email: str, password: str) -> None:
+        await self.db.execute(
+            update(User).where(User.email == email).values(password=password)
+        )
+
         await self.db.commit()

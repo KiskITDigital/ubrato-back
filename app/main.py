@@ -1,3 +1,7 @@
+from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator
+
+from broker import get_nats_connection
 from exceptions import (
     AuthException,
     ServiceException,
@@ -11,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
+from repositories import redis, typesense
 from repositories.postgres.exceptions import RepositoryException
 from routers.v1 import (
     auth,
@@ -24,6 +29,17 @@ from routers.v1 import (
     verification,
 )
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[Any, Any]:
+    nats_conn = get_nats_connection()
+    typesense.get_db_connection()
+    redis.get_db_connection()
+    await nats_conn.connect()
+    yield
+    await nats_conn.close()
+
+
 app = FastAPI(
     title="Ubrato API",
     version="0.1.0",
@@ -33,6 +49,7 @@ app = FastAPI(
             "description": "development environment",
         },
     ],
+    lifespan=lifespan,
 )
 
 Instrumentator().instrument(app).expose(app)
