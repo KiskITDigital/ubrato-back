@@ -25,7 +25,7 @@ class Config:
 
     class Broker:
         class JetStream:
-            DSN: str = os.getenv("JETSTREAM_HOST", "nats://localhost:4222")
+            DSN: str = os.getenv("NATS_HOST", "nats://localhost:4222")
 
     class JWT:
         secret: str = os.getenv("JWT_SECRET", "secret")
