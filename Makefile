@@ -17,7 +17,7 @@ docker_build:
 	docker build --build-arg GIT_VERSION=$(git describe --long --tags --always) -t ubrato:0.1.0 .
 
 docker_run:
-	docker run --name ubrato -p $(SERVER_PORT):8080 ubrato:0.1.0 --port $(SERVER_PORT) --host $(SERVER_ADDR)
+	docker run --name ubrato -p $(SERVER_PORT):8080 ubrato:0.1.0 --port=$(SERVER_PORT) --host=$(SERVER_ADDR)
 
 docker_clean:
 	docker stop ubrato

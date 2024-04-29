@@ -56,6 +56,9 @@ disallow_untyped_defs = false
 ignore_missing_imports = true
 exclude = "test"
 
+[tool.ruff]
+exclude = ["password_recovery_pb2.py"]
+
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
