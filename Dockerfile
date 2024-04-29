@@ -47,7 +47,7 @@ RUN poetry install
 EXPOSE $SERVER_PORT
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${SERVER_PORT}/health/ || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://0.0.0.0:${SERVER_PORT}/health/ || exit 1
 
 WORKDIR /ubrato/app
 
