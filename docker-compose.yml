@@ -33,3 +33,17 @@ services:
     volumes:
       - ./typesense-data:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
+
+  service-nats:
+    container_name: service-nats
+    image: nats:2.10.14-alpine3.19
+    ports:
+      - "4222:4222"
+      - "6222:6222"
+      - "8222:8222"
+    command:
+      - "--name=service-nats"
+      - "--http_port=8222"
+      - "--js"
+      - "--sd=/data"
+    restart: "on-failure"

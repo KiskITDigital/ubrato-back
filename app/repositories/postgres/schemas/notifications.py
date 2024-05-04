@@ -1,7 +1,8 @@
+from datetime import datetime
 from typing import Optional
 
 from repositories.postgres.schemas.base import Base
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import TIMESTAMP, Boolean, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -16,5 +17,8 @@ class Notification(Base):
     href_text: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     href_color: Mapped[Optional[int]] = mapped_column(Integer, default=0)
     read: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(
+        TIMESTAMP(timezone=True), default=func.current_timestamp()
+    )
 
     user = relationship("User", back_populates="notification")
