@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, status
 from routers.v1.dependencies import get_user, is_creator_or_manager
 from schemas import models
+from schemas.add_document import AddDocumentResponse
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
@@ -31,7 +32,7 @@ async def get_doc_types(
 
 @router.post(
     "/docs",
-    response_model=SuccessResponse,
+    response_model=AddDocumentResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
@@ -41,9 +42,9 @@ async def save_user_doc(
     doc: SaveVerificationDoc,
     verf_service: VerificationService = Depends(),
     user: JWTUser = Depends(get_user),
-) -> SuccessResponse:
-    await verf_service.save_doc(link=doc.link, type=doc.type, user_id=user.id)
-    return SuccessResponse()
+) -> AddDocumentResponse:
+    id = await verf_service.save_doc(link=doc.link, type=doc.type, user_id=user.id)
+    return AddDocumentResponse(id=id)
 
 
 @router.get(

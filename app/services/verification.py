@@ -25,14 +25,16 @@ class VerificationService:
 
         return doc_types
 
-    async def save_doc(self, link: str, user_id: str, type: int) -> None:
+    async def save_doc(self, link: str, user_id: str, type: int) -> str:
+        id = f"doc_{uuid.uuid4()}"
         document = Document(
-            id=f"doc_{uuid.uuid4()}",
+            id=id,
             url=link,
             type=type,
             user_id=user_id,
         )
         await self.verf_repository.save_docs(document)
+        return id
 
     async def get_user_doc(self, user_id: str) -> List[models.VerificationDoc]:
         return await self.verf_repository.get_user_doc(user_id=user_id)
