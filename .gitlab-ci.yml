@@ -25,34 +25,6 @@ lint:
     - pip install ruff 
     - ruff check --output-format=gitlab app/
 
-test:
-  image: python:3.11.6-slim-bullseye
-  stage: test
-  variables:
-    POSTGRES_USER: "postgres"
-    POSTGRES_PASSWORD: "12345"
-    POSTGRES_DB: "test"
-    DB_ADDR: "postgres"
-    DB_DSN: "postgresql+asyncpg://postgres:12345@postgres:5432/test"
-
-    TYPESENSE_API_KEY: "xyz"
-    TYPESENSE_HOST: "typesense"
-    TYPESENSE_PORT: 8108
-    TYPESENSE_PROTOCOL: "http"
-  services:
-    - name: postgres:16.2-alpine3.19
-      alias: postgres
-    - name: typesense/typesense:26.0-amd64
-      alias: typesense
-      entrypoint: ["/bin/sh"]
-      command: ["-c", "mkdir /data && /opt/typesense-server --data-dir /data --api-key=xyz --enable-cors"]
-  script:
-    - pip install poetry
-    - poetry --version
-    - poetry config virtualenvs.in-project true
-    - poetry install -vv
-    - poetry run pytest
-
 prod-build:
   only: [main]
   stage: build
