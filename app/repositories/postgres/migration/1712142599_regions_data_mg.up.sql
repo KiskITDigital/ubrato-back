@@ -1,5 +1,4 @@
-INSERT INTO regions (name)
-VALUES
+INSERT INTO regions (name) VALUES
     ( 'Москва и Московская область' ),
     ( 'Санкт-Петербург и Ленинградская область' ),
     ( 'Республика Адыгея' ),

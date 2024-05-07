@@ -1,3 +1,3 @@
 [submodule "proto"]
 	path = proto
-	url = git@git.ubrato.ru:ubrato/proto.git
+	url = git@gitlab.ubrato.ru:ubrato/proto.git
