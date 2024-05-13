@@ -7,7 +7,12 @@ from repositories.postgres.exceptions import (
     USERID_NOT_FOUND,
     RepositoryException,
 )
-from repositories.postgres.schemas import Organization, User
+from repositories.postgres.schemas import (
+    ContractorProfile,
+    CustomerProfile,
+    Organization,
+    User,
+)
 from schemas import models
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -31,9 +36,17 @@ class UserRepository:
         await self.db.refresh(user)
         await self.db.refresh(org)
 
-        return models.User(**user.__dict__), models.Organization(
-            **org.__dict__
-        )
+        self.db.add(CustomerProfile(org_id=org.id))
+        await self.db.flush()
+        if user.is_contractor:
+            self.db.add(ContractorProfile(org_id=org.id))
+
+        await self.db.commit()
+
+        await self.db.refresh(user)
+        await self.db.refresh(org)
+
+        return models.User(**user.__dict__), org.to_model()
 
     async def get_by_email(self, email: str) -> models.User:
         query = await self.db.execute(select(User).where(User.email == email))

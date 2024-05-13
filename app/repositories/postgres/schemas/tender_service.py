@@ -28,6 +28,9 @@ class ServiceType(Base):
     draft_service_group = relationship(
         "DraftTenderServiceType", back_populates="service_type"
     )
+    contractor_services = relationship(
+        "ContractorService", back_populates="service_type"
+    )
 
 
 class TenderServiceType(Base):

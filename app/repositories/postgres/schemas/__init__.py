@@ -21,6 +21,13 @@ __all__ = [
     "VerificationRequest",
     "Document",
     "DocumentType",
+    "CustomerProfile",
+    "ContractorProfile",
+    "ContractorService",
+    "ContractorObject",
+    "ContractorCV",
+    "ContractorLocation",
+    "CustomerLocation",
 ]
 
 
@@ -32,6 +39,15 @@ from .draft_tender_service import DraftTenderServiceType
 from .logs import Logs
 from .notifications import Notification
 from .organiztion import Organization
+from .profile import (
+    ContractorCV,
+    ContractorLocation,
+    ContractorObject,
+    ContractorProfile,
+    ContractorService,
+    CustomerLocation,
+    CustomerProfile,
+)
 from .questionnaire import Questionnaire
 from .region import Region
 from .session import Session

@@ -11,6 +11,8 @@ SERVICE_NOT_FOUND = "Service with id {} not found."
 QUESTIONNAIRE_NOT_FOUND = "Questionnaire not found."
 DOCUMENT_NOT_FOUND = "Document with ID {} not found."
 VERIFIED_REQUEST_NOT_FOUND = "Verified request with ID {} not found."
+CV_NOT_FOUND = "CV with ID {} not found."
+PROFILE_NOT_FOUND = "Profile org with ID {} not found."
 
 
 class RepositoryException(HTTPException):

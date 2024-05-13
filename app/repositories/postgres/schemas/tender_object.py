@@ -28,6 +28,9 @@ class ObjectType(Base):
     draft_object_group = relationship(
         "DraftTenderObjectType", back_populates="object_type"
     )
+    contractor_objects = relationship(
+        "ContractorObject", back_populates="object_type"
+    )
 
 
 class TenderObjectType(Base):

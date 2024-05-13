@@ -13,3 +13,9 @@ class City(Base):
     region = relationship("Region", back_populates="cities")
     tenders = relationship("Tender", back_populates="city")
     draft_tender = relationship("DraftTender", back_populates="city")
+    customer_locations = relationship(
+        "CustomerLocation", back_populates="city"
+    )
+    contractor_locations = relationship(
+        "ContractorLocation", back_populates="city"
+    )

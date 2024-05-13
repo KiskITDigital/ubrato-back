@@ -22,6 +22,11 @@ __all__ = [
     "VerificationDocType",
     "VerificationDoc",
     "VerificationInfo",
+    "CustomerProfile",
+    "ContractorPricing",
+    "ContractorCV",
+    "ContractorProfile",
+    "ContactInfo",
 ]
 
 from .city import City
@@ -32,7 +37,18 @@ from .object_group import (
     ObjectsGroupsWithTypes,
     ObjectTypeModel,
 )
-from .organization import EgrulCompany, Organization, OrganizationLiteDTO
+from .organization import (
+    ContactInfo,
+    EgrulCompany,
+    Organization,
+    OrganizationLiteDTO,
+)
+from .profile import (
+    ContractorCV,
+    ContractorPricing,
+    ContractorProfile,
+    CustomerProfile,
+)
 from .questionnaire_answer import QuestionnaireAnswer
 from .service_group import (
     ServiceGroupModel,

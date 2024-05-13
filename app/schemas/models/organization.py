@@ -1,6 +1,12 @@
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel
+
+
+class ContactInfo(BaseModel):
+    contact: str
+    info: str
 
 
 class Organization(BaseModel):
@@ -14,8 +20,10 @@ class Organization(BaseModel):
     kpp: str
     tax_code: int
     address: str
-    email: str
-    phone: str
+    avatar: Optional[str]
+    email: List[ContactInfo]
+    phone: List[ContactInfo]
+    messager: List[ContactInfo]
     user_id: str
     update_at: datetime
     created_at: datetime

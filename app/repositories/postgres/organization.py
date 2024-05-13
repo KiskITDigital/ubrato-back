@@ -48,7 +48,7 @@ class OrganizationRepository:
             select(Organization).where(Organization.user_id == user_id)
         )
 
-        org = query.fetchone()
+        org = query.scalar()
 
         if org is None:
             raise RepositoryException(
@@ -56,7 +56,7 @@ class OrganizationRepository:
                 detail=ORG_NOT_FOUND,
                 sql_msg="",
             )
-        return models.Organization(**org[0].__dict__)
+        return org.to_model()
 
     async def update_org(
         self,

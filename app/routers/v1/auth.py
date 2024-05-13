@@ -3,7 +3,6 @@ from typing import Annotated
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
 from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
-from schemas import models
 from schemas.change_password import ChangePasswordRequest
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
@@ -145,9 +144,7 @@ async def refresh_session(
     org = await org_service.get_organization_by_user_id(user.id)
 
     return SignInResponse(
-        access_token=jwt_service.generate_jwt(
-            user=user, org=models.Organization(**org.__dict__)
-        )
+        access_token=jwt_service.generate_jwt(user=user, org=org)
     )
 
 

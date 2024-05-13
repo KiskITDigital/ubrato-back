@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS organizations (
     kpp                 VARCHAR(9)      NOT NULL UNIQUE,
     tax_code            INT             NOT NULL,
     address             VARCHAR(255)    NOT NULL,
-    email               VARCHAR(255)    NOT NULL,
-    phone               VARCHAR(20)     NOT NULL,
+    avatar              VARCHAR(255)    DEFAULT NULL,
+    email               JSONB           DEFAULT '[]'::jsonb,
+    phone               JSONB           DEFAULT '[]'::jsonb,
+    messager            JSONB           DEFAULT '[]'::jsonb,
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
     update_at           TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP,
     created_at          TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
