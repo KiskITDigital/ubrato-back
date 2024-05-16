@@ -34,6 +34,15 @@ services:
       - ./typesense-data:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
 
+  typesense-web:
+    image: ghcr.io/bfritscher/typesense-dashboard:latest
+    container_name: ubrato-typesense-web
+    restart: on-failure
+    ports:
+      - "3003:80"
+    volumes:
+      - ./typesense-config.json:/srv/config.json
+
   service-nats:
     container_name: service-nats
     image: nats:2.10.14-alpine3.19

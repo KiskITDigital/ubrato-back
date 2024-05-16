@@ -1,0 +1,8 @@
+{
+  "name": "contractor_index",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "inn", "type": "string"}
+  ]
+}

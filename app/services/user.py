@@ -9,6 +9,8 @@ from broker.topic import EMAIL_RESET_PASS_TOPIC
 from fastapi import Depends, status
 from repositories.postgres import UserRepository
 from repositories.postgres.schemas import Organization, User
+from repositories.typesense import ContractorIndex
+from repositories.typesense.schemas import TypesenseContractor
 from schemas import models
 from schemas.pb.models.v1.password_recovery_pb2 import EmailPasswordRecovery
 from services.exceptions import EXPIRED_RESET_CODE, ServiceException
@@ -17,14 +19,17 @@ from services.exceptions import EXPIRED_RESET_CODE, ServiceException
 class UserService:
     user_repository: UserRepository
     nats_client: NatsClient
+    contractor_index: ContractorIndex
 
     def __init__(
         self,
         user_repository: UserRepository = Depends(),
+        contractor_index: ContractorIndex = Depends(),
         nats_client: NatsClient = Depends(get_nats_connection),
     ) -> None:
         self.user_repository = user_repository
         self.nats_client = nats_client
+        self.contractor_index = contractor_index
 
     async def create(
         self,
@@ -62,6 +67,18 @@ class UserService:
         created_user, created_org = await self.user_repository.create(
             user=user, org=org
         )
+
+        if created_user.is_contractor:
+            self.contractor_index.save(
+                contractor=TypesenseContractor(
+                    id=created_org.id,
+                    name=created_org.brand_name,
+                    inn=created_org.inn,
+                ),
+                cities=[],
+                objects=[],
+                services=[],
+            )
 
         return created_user, created_org
 

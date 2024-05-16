@@ -1,3 +1,5 @@
+from typing import List
+
 import typesense
 from fastapi import Depends
 from repositories.typesense.client import get_db_connection
@@ -12,10 +14,40 @@ class TenderIndex:
     ) -> None:
         self.db = db
 
-    def save(self, tender: TypesenseTender) -> None:
+    def save(
+        self, tender: TypesenseTender, services: List[int], objects: List[int]
+    ) -> None:
         self.db.collections["tender_index"].documents.create(tender.__dict__)
+        for service in services:
+            self.db.collections["tender_service"].documents.create(
+                {"tender_id": tender.id, "service_type_id": str(service)}
+            )
 
-    def update(self, tender: TypesenseTender) -> None:
+        for object in objects:
+            self.db.collections["tender_object"].documents.create(
+                {"tender_id": tender.id, "object_type_id": str(object)}
+            )
+
+    def update(
+        self, tender: TypesenseTender, services: List[int], objects: List[int]
+    ) -> None:
         self.db.collections["tender_index"].documents.update(
             tender.__dict__, {"filter_by": f"id:{tender.id}"}
         )
+
+        self.db.collections["tender_service"].documents.delete(
+            {"filter_by": f"id:{tender.id}"}
+        )
+        self.db.collections["tender_object"].documents.delete(
+            {"filter_by": f"id:{tender.id}"}
+        )
+
+        for service in services:
+            self.db.collections["tender_service"].documents.create(
+                {"tender_id": tender.id, "service_type_id": service}
+            )
+
+        for object in objects:
+            self.db.collections["tender_object"].documents.create(
+                {"tender_id": tender.id, "object_type_id": str(object)}
+            )

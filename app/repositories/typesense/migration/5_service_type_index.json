@@ -1,0 +1,8 @@
+{
+  "name": "service_type_index",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"},
+    {"name": "group_id", "type": "string", "reference": "service_group_index.id"}
+  ]
+}

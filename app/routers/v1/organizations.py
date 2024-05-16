@@ -100,10 +100,10 @@ async def update_my_customer_profile(
     org_service: OrganizationService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await org_service.profile_repository.update_customer_info(
+    await org_service.update_customer_info(
         org_id=user.org_id, description=data.description
     )
-    await org_service.profile_repository.set_customer_location(
+    await org_service.set_customer_locations(
         org_id=user.org_id,
         locations=[
             CustomerLocation(org_id=user.org_id, city_id=city_id)
@@ -128,17 +128,17 @@ async def update_my_contractor_profile(
     org_service: OrganizationService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await org_service.profile_repository.update_contractor_info(
+    await org_service.update_contractor_info(
         org_id=user.org_id, description=data.description
     )
-    await org_service.profile_repository.set_contractor_locations(
+    await org_service.set_contractor_locations(
         org_id=user.org_id,
         locations=[
             ContractorLocation(org_id=user.org_id, city_id=city_id)
             for city_id in data.locations
         ],
     )
-    await org_service.profile_repository.set_contractor_services(
+    await org_service.set_contractor_services(
         org_id=user.org_id,
         services=[
             ContractorService(
@@ -149,7 +149,7 @@ async def update_my_contractor_profile(
             for service in data.services
         ],
     )
-    await org_service.profile_repository.set_contractor_objects(
+    await org_service.set_contractor_objects(
         org_id=user.org_id,
         objects=[
             ContractorObject(org_id=user.org_id, object_type_id=object_id)

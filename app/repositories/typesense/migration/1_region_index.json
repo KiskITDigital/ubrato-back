@@ -1,0 +1,7 @@
+{
+  "name": "region_index",
+  "fields": [
+    {"name": "id", "type": "string"},
+    {"name": "name", "type": "string"}
+  ]
+}

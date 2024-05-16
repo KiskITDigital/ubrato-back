@@ -1,0 +1,7 @@
+{
+  "name": "tender_object",
+  "fields": [
+    {"name": "tender_id", "type": "string", "reference": "tender_index.id"},
+    {"name": "object_type_id", "type": "string", "reference": "object_type_index.id"}
+  ]
+}

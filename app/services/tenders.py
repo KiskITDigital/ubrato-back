@@ -64,21 +64,10 @@ class TenderService:
             object_type_ids=tender.objects_types,
         )
 
-        object_group_id = await self.tender_repository.get_object_group(
-            object_type_id=tender.objects_types[0]
-        )
-
-        services_groups_ids = await self.tender_repository.get_services_groups(
-            service_type_ids=tender.services_types
-        )
-
         self.tender_index.save(
-            created_tender.ConvertToIndexSchema(
-                object_group_id=object_group_id,
-                objects_types=tender.objects_types,
-                services_groups=services_groups_ids,
-                services_types=tender.services_types,
-            )
+            tender=created_tender.ConvertToIndexSchema(),
+            services=tender.services_types,
+            objects=tender.objects_types,
         )
         return await self.tender_repository.get_tender_by_id(
             tender_id=created_tender.id
@@ -170,19 +159,8 @@ class TenderService:
             tender_id=tender_id,
         )
 
-        object_group_id = await self.tender_repository.get_object_group(
-            object_type_id=tender.objects_types[0]
-        )
-
-        services_groups_ids = await self.tender_repository.get_services_groups(
-            service_type_ids=tender.services_types
-        )
-
         self.tender_index.update(
-            updated_tender.ConvertToIndexSchema(
-                object_group_id=object_group_id,
-                objects_types=tender.objects_types,
-                services_groups=services_groups_ids,
-                services_types=tender.services_types,
-            )
+            tender=updated_tender.ConvertToIndexSchema(),
+            services=tender.services_types,
+            objects=tender.objects_types,
         )

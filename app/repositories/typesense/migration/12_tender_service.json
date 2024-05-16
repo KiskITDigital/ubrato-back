@@ -1,0 +1,7 @@
+{
+  "name": "tender_service",
+  "fields": [
+    {"name": "tender_id", "type": "string", "reference": "tender_index.id"},
+    {"name": "service_type_id", "type": "string", "reference": "service_type_index.id"}
+  ]
+}

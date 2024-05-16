@@ -67,10 +67,6 @@ class Tender(Base):
 
     def ConvertToIndexSchema(
         self,
-        object_group_id: int,
-        objects_types: List[int],
-        services_groups: List[int],
-        services_types: List[int],
     ) -> TypesenseTender:
         return TypesenseTender(
             id=str(self.id),
@@ -78,18 +74,14 @@ class Tender(Base):
             price=self.price,
             is_contract_price=self.is_contract_price,
             is_nds_price=self.is_nds_price,
-            city_id=self.city_id,
+            city_id=str(self.city_id),
             floor_space=self.floor_space,
             description=self.description,
             wishes=self.wishes,
-            services_groups=services_groups,
-            services_types=services_types,
             reception_start=int(self.reception_start.timestamp()),
             reception_end=int(self.reception_end.timestamp()),
             work_start=int(self.work_start.timestamp()),
             work_end=int(self.work_end.timestamp()),
-            object_group_id=object_group_id,
-            object_type_id=objects_types,
             verified=self.verified,
             created_at=int(self.created_at.timestamp()),
         )

@@ -12,8 +12,11 @@ from repositories.postgres.schemas import (
     ContractorLocation,
     ContractorObject,
     ContractorService,
+    CustomerLocation,
     Organization,
 )
+from repositories.typesense import ContractorIndex
+from repositories.typesense.schemas import TypesenseContractorService
 from schemas import models
 from services.exceptions import ServiceException
 
@@ -21,14 +24,17 @@ from services.exceptions import ServiceException
 class OrganizationService:
     org_repository: OrganizationRepository
     profile_repository: ProfileRepository
+    contractor_index: ContractorIndex
 
     def __init__(
         self,
         org_repository: OrganizationRepository = Depends(),
         profile_repository: ProfileRepository = Depends(),
+        contractor_index: ContractorIndex = Depends(),
     ) -> None:
         self.org_repository = org_repository
         self.profile_repository = profile_repository
+        self.contractor_index = contractor_index
         self.dadata = Dadata(get_config().Dadata.api_key)
 
     def get_organization_from_api(self, inn: str) -> Organization:
@@ -100,7 +106,9 @@ class OrganizationService:
             org_id=org_id
         )
         contractor_locations = (
-            await self.profile_repository.get_contractor_location(org_id=org_id)
+            await self.profile_repository.get_contractor_location(
+                org_id=org_id
+            )
         )
 
         contractor_pricing = (
@@ -120,11 +128,25 @@ class OrganizationService:
             portfolio=contractor_cv,
         )
 
-    async def set_contractor_services(
-        self, org_id: str, services: List[ContractorService]
+    async def update_customer_info(
+        self, org_id: str, description: str
     ) -> None:
-        await self.profile_repository.set_contractor_services(
-            org_id=org_id, services=services
+        await self.profile_repository.update_customer_info(
+            org_id=org_id, description=description
+        )
+
+    async def set_customer_locations(
+        self, org_id: str, locations: List[CustomerLocation]
+    ) -> None:
+        await self.profile_repository.set_customer_location(
+            org_id=org_id, locations=locations
+        )
+
+    async def update_contractor_info(
+        self, org_id: str, description: str
+    ) -> None:
+        await self.profile_repository.update_contractor_info(
+            org_id=org_id, description=description
         )
 
     async def set_contractor_locations(
@@ -133,12 +155,37 @@ class OrganizationService:
         await self.profile_repository.set_contractor_locations(
             org_id=org_id, locations=locations
         )
+        self.contractor_index.update_locations(
+            contractor_id=org_id, locations=[id.city_id for id in locations]
+        )
+
+    async def set_contractor_services(
+        self, org_id: str, services: List[ContractorService]
+    ) -> None:
+        await self.profile_repository.set_contractor_services(
+            org_id=org_id, services=services
+        )
+        self.contractor_index.update_services(
+            contractor_id=org_id,
+            services=[
+                TypesenseContractorService(
+                    contractor_id=org_id,
+                    service_type_id=str(service.service_type_id),
+                    price=service.price,
+                )
+                for service in services
+            ],
+        )
 
     async def set_contractor_objects(
         self, org_id: str, objects: List[ContractorObject]
     ) -> None:
         await self.profile_repository.set_contractor_objects(
             org_id=org_id, objects=objects
+        )
+        self.contractor_index.update_objects(
+            contractor_id=org_id,
+            objects=[object.object_type_id for object in objects],
         )
 
     async def save_contractor_cv(self, cv: ContractorCV) -> str:

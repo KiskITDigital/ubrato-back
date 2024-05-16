@@ -1,0 +1,8 @@
+{
+  "name": "contractor_service",
+  "fields": [
+    {"name": "contractor_id", "type": "string", "reference": "contractor_index.id"},
+    {"name": "service_type_id", "type": "string", "reference": "service_type_index.id"},
+    {"name": "price", "type": "int32"}
+  ]
+}
