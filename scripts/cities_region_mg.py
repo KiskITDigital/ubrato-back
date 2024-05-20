@@ -16,4 +16,4 @@ for v in filter:
 print("INSERT INTO cities (name, region_id) VALUES")
 
 for row in df.values:
-    print(f"( '{row[1]}', {filter.index(row[4])} ),")
+    print(f"( '{row[1]}', {filter.index(row[4]) + 1} ),")
