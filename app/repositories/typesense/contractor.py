@@ -65,7 +65,10 @@ class ContractorIndex:
         )
         for object in objects:
             self.db.collections["contractor_object"].documents.create(
-                {"contractor_id": str(contractor_id), "object_type_id": str(object)}
+                {
+                    "contractor_id": str(contractor_id),
+                    "object_type_id": str(object),
+                }
             )
 
     def update_services(

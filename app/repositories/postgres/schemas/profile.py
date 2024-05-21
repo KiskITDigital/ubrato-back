@@ -26,8 +26,12 @@ class CustomerLocation(Base):
         Integer, ForeignKey("cities.id"), primary_key=True
     )
 
-    org = relationship("Organization", back_populates="customer_locations")
-    city = relationship("City", back_populates="customer_locations")
+    org = relationship(
+        "Organization", back_populates="customer_locations", lazy="selectin"
+    )
+    city = relationship(
+        "City", back_populates="customer_locations", lazy="selectin"
+    )
 
 
 class ContractorProfile(Base):
@@ -54,7 +58,7 @@ class ContractorService(Base):
 
     org = relationship("Organization", back_populates="contractor_services")
     service_type = relationship(
-        "ServiceType", back_populates="contractor_services"
+        "ServiceType", back_populates="contractor_services", lazy="selectin"
     )
 
 
@@ -70,7 +74,7 @@ class ContractorObject(Base):
 
     org = relationship("Organization", back_populates="contractor_objects")
     object_type = relationship(
-        "ObjectType", back_populates="contractor_objects"
+        "ObjectType", back_populates="contractor_objects", lazy="selectin"
     )
 
 
@@ -98,5 +102,9 @@ class ContractorLocation(Base):
         Integer, ForeignKey("cities.id"), primary_key=True
     )
 
-    org = relationship("Organization", back_populates="contractor_locations")
-    city = relationship("City", back_populates="contractor_locations")
+    org = relationship(
+        "Organization", back_populates="contractor_locations", lazy="selectin"
+    )
+    city = relationship(
+        "City", back_populates="contractor_locations", lazy="selectin"
+    )
