@@ -19,6 +19,10 @@ class ContractorCVRequest(BaseModel):
     imgs: List[str]
 
 
+class ContractorCVResponse(BaseModel):
+    id: str
+
+
 class UpdateContractorProfileRequest(BaseModel):
     description: str
     locations: List[int]

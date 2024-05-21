@@ -17,6 +17,7 @@ from repositories.postgres.schemas import (
     ContractorService,
     CustomerLocation,
     CustomerProfile,
+    ObjectType,
     Organization,
     ServiceType,
 )
@@ -156,6 +157,33 @@ class ProfileRepository:
             )
 
         return services
+
+    async def get_contractor_objects(
+        self, org_id: str
+    ) -> List[models.ContractorObject]:
+        query = await self.db.execute(
+            select(ObjectType.id, ObjectType.name)
+            .select_from(ObjectType)
+            .join(
+                ContractorService,
+                ObjectType.id == ContractorService.service_type_id,
+            )
+            .where(
+                ContractorService.org_id == org_id,
+            )
+        )
+
+        objects: List[models.ContractorObject] = []
+        for service in query.all():
+            id, name = service._tuple()
+            objects.append(
+                models.ContractorObject(
+                    id=id,
+                    name=name,
+                )
+            )
+
+        return objects
 
     async def get_contractor_cv(
         self, org_id: str

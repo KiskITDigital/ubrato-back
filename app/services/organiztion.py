@@ -117,6 +117,10 @@ class OrganizationService:
             )
         )
 
+        contractor_objects = (
+            await self.profile_repository.get_contractor_objects(org_id=org_id)
+        )
+
         contractor_cv = await self.profile_repository.get_contractor_cv(
             org_id=org_id
         )
@@ -125,6 +129,7 @@ class OrganizationService:
             description=contractor_info.description,
             locations=contractor_locations,
             services=contractor_pricing,
+            objects=contractor_objects,
             portfolio=contractor_cv,
         )
 
@@ -189,9 +194,17 @@ class OrganizationService:
             org_id=org_id, objects=objects
         )
 
-    async def save_contractor_cv(self, cv: ContractorCV) -> str:
+    async def save_contractor_cv(
+        self, org_id: str, name: str, description: str, links: List[str]
+    ) -> str:
         id = "cv_" + str(uuid.uuid4())
-        cv.id = id
+        cv: ContractorCV = ContractorCV(
+            id=id,
+            org_id=org_id,
+            name=name,
+            description=description,
+            links=links,
+        )
         return await self.profile_repository.save_contractor_cv(cv=cv)
 
     async def update_contractor_cv(

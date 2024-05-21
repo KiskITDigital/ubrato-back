@@ -13,6 +13,7 @@ from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.update_profile import (
     ContractorCVRequest,
+    ContractorCVResponse,
     UpdateBrandProfileRequest,
     UpdateContractorProfileRequest,
     UpdateCustomerProfileRequest,
@@ -172,6 +173,31 @@ async def update_my_contractor_profile(
         ],
     )
     return SuccessResponse()
+
+
+@router.post(
+    "/my/profile/cv",
+    response_model=ContractorCVResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
+        status.HTTP_403_FORBIDDEN: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def save_my_cv(
+    data: ContractorCVRequest,
+    org_service: OrganizationService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> ContractorCVResponse:
+    id = await org_service.save_contractor_cv(
+        org_id=user.org_id,
+        name=data.name,
+        description=data.description,
+        links=data.imgs,
+    )
+    return ContractorCVResponse(id=id)
 
 
 @router.put(

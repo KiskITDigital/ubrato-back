@@ -14,6 +14,11 @@ class ProfileLocation(BaseModel):
     name: str
 
 
+class ContractorObject(BaseModel):
+    id: int
+    name: str
+
+
 class ContractorCV(BaseModel):
     name: str
     description: str
@@ -29,4 +34,5 @@ class ContractorProfile(BaseModel):
     description: Optional[str]
     locations: List[ProfileLocation]
     services: List[ContractorPricing]
+    objects: List[ContractorObject]
     portfolio: List[ContractorCV]
