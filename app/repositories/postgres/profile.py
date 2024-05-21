@@ -44,9 +44,11 @@ class ProfileRepository:
 
         return profile
 
-    async def get_customer_location(self, org_id: str) -> List[str]:
+    async def get_customer_location(
+        self, org_id: str
+    ) -> List[models.ProfileLocation]:
         query = await self.db.execute(
-            select(City.name)
+            select(City.id, City.name)
             .select_from(CustomerLocation)
             .join(City)
             .where(
@@ -57,9 +59,10 @@ class ProfileRepository:
             )
         )
 
-        locations: List[str] = []
-        for location in query.scalars().all():
-            locations.append(location)
+        locations: List[models.ProfileLocation] = []
+        for location in query.all():
+            id, name = location.tuple()
+            locations.append(models.ProfileLocation(id=id, name=name))
 
         return locations
 
@@ -78,9 +81,11 @@ class ProfileRepository:
 
         return profile
 
-    async def get_contractor_location(self, org_id: str) -> List[str]:
+    async def get_contractor_location(
+        self, org_id: str
+    ) -> List[models.ProfileLocation]:
         query = await self.db.execute(
-            select(City.name)
+            select(City.id, City.name)
             .select_from(ContractorLocation)
             .join(City)
             .where(
@@ -91,9 +96,10 @@ class ProfileRepository:
             )
         )
 
-        locations: List[str] = []
-        for location in query.scalars().all():
-            locations.append(location)
+        locations: List[models.ProfileLocation] = []
+        for location in query.all():
+            id, name = location.tuple()
+            locations.append(models.ProfileLocation(id=id, name=name))
 
         return locations
 
@@ -101,7 +107,7 @@ class ProfileRepository:
         self, org_id: str
     ) -> List[models.ContractorPricing]:
         query = await self.db.execute(
-            select(ContractorService.price, ServiceType.name)
+            select(ContractorService.price, ServiceType.id, ServiceType.name)
             .join(
                 ServiceType,
                 ServiceType.id == ContractorService.service_type_id,
@@ -113,9 +119,10 @@ class ProfileRepository:
 
         services: List[models.ContractorPricing] = []
         for service in query.all():
-            price, name = service._tuple()
+            price, id, name = service._tuple()
             services.append(
                 models.ContractorPricing(
+                    id=id,
                     name=name,
                     price=price,
                 )

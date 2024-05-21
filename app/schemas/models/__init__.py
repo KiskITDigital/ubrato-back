@@ -27,6 +27,7 @@ __all__ = [
     "ContractorCV",
     "ContractorProfile",
     "ContactInfo",
+    "ProfileLocation",
 ]
 
 from .city import City
@@ -48,6 +49,7 @@ from .profile import (
     ContractorPricing,
     ContractorProfile,
     CustomerProfile,
+    ProfileLocation,
 )
 from .questionnaire_answer import QuestionnaireAnswer
 from .service_group import (
