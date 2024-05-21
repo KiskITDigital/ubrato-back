@@ -4,6 +4,7 @@ from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
 from repositories.postgres.exceptions import (
     CV_NOT_FOUND,
+    ORG_NOT_FOUND,
     PROFILE_NOT_FOUND,
     RepositoryException,
 )
@@ -16,6 +17,7 @@ from repositories.postgres.schemas import (
     ContractorService,
     CustomerLocation,
     CustomerProfile,
+    Organization,
     ServiceType,
 )
 from schemas import models
@@ -28,6 +30,40 @@ class ProfileRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+
+    async def set_brand_avatar(self, org_id: str, url: str) -> None:
+        query = await self.db.execute(
+            select(Organization).where(Organization.id == org_id)
+        )
+
+        org = query.scalar()
+
+        if org is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ORG_NOT_FOUND.format(org_id),
+                sql_msg="",
+            )
+
+        org.avatar = url
+        await self.db.commit()
+
+    async def set_brand_name(self, org_id: str, name: str) -> None:
+        query = await self.db.execute(
+            select(Organization).where(Organization.id == org_id)
+        )
+
+        org = query.scalar()
+
+        if org is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=ORG_NOT_FOUND.format(org_id),
+                sql_msg="",
+            )
+
+        org.brand_name = name
+        await self.db.commit()
 
     async def get_customer(self, org_id: str) -> CustomerProfile:
         query = await self.db.execute(

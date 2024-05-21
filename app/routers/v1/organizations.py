@@ -13,6 +13,7 @@ from schemas.jwt_user import JWTUser
 from schemas.success import SuccessResponse
 from schemas.update_profile import (
     ContractorCVRequest,
+    UpdateBrandProfileRequest,
     UpdateContractorProfileRequest,
     UpdateCustomerProfileRequest,
 )
@@ -229,3 +230,24 @@ async def get_my_org(
     return (
         await org_service.get_organization_by_id(org_id=user.org_id)
     ).to_model()
+
+
+@router.put(
+    "/my/profile/brand",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def update_my_brand_profile(
+    data: UpdateBrandProfileRequest,
+    org_service: OrganizationService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await org_service.set_brand_avatar(user.org_id, data.avatar)
+    await org_service.set_brand_name(user.org_id, data.name)
+
+    return SuccessResponse()

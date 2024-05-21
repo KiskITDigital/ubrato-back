@@ -211,3 +211,9 @@ class OrganizationService:
         return await self.profile_repository.get_contractor_cv_by_id(
             cv_id=cv_id
         )
+
+    async def set_brand_avatar(self, org_id: str, url: str) -> None:
+        await self.profile_repository.set_brand_avatar(org_id=org_id, url=url)
+
+    async def set_brand_name(self, org_id: str, name: str) -> None:
+        await self.profile_repository.set_brand_name(org_id=org_id, name=name)

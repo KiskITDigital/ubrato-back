@@ -24,3 +24,8 @@ class UpdateContractorProfileRequest(BaseModel):
     locations: List[int]
     services: List[ContractorPricingRequest]
     objects: List[int]
+
+
+class UpdateBrandProfileRequest(BaseModel):
+    name: str
+    avatar: str
