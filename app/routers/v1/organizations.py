@@ -55,6 +55,20 @@ async def get_contractor_profile(
 
 
 @router.get(
+    "/profile/{org_id}",
+    response_model=models.OrganizationDTO,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+)
+async def get_organization_profile(
+    org_id: str, org_service: OrganizationService = Depends()
+) -> models.Organization:
+    return (await org_service.get_organization_by_id(org_id)).to_model()
+
+
+@router.get(
     "/my/profile/customer",
     response_model=models.CustomerProfile,
     responses={
@@ -247,7 +261,7 @@ async def update_my_brand_profile(
     org_service: OrganizationService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await org_service.set_brand_avatar(user.org_id, data.avatar)
     await org_service.set_brand_name(user.org_id, data.name)
+    await org_service.set_brand_avatar(user.org_id, data.avatar)
 
     return SuccessResponse()

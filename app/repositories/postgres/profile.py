@@ -21,7 +21,7 @@ from repositories.postgres.schemas import (
     ServiceType,
 )
 from schemas import models
-from sqlalchemy import and_, delete, select
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -49,21 +49,12 @@ class ProfileRepository:
         await self.db.commit()
 
     async def set_brand_name(self, org_id: str, name: str) -> None:
-        query = await self.db.execute(
-            select(Organization).where(Organization.id == org_id)
+        stmn = (
+            update(Organization)
+            .where(Organization.id == org_id)
+            .values(brand_name=name)
         )
-
-        org = query.scalar()
-
-        if org is None:
-            raise RepositoryException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=ORG_NOT_FOUND.format(org_id),
-                sql_msg="",
-            )
-
-        org.brand_name = name
-        await self.db.commit()
+        await self.db.execute(stmn)
 
     async def get_customer(self, org_id: str) -> CustomerProfile:
         query = await self.db.execute(

@@ -38,6 +38,17 @@ class OrganizationLiteDTO(BaseModel):
     kpp: str
 
 
+class OrganizationDTO(BaseModel):
+    id: str
+    brand_name: str
+    short_name: str
+    inn: str
+    okpo: str
+    ogrn: str
+    kpp: str
+    avatar: Optional[str]
+
+
 class EgrulCompany(BaseModel):
     name: str
     director: str

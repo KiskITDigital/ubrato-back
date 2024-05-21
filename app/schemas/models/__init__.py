@@ -28,6 +28,7 @@ __all__ = [
     "ContractorProfile",
     "ContactInfo",
     "ProfileLocation",
+    "OrganizationDTO",
 ]
 
 from .city import City
@@ -42,6 +43,7 @@ from .organization import (
     ContactInfo,
     EgrulCompany,
     Organization,
+    OrganizationDTO,
     OrganizationLiteDTO,
 )
 from .profile import (
