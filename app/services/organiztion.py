@@ -67,9 +67,8 @@ class OrganizationService:
     async def get_organization_by_id(self, org_id: str) -> Organization:
         org = await self.org_repository.get_organization_by_id(org_id=org_id)
         if (
-            org.update_at
+            org.update_at + datetime.timedelta(days=30)
             < datetime.datetime.now().astimezone()
-            + datetime.timedelta(days=30)
         ):
             upd_org = self.get_organization_from_api(org.inn)
             org = await self.org_repository.update_org(upd_org=upd_org)

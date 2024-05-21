@@ -19,6 +19,7 @@ class OrganizationRepository:
         self,
         org: Organization,
     ) -> None:
+        org.update_at = datetime.now()
         self.db.add(org)
         await self.db.commit()
 
