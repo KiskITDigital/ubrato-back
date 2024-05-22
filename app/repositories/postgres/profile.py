@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
@@ -326,4 +326,49 @@ class ProfileRepository:
 
         profile_to_update.description = description
 
+        await self.db.commit()
+
+    async def set_brand_emails(
+        self, org_id: str, emails: List[Tuple[str, str]]
+    ) -> None:
+        await self.db.execute(
+            update(Organization)
+            .values(
+                email=[
+                    {"contact": contact, "description": description}
+                    for contact, description in emails
+                ]
+            )
+            .where(Organization.id == org_id)
+        )
+        await self.db.commit()
+
+    async def set_brand_phones(
+        self, org_id: str, phones: List[Tuple[str, str]]
+    ) -> None:
+        await self.db.execute(
+            update(Organization)
+            .values(
+                phone=[
+                    {"contact": contact, "description": description}
+                    for contact, description in phones
+                ]
+            )
+            .where(Organization.id == org_id)
+        )
+        await self.db.commit()
+
+    async def set_brand_messengers(
+        self, org_id: str, messengers: List[Tuple[str, str]]
+    ) -> None:
+        await self.db.execute(
+            update(Organization)
+            .values(
+                messenger=[
+                    {"contact": contact, "description": description}
+                    for contact, description in messengers
+                ]
+            )
+            .where(Organization.id == org_id)
+        )
         await self.db.commit()

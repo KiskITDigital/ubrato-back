@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS organizations (
     avatar              VARCHAR(255)    DEFAULT NULL,
     email               JSONB           DEFAULT '[]'::jsonb,
     phone               JSONB           DEFAULT '[]'::jsonb,
-    messager            JSONB           DEFAULT '[]'::jsonb,
+    messenger            JSONB           DEFAULT '[]'::jsonb,
     user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
     update_at           TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP,
     created_at          TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP

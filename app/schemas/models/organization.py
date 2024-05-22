@@ -23,7 +23,7 @@ class Organization(BaseModel):
     avatar: Optional[str]
     email: List[ContactInfo]
     phone: List[ContactInfo]
-    messager: List[ContactInfo]
+    messenger: List[ContactInfo]
     user_id: str
     update_at: datetime
     created_at: datetime

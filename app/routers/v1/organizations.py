@@ -14,6 +14,7 @@ from schemas.success import SuccessResponse
 from schemas.update_profile import (
     ContractorCVRequest,
     ContractorCVResponse,
+    UpdateBrandContactRequest,
     UpdateBrandProfileRequest,
     UpdateContractorProfileRequest,
     UpdateCustomerProfileRequest,
@@ -289,5 +290,33 @@ async def update_my_brand_profile(
 ) -> SuccessResponse:
     await org_service.set_brand_name(user.org_id, data.name)
     await org_service.set_brand_avatar(user.org_id, data.avatar)
+
+    return SuccessResponse()
+
+
+@router.put(
+    "/my/profile/brand/contacts",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": UnauthExceptionResponse},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def update_my_brand_contacts(
+    data: UpdateBrandContactRequest,
+    org_service: OrganizationService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await org_service.set_brand_contact_info(
+        org_id=user.org_id,
+        emails=[(email.contact, email.info) for email in data.emails],
+        phones=[(phone.contact, phone.info) for phone in data.phones],
+        messengers=[
+            (messenger.contact, messenger.info)
+            for messenger in data.messengers
+        ],
+    )
 
     return SuccessResponse()

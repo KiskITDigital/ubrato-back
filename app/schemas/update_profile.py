@@ -1,6 +1,7 @@
 from typing import List
 
 from pydantic import BaseModel
+from schemas.models.organization import ContactInfo
 
 
 class UpdateCustomerProfileRequest(BaseModel):
@@ -33,3 +34,9 @@ class UpdateContractorProfileRequest(BaseModel):
 class UpdateBrandProfileRequest(BaseModel):
     name: str
     avatar: str
+
+
+class UpdateBrandContactRequest(BaseModel):
+    emails: List[ContactInfo]
+    phones: List[ContactInfo]
+    messengers: List[ContactInfo]

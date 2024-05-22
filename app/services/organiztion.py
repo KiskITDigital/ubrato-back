@@ -1,7 +1,7 @@
 import datetime
 import hashlib
 import uuid
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from config import get_config
 from dadata import Dadata
@@ -229,3 +229,20 @@ class OrganizationService:
 
     async def set_brand_name(self, org_id: str, name: str) -> None:
         await self.profile_repository.set_brand_name(org_id=org_id, name=name)
+
+    async def set_brand_contact_info(
+        self,
+        org_id: str,
+        emails: List[Tuple[str, str]],
+        phones: List[Tuple[str, str]],
+        messengers: List[Tuple[str, str]],
+    ) -> None:
+        await self.profile_repository.set_brand_emails(
+            org_id=org_id, emails=emails
+        )
+        await self.profile_repository.set_brand_phones(
+            org_id=org_id, phones=phones
+        )
+        await self.profile_repository.set_brand_messengers(
+            org_id=org_id, messengers=messengers
+        )

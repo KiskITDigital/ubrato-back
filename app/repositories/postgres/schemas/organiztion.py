@@ -28,7 +28,7 @@ class Organization(Base):
     phone: Mapped[List[dict[str, str]]] = mapped_column(
         JSONB, default=[], nullable=True
     )
-    messager: Mapped[List[dict[str, str]]] = mapped_column(
+    messenger: Mapped[List[dict[str, str]]] = mapped_column(
         JSONB, default=[], nullable=True
     )
     user_id: Mapped[str] = mapped_column(
@@ -74,9 +74,9 @@ class Organization(Base):
                 )
             )
 
-        messager: List[models.ContactInfo] = []
-        for info in self.messager:
-            messager.append(
+        messenger: List[models.ContactInfo] = []
+        for info in self.messenger:
+            messenger.append(
                 models.ContactInfo(
                     contact=info["contact"], info=info["description"]
                 )
@@ -96,7 +96,7 @@ class Organization(Base):
             avatar=self.avatar,
             email=email,
             phone=phone,
-            messager=messager,
+            messenger=messenger,
             user_id=self.user_id,
             update_at=self.update_at,
             created_at=self.created_at,
