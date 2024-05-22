@@ -14,6 +14,7 @@ class TenderRespond(Base):
     user_id: Mapped[str] = mapped_column(
         String(40), ForeignKey("users.id"), primary_key=True
     )
+    price: Mapped[int] = mapped_column(Integer, nullable=True)
     respond_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), default=func.current_timestamp()
     )

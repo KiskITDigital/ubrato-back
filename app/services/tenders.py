@@ -165,9 +165,11 @@ class TenderService:
             objects=tender.objects_types,
         )
 
-    async def respond_tender(self, tender_id: int, user_id: str) -> None:
+    async def respond_tender(
+        self, tender_id: int, user_id: str, price: Optional[int]
+    ) -> None:
         await self.tender_repository.respond_tender(
-            tender_id=tender_id, user_id=user_id
+            tender_id=tender_id, user_id=user_id, price=price
         )
 
     async def is_responded_to_tender(

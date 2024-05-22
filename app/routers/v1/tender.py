@@ -9,6 +9,7 @@ from schemas.jwt_user import JWTUser
 from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
+from schemas.tender_respond import TenderRespondRequest
 from services import DraftTenderService, TenderService
 from tools.cache import redis_cache
 
@@ -112,10 +113,13 @@ async def get_tender(
 )
 async def respond_tender(
     tender_id: int,
+    data: TenderRespondRequest,
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await tender_service.respond_tender(tender_id=tender_id, user_id=user.id)
+    await tender_service.respond_tender(
+        tender_id=tender_id, user_id=user.id, price=data.price
+    )
     return SuccessResponse()
 
 

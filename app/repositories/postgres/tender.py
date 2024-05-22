@@ -399,8 +399,12 @@ class TenderRepository:
             verified=tender.verified,
         )
 
-    async def respond_tender(self, tender_id: int, user_id: str) -> None:
-        self.db.add(TenderRespond(tender_id=tender_id, user_id=user_id))
+    async def respond_tender(
+        self, tender_id: int, user_id: str, price: Optional[int]
+    ) -> None:
+        self.db.add(
+            TenderRespond(tender_id=tender_id, user_id=user_id, price=price)
+        )
         await self.db.commit()
 
     async def is_responded_to_tender(
