@@ -15,6 +15,7 @@ from repositories.postgres.schemas import (
     ServiceType,
     Tender,
     TenderObjectType,
+    TenderRespond,
     TenderServiceType,
 )
 from schemas import models
@@ -397,3 +398,41 @@ class TenderRepository:
             created_at=tender.created_at,
             verified=tender.verified,
         )
+
+    async def respond_tender(self, tender_id: int, user_id: str) -> None:
+        self.db.add(TenderRespond(tender_id=tender_id, user_id=user_id))
+        await self.db.commit()
+
+    async def is_responded_to_tender(
+        self, tender_id: int, user_id: str
+    ) -> bool:
+        query = await self.db.execute(
+            select(TenderRespond).where(
+                and_(
+                    TenderRespond.tender_id == tender_id,
+                    TenderRespond.user_id == user_id,
+                )
+            )
+        )
+
+        return query.scalar() is not None
+
+    async def get_tender_responses(
+        self, tender_id: int
+    ) -> List[TenderRespond]:
+        query = await self.db.execute(
+            select(TenderRespond).where(
+                TenderRespond.tender_id == tender_id,
+            )
+        )
+
+        return [response for response in query.scalars().all()]
+
+    async def get_user_responses(self, user_id: str) -> List[TenderRespond]:
+        query = await self.db.execute(
+            select(TenderRespond).where(
+                TenderRespond.user_id == user_id,
+            )
+        )
+
+        return [response for response in query.scalars().all()]

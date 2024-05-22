@@ -30,6 +30,7 @@ __all__ = [
     "ProfileLocation",
     "OrganizationDTO",
     "ContractorObject",
+    "TenderResponse",
 ]
 
 from .city import City
@@ -63,6 +64,7 @@ from .service_group import (
     ServiceTypeModel,
 )
 from .tender import DraftTender, Tender
+from .tender_response import TenderResponse
 from .user import User, UserMe, UserPrivateDTO
 from .verification import VerificationInfo
 from .verification_doc import VerificationDoc

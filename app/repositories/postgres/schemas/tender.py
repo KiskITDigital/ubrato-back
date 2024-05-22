@@ -58,6 +58,7 @@ class Tender(Base):
 
     user = relationship("User", back_populates="tender")
     city = relationship("City")
+    tender_respond = relationship("TenderRespond", back_populates="tender")
     tender_service_type = relationship(
         "TenderServiceType", back_populates="tender"
     )

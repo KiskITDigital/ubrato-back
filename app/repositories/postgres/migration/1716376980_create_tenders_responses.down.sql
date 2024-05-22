@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS tenders_responses;

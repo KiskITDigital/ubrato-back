@@ -35,3 +35,4 @@ class User(Base):
     verification_requests = relationship(
         "VerificationRequest", back_populates="user"
     )
+    tender_respond = relationship("TenderRespond", back_populates="user")

@@ -164,3 +164,15 @@ class TenderService:
             services=tender.services_types,
             objects=tender.objects_types,
         )
+
+    async def respond_tender(self, tender_id: int, user_id: str) -> None:
+        await self.tender_repository.respond_tender(
+            tender_id=tender_id, user_id=user_id
+        )
+
+    async def is_responded_to_tender(
+        self, tender_id: int, user_id: str
+    ) -> bool:
+        return await self.tender_repository.is_responded_to_tender(
+            tender_id=tender_id, user_id=user_id
+        )
