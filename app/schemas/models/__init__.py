@@ -31,9 +31,11 @@ __all__ = [
     "OrganizationDTO",
     "ContractorObject",
     "TenderResponse",
+    "FavoriteContractor",
 ]
 
 from .city import City
+from .favorite_contractor import FavoriteContractor
 from .notification import Notification, Notifications
 from .object_group import (
     ObjectGroupModel,

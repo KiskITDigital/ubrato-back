@@ -12,9 +12,10 @@ from repositories.postgres.schemas import (
     CustomerProfile,
     Organization,
     User,
+    UserFavoriteContractor,
 )
 from schemas import models
-from sqlalchemy import select, update
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -123,3 +124,66 @@ class UserRepository:
         )
 
         await self.db.commit()
+
+    async def add_favorite_contratctor(
+        self, user_id: str, contractor_id: str
+    ) -> None:
+        self.db.add(
+            UserFavoriteContractor(
+                user_id=user_id, contractor_id=contractor_id
+            )
+        )
+        await self.db.commit()
+
+    async def remove_favorite_contratctor(
+        self, user_id: str, contractor_id: str
+    ) -> None:
+        await self.db.execute(
+            delete(UserFavoriteContractor).where(
+                and_(
+                    UserFavoriteContractor.user_id == user_id,
+                    UserFavoriteContractor.contractor_id == contractor_id,
+                )
+            )
+        )
+
+        await self.db.commit()
+
+    async def is_favorite_contratctor(
+        self, user_id: str, contractor_id: str
+    ) -> bool:
+        query = await self.db.execute(
+            select(UserFavoriteContractor).where(
+                and_(
+                    UserFavoriteContractor.user_id == user_id,
+                    UserFavoriteContractor.contractor_id == contractor_id,
+                )
+            )
+        )
+
+        return query.scalar() is not None
+
+    async def get_favorite_contratctor(
+        self, user_id: str
+    ) -> List[models.FavoriteContractor]:
+        query = await self.db.execute(
+            select(
+                UserFavoriteContractor.contractor_id, Organization.brand_name
+            )
+            .join(
+                Organization,
+                Organization.user_id == UserFavoriteContractor.contractor_id,
+            )
+            .where(UserFavoriteContractor.user_id == user_id)
+        )
+
+        contractors: List[models.FavoriteContractor] = []
+
+        for contractor in query.all():
+            id, name = contractor.tuple()
+            contractors.append(models.FavoriteContractor(
+                id=id,
+                org_name=name,
+            ))
+
+        return contractors

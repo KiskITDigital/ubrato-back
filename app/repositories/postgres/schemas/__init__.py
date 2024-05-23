@@ -29,6 +29,7 @@ __all__ = [
     "ContractorLocation",
     "CustomerLocation",
     "TenderRespond",
+    "UserFavoriteContractor",
 ]
 
 
@@ -57,4 +58,5 @@ from .tender_object import ObjectGroup, ObjectType, TenderObjectType
 from .tender_respond import TenderRespond
 from .tender_service import ServiceGroup, ServiceType, TenderServiceType
 from .user import User
+from .user_favorite_contractor import UserFavoriteContractor
 from .verification_requests import VerificationRequest

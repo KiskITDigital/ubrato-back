@@ -156,3 +156,78 @@ async def mark_read_notice(
 
     await notice_service.mark_read(ids=ids, user_id=user.id)
     return SuccessResponse()
+
+
+@router.post(
+    "/{contractor_id}/add_favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def add_favorite_contractor(
+    contractor_id: str,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await user_service.add_favorite_contratctor(
+        user_id=user.id, contractor_id=contractor_id
+    )
+    return SuccessResponse()
+
+
+@router.post(
+    "/{contractor_id}/remove_favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def remove_favorite_contractor(
+    contractor_id: str,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await user_service.remove_favorite_contratctor(
+        user_id=user.id, contractor_id=contractor_id
+    )
+    return SuccessResponse()
+
+
+@router.post(
+    "/{contractor_id}/is_favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def is_favorite_contractor(
+    contractor_id: str,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    return SuccessResponse(
+        status=await user_service.is_favorite_contratctor(
+            user_id=user.id, contractor_id=contractor_id
+        )
+    )
+
+
+@router.get(
+    "/me/favorite_contractors",
+    response_model=List[models.FavoriteContractor],
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def list_favorite_contractor(
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.FavoriteContractor]:
+    return await user_service.list_favorite_contratctor(
+            user_id=user.id
+        )
