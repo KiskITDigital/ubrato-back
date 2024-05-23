@@ -196,7 +196,7 @@ async def remove_favorite_contractor(
     return SuccessResponse()
 
 
-@router.post(
+@router.get(
     "/{contractor_id}/is_favorite",
     response_model=SuccessResponse,
     responses={
