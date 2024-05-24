@@ -172,7 +172,7 @@ class UserRepository:
             )
             .join(
                 Organization,
-                Organization.user_id == UserFavoriteContractor.contractor_id,
+                Organization.id == UserFavoriteContractor.contractor_id,
             )
             .where(UserFavoriteContractor.user_id == user_id)
         )
