@@ -8,8 +8,10 @@ from schemas import models
 from schemas.create_tender import CreateTenderRequest
 from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
 from services.exceptions import (
+    ALREADY_HAS_OFFER,
     INVALID_OBJECTS_COUNT,
     INVALID_SERVICES_COUNT,
+    NO_ACCESS,
     ServiceException,
 )
 
@@ -177,4 +179,41 @@ class TenderService:
     ) -> bool:
         return await self.tender_repository.is_responded_to_tender(
             tender_id=tender_id, user_id=user_id
+        )
+
+    async def make_offer(
+        self, contractor_id: str, tender_id: int, user_id: str
+    ) -> None:
+        if not await self.has_permission_make_offer(
+            user_id=user_id, tender_id=tender_id
+        ):
+            raise ServiceException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=NO_ACCESS,
+            )
+
+        if await self.is_already_got_offer(
+            contractor_id=contractor_id, tender_id=tender_id
+        ):
+            raise ServiceException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ALREADY_HAS_OFFER,
+            )
+
+        await self.tender_repository.make_offer(
+            contractor_id=contractor_id, tender_id=tender_id
+        )
+
+    async def is_already_got_offer(
+        self, contractor_id: str, tender_id: int
+    ) -> bool:
+        return await self.tender_repository.is_offer_exist(
+            contractor_id=contractor_id, tender_id=tender_id
+        )
+
+    async def has_permission_make_offer(
+        self, user_id: str, tender_id: int
+    ) -> bool:
+        return await self.tender_repository.is_tender_owner(
+            user_id=user_id, tender_id=tender_id
         )

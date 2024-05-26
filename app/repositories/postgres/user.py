@@ -181,9 +181,11 @@ class UserRepository:
 
         for contractor in query.all():
             id, name = contractor.tuple()
-            contractors.append(models.FavoriteContractor(
-                id=id,
-                org_name=name,
-            ))
+            contractors.append(
+                models.FavoriteContractor(
+                    id=id,
+                    org_name=name,
+                )
+            )
 
         return contractors

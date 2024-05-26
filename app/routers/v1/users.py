@@ -6,11 +6,13 @@ from routers.v1.dependencies import authorized, get_user
 from schemas import models
 from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
+from schemas.offer_tender import OfferTenderRequest
 from schemas.success import SuccessResponse
 from schemas.upd_avatar import UpdAvatarRequest
 from services import (
     NoticeService,
     QuestionnaireService,
+    TenderService,
     UserService,
     VerificationService,
 )
@@ -228,6 +230,24 @@ async def list_favorite_contractor(
     user_service: UserService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> List[models.FavoriteContractor]:
-    return await user_service.list_favorite_contratctor(
-            user_id=user.id
-        )
+    return await user_service.list_favorite_contratctor(user_id=user.id)
+
+
+@router.post(
+    "/{contractor_id}/offer",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def offer_tender(
+    contractor_id: str,
+    data: OfferTenderRequest,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await tender_service.make_offer(
+        contractor_id=contractor_id, tender_id=data.tender_id, user_id=user.id
+    )
+    return SuccessResponse()

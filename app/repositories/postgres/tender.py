@@ -15,6 +15,7 @@ from repositories.postgres.schemas import (
     ServiceType,
     Tender,
     TenderObjectType,
+    TenderOffer,
     TenderRespond,
     TenderServiceType,
 )
@@ -440,3 +441,37 @@ class TenderRepository:
         )
 
         return [response for response in query.scalars().all()]
+
+    async def make_offer(self, contractor_id: str, tender_id: int) -> None:
+        self.db.add(
+            TenderOffer(contractor_id=contractor_id, tender_id=tender_id)
+        )
+        await self.db.commit()
+
+    async def is_offer_exist(self, contractor_id: str, tender_id: int) -> bool:
+        query = await self.db.execute(
+            select(TenderOffer).where(
+                and_(
+                    TenderOffer.contractor_id == contractor_id,
+                    TenderOffer.tender_id == tender_id,
+                )
+            )
+        )
+
+        return query.scalar() is not None
+
+    async def is_tender_owner(self, user_id: str, tender_id: int) -> bool:
+        query = await self.db.execute(
+            select(Tender).where(Tender.id == tender_id)
+        )
+
+        tender = query.scalar()
+
+        if tender is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=TENDERID_NOT_FOUND.format(tender_id),
+                sql_msg="",
+            )
+
+        return tender.user_id == user_id
