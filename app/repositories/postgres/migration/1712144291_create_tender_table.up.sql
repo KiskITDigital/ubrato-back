@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS tender (
     floor_space         INT             NOT NULL,
     description         VARCHAR(400)    NULL,
     wishes              VARCHAR(400)    NULL,
+    specification       VARCHAR(400)    NOT NULL,
     attachments         TEXT[8]         NULL,
     verified            BOOLEAN         NOT NULL DEFAULT FALSE,
     reception_start     TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,

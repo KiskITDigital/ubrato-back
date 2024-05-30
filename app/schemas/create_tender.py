@@ -12,6 +12,7 @@ class CreateTenderRequest(BaseModel):
     floor_space: int
     description: str
     wishes: str
+    specification: str
     attachments: List[str]
     services_types: List[int]
     objects_types: List[int]

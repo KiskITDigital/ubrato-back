@@ -55,6 +55,7 @@ class TenderService:
                 floor_space=tender.floor_space,
                 description=tender.description,
                 wishes=tender.wishes,
+                specification=tender.specification,
                 attachments=tender.attachments,
                 reception_start=tender.reception_start,
                 reception_end=tender.reception_end,

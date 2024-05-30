@@ -33,6 +33,7 @@ class Tender(Base):
     floor_space: Mapped[int] = mapped_column(Integer, nullable=False)
     description: Mapped[str] = mapped_column(String(400))
     wishes: Mapped[str] = mapped_column(String(400))
+    specification: Mapped[str] = mapped_column(String(400))
     attachments: Mapped[List[str]] = mapped_column(ARRAY(Text))
     reception_start: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), server_default=func.current_timestamp()

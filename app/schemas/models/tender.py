@@ -14,6 +14,7 @@ class Tender(BaseModel):
     floor_space: int
     description: str
     wishes: str
+    specification: str
     attachments: List[str]
     services_groups: List[str]
     services_types: List[str]
@@ -38,6 +39,7 @@ class DraftTender(BaseModel):
     floor_space: int
     description: str
     wishes: str
+    specification: str
     attachments: List[str]
     services_groups: List[str]
     services_types: List[str]
