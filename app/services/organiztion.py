@@ -189,6 +189,7 @@ class OrganizationService:
             contractor_id=org_id,
             objects=[object.object_type_id for object in objects],
         )
+
         await self.profile_repository.set_contractor_objects(
             org_id=org_id, objects=objects
         )

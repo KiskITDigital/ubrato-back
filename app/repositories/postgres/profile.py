@@ -163,13 +163,12 @@ class ProfileRepository:
     ) -> List[models.ContractorObject]:
         query = await self.db.execute(
             select(ObjectType.id, ObjectType.name)
-            .select_from(ObjectType)
             .join(
-                ContractorService,
-                ObjectType.id == ContractorService.service_type_id,
+                ContractorObject,
+                ObjectType.id == ContractorObject.object_type_id,
             )
             .where(
-                ContractorService.org_id == org_id,
+                ContractorObject.org_id == org_id,
             )
         )
 
