@@ -124,6 +124,26 @@ async def respond_tender(
 
 
 @router.get(
+    "/tender/{tender_id}/is_respond",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def get_tender_respond_status(
+    tender_id: int,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    return SuccessResponse(
+        status=await tender_service.is_responded(
+            tender_id=tender_id, user_id=user.id
+        )
+    )
+
+
+@router.get(
     "/tender/{tender_id}/has_offer/{org_id}",
     response_model=SuccessResponse,
     responses={

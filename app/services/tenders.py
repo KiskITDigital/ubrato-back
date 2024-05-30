@@ -174,9 +174,12 @@ class TenderService:
             tender_id=tender_id, user_id=user_id, price=price
         )
 
-    async def is_has_offer(
-        self, tender_id: int, org_id: str
-    ) -> bool:
+    async def is_responded(self, tender_id: int, user_id: str) -> bool:
+        return await self.tender_repository.is_responded(
+            tender_id=tender_id, user_id=user_id
+        )
+
+    async def is_has_offer(self, tender_id: int, org_id: str) -> bool:
         return await self.tender_repository.is_has_offer(
             tender_id=tender_id, org_id=org_id
         )

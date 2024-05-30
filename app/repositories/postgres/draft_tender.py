@@ -3,7 +3,10 @@ from typing import Any, List
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import RepositoryException
+from repositories.postgres.exceptions import (
+    NO_DRAFT_TENDER,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     DraftTender,
@@ -122,7 +125,7 @@ class DraftTenderRepository:
         if found_tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="",
+                detail=NO_DRAFT_TENDER,
                 sql_msg="",
             )
 
@@ -137,6 +140,12 @@ class DraftTenderRepository:
         await self.db.execute(
             delete(DraftTenderServiceType).where(
                 DraftTenderServiceType.tender_id == id,
+            )
+        )
+
+        await self.db.execute(
+            delete(DraftTenderObjectType).where(
+                DraftTenderObjectType.tender_id == id,
             )
         )
 

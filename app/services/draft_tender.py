@@ -26,6 +26,7 @@ class DraftTenderService:
                 name=tender.name,
                 price=tender.price,
                 is_contract_price=tender.is_contract_price,
+                is_nds_price=tender.is_nds_price,
                 city_id=tender.city_id,
                 floor_space=tender.floor_space,
                 description=tender.description,

@@ -13,6 +13,7 @@ DOCUMENT_NOT_FOUND = "Document with ID {} not found."
 VERIFIED_REQUEST_NOT_FOUND = "Verified request with ID {} not found."
 CV_NOT_FOUND = "CV with ID {} not found."
 PROFILE_NOT_FOUND = "Profile org with ID {} not found."
+NO_DRAFT_TENDER = "You don't have a draft version of the tender."
 
 
 class RepositoryException(HTTPException):

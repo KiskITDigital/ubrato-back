@@ -260,6 +260,6 @@ async def offer_tender(
         msg="Вы получиле оффер",
         href=f"https://ubrato.ru/tender/{data.tender_id}",
         href_text="посмотреть тендер",
-        href_color=1
+        href_color=1,
     )
     return SuccessResponse()

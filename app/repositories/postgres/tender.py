@@ -3,7 +3,10 @@ from typing import Any, List, Optional
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import (
+    TENDERID_NOT_FOUND,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -405,9 +408,19 @@ class TenderRepository:
         )
         await self.db.commit()
 
-    async def is_has_offer(
-        self, tender_id: int, org_id: str
-    ) -> bool:
+    async def is_responded(self, tender_id: int, user_id: str) -> bool:
+        query = await self.db.execute(
+            select(TenderRespond).where(
+                and_(
+                    TenderRespond.tender_id == tender_id,
+                    TenderRespond.user_id == user_id,
+                )
+            )
+        )
+
+        return query.scalar() is not None
+
+    async def is_has_offer(self, tender_id: int, org_id: str) -> bool:
         query = await self.db.execute(
             select(TenderOffer).where(
                 and_(
