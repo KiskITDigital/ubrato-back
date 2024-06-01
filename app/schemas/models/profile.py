@@ -20,6 +20,7 @@ class ContractorObject(BaseModel):
 
 
 class ContractorCV(BaseModel):
+    id: str
     name: str
     description: str
     links: List[str]

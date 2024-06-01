@@ -195,6 +195,7 @@ class ProfileRepository:
         for work in query.scalars().all():
             cv.append(
                 models.ContractorCV(
+                    id=work.id,
                     name=work.name,
                     description=work.description,
                     links=work.links,
