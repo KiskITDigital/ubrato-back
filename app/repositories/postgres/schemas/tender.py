@@ -84,6 +84,7 @@ class Tender(Base):
             reception_end=int(self.reception_end.timestamp()),
             work_start=int(self.work_start.timestamp()),
             work_end=int(self.work_end.timestamp()),
+            user_id=self.user_id,
             verified=self.verified,
             created_at=int(self.created_at.timestamp()),
         )

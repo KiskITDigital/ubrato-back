@@ -15,6 +15,7 @@ class TypesenseTender(BaseModel):
     reception_end: int
     work_start: int
     work_end: int
+    user_id: str
     verified: bool
     created_at: int
 
