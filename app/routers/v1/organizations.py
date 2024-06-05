@@ -196,7 +196,7 @@ async def save_my_cv(
         org_id=user.org_id,
         name=data.name,
         description=data.description,
-        links=data.imgs,
+        links=data.links,
     )
     return ContractorCVResponse(id=id)
 

@@ -17,7 +17,7 @@ class ContractorPricingRequest(BaseModel):
 class ContractorCVRequest(BaseModel):
     name: str
     description: str
-    imgs: List[str]
+    links: List[str]
 
 
 class ContractorCVResponse(BaseModel):

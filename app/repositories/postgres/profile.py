@@ -270,6 +270,8 @@ class ProfileRepository:
             delete(ContractorCV).where(ContractorCV.id == cv_id)
         )
 
+        await self.db.commit()
+
     async def set_contractor_locations(
         self, org_id: str, locations: List[ContractorLocation]
     ) -> None:
