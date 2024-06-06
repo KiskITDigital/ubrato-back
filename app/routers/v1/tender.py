@@ -304,3 +304,55 @@ async def get_draft_tender(
     user: JWTUser = Depends(get_user),
 ) -> models.DraftTender:
     return await tender_service.get_by_id(id=user.id)
+
+
+@router.get(
+    "/tender/{tender_id}/is_favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def is_favorite(
+    tender_id: int,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    return SuccessResponse(
+        status=await tender_service.is_favorite(tender_id=tender_id, user_id=user.id)
+    )
+
+
+@router.post(
+    "/tender/{tender_id}/favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def add_favorite(
+    tender_id: int,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await tender_service.add_to_favorite(tender_id=tender_id, user_id=user.id)
+    return SuccessResponse()
+
+
+@router.delete(
+    "/tender/{tender_id}/favorite",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def remove_favorite(
+    tender_id: int,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await tender_service.remove_from_favorite(tender_id=tender_id, user_id=user.id)
+    return SuccessResponse()

@@ -15,6 +15,7 @@ from repositories.postgres.schemas import (
     TenderOffer,
     TenderRespond,
     TenderServiceType,
+    UserFavoriteTender,
 )
 from schemas import models
 from sqlalchemy import and_, delete, func, select
@@ -483,3 +484,62 @@ class TenderRepository:
             )
 
         return tender.user_id == user_id
+
+    async def is_favorite(self, tender_id: int, user_id: str) -> bool:
+        query = await self.db.execute(
+            select(UserFavoriteTender).where(
+                and_(
+                    UserFavoriteTender.user_id == user_id,
+                    UserFavoriteTender.tender_id == tender_id,
+                )
+            )
+        )
+
+        return query.scalar() is not None
+
+    async def add_to_favorite(self, tender_id: int, user_id: str) -> None:
+        self.db.add(
+            UserFavoriteTender(
+                user_id=user_id,
+                tender_id=tender_id,
+            )
+        )
+
+        await self.db.commit()
+
+    async def remove_from_favorite(self, tender_id: int, user_id: str) -> None:
+        await self.db.execute(
+            delete(UserFavoriteTender).where(
+                and_(
+                    UserFavoriteTender.user_id == user_id,
+                    UserFavoriteTender.tender_id == tender_id,
+                )
+            )
+        )
+
+        await self.db.commit()
+
+    async def get_user_favorites(self, user_id: str) -> List[models.Tender]:
+        query = await self.db.execute(
+            select(Tender, City.name)
+            .join(City, Tender.city_id == City.id)
+            .join(UserFavoriteTender, Tender.id == UserFavoriteTender.tender_id)
+            .where(
+                and_(
+                    UserFavoriteTender.user_id == user_id,
+                )
+            )
+        )
+
+        tenders: List[models.Tender] = []
+
+        for found_tender in query.all():
+            tender, city_name = found_tender._tuple()
+
+            tender_model = await self.format_tender(
+                tender=tender,
+                city_name=city_name,
+            )
+            tenders.append(tender_model)
+
+        return tenders

@@ -263,3 +263,18 @@ async def offer_tender(
         href_color=1,
     )
     return SuccessResponse()
+
+
+@router.get(
+    "/me/favorite_tenders",
+    response_model=List[models.Tender],
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def list_favorite_tenders(
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.Tender]:
+    return await user_service.list_favorite_tenders(user_id=user.id)

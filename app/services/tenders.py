@@ -221,3 +221,18 @@ class TenderService:
         return await self.tender_repository.is_tender_owner(
             user_id=user_id, tender_id=tender_id
         )
+
+    async def add_to_favorite(self, user_id: str, tender_id: int) -> None:
+        await self.tender_repository.add_to_favorite(
+            tender_id=tender_id, user_id=user_id
+        )
+
+    async def remove_from_favorite(self, user_id: str, tender_id: int) -> None:
+        await self.tender_repository.remove_from_favorite(
+            tender_id=tender_id, user_id=user_id
+        )
+
+    async def is_favorite(self, user_id: str, tender_id: int) -> bool:
+        return await self.tender_repository.is_favorite(
+            tender_id=tender_id, user_id=user_id
+        )

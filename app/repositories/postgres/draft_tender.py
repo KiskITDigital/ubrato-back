@@ -3,7 +3,10 @@ from typing import Any, List
 
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import NO_DRAFT_TENDER, RepositoryException
+from repositories.postgres.exceptions import (
+    NO_DRAFT_TENDER,
+    RepositoryException,
+)
 from repositories.postgres.schemas import (
     City,
     DraftTender,

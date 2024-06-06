@@ -7,7 +7,7 @@ import pyotp
 from broker.nats import NatsClient, get_nats_connection
 from broker.topic import EMAIL_RESET_PASS_TOPIC
 from fastapi import Depends, status
-from repositories.postgres import UserRepository
+from repositories.postgres import TenderRepository, UserRepository
 from repositories.postgres.schemas import Organization, User
 from repositories.typesense import ContractorIndex
 from repositories.typesense.schemas import TypesenseContractor
@@ -18,16 +18,19 @@ from services.exceptions import EXPIRED_RESET_CODE, ServiceException
 
 class UserService:
     user_repository: UserRepository
+    tender_repository: TenderRepository
     nats_client: NatsClient
     contractor_index: ContractorIndex
 
     def __init__(
         self,
         user_repository: UserRepository = Depends(),
+        tender_repository: TenderRepository = Depends(),
         contractor_index: ContractorIndex = Depends(),
         nats_client: NatsClient = Depends(get_nats_connection),
     ) -> None:
         self.user_repository = user_repository
+        self.tender_repository = tender_repository
         self.nats_client = nats_client
         self.contractor_index = contractor_index
 
@@ -169,3 +172,6 @@ class UserService:
         return await self.user_repository.get_favorite_contratctor(
             user_id=user_id
         )
+
+    async def list_favorite_tenders(self, user_id: str) -> List[models.Tender]:
+        return await self.tender_repository.get_user_favorites(user_id=user_id)

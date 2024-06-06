@@ -31,6 +31,7 @@ __all__ = [
     "TenderRespond",
     "UserFavoriteContractor",
     "TenderOffer",
+    "UserFavoriteTender",
 ]
 
 
@@ -61,4 +62,5 @@ from .tender_respond import TenderRespond
 from .tender_service import ServiceGroup, ServiceType, TenderServiceType
 from .user import User
 from .user_favorite_contractor import UserFavoriteContractor
+from .user_favorite_tender import UserFavoriteTender
 from .verification_requests import VerificationRequest
