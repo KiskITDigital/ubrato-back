@@ -6,12 +6,7 @@ from config import Config, get_config
 from fastapi import Depends, status
 from schemas import models
 from schemas.jwt_user import JWTUser
-from services.exceptions import (
-    INVALID_BARRIER,
-    NO_BARRIER_TOKEN,
-    AuthException,
-    ServiceException,
-)
+from services.exceptions import AuthException, ServiceException
 
 
 class JWTService:
@@ -20,6 +15,7 @@ class JWTService:
     algorithm: str
 
     def __init__(self, config: Config = Depends(get_config)) -> None:
+        self.localization = get_config().Localization.config
         self.secret = config.JWT.secret
         self.time_live = int(config.JWT.time_live)
         self.algorithm = "HS256"
@@ -64,7 +60,9 @@ class JWTService:
         except Exception:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=INVALID_BARRIER,
+                detail=self.localization["errors"][
+                    "invalid_barrier"
+                ],
             )
 
     def unmarshal_jwt(self, authorization: str) -> JWTUser:
@@ -72,7 +70,9 @@ class JWTService:
         if header[0] != "Bearer":
             raise AuthException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=NO_BARRIER_TOKEN,
+                detail=self.localization["errors"][
+                    "no_barrier_token"
+                ],
             )
 
         return self.decode_jwt(header[1])

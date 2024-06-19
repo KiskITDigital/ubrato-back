@@ -7,22 +7,26 @@ from repositories.postgres import (
     VerificationRepository,
 )
 from repositories.postgres.schemas import VerificationRequest
+from repositories.typesense import TenderIndex
 from schemas import models
 
 
 class ManagerService:
     user_repository: UserRepository
     tender_repository: TenderRepository
+    tender_index: TenderIndex
     verf_repository: VerificationRepository
 
     def __init__(
         self,
         user_repository: UserRepository = Depends(),
         tender_repository: TenderRepository = Depends(),
+        tender_index: TenderIndex = Depends(),
         verf_repository: VerificationRepository = Depends(),
     ) -> None:
         self.user_repository = user_repository
         self.tender_repository = tender_repository
+        self.tender_index = tender_index
         self.verf_repository = verf_repository
 
     async def response_user_verification_request(
@@ -60,5 +64,8 @@ class ManagerService:
         self, tender_id: int, status: bool
     ) -> None:
         await self.tender_repository.update_verified_status(
+            tender_id=tender_id, verified=status
+        )
+        self.tender_index.update_verified_status(
             tender_id=tender_id, verified=status
         )

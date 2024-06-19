@@ -6,6 +6,7 @@ import bcrypt
 import pyotp
 from broker.nats import NatsClient, get_nats_connection
 from broker.topic import EMAIL_RESET_PASS_TOPIC
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres import TenderRepository, UserRepository
 from repositories.postgres.schemas import Organization, User
@@ -13,7 +14,7 @@ from repositories.typesense import ContractorIndex
 from repositories.typesense.schemas import TypesenseContractor
 from schemas import models
 from schemas.pb.models.v1.password_recovery_pb2 import EmailPasswordRecovery
-from services.exceptions import EXPIRED_RESET_CODE, ServiceException
+from services.exceptions import ServiceException
 
 
 class UserService:
@@ -33,6 +34,7 @@ class UserService:
         self.tender_repository = tender_repository
         self.nats_client = nats_client
         self.contractor_index = contractor_index
+        self.localization = get_config().Localization.config
 
     async def create(
         self,
@@ -134,7 +136,9 @@ class UserService:
         if salt.hexdigest() != code:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=EXPIRED_RESET_CODE,
+                detail=self.localization["errors"][
+                    "expired_reset_code"
+                ],
             )
 
         password = bcrypt.hashpw(

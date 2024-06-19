@@ -1,9 +1,7 @@
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    SESSION_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import Session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +12,7 @@ class SessionRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+        self.localization = get_config().Localization.config
 
     async def create(self, session: Session) -> None:
         self.db.add(session)
@@ -29,7 +28,9 @@ class SessionRepository:
         if session is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=SESSION_NOT_FOUND,
+                detail=self.localization["errors"][
+                    "session_not_found"
+                ],
                 sql_msg="",
             )
         return session

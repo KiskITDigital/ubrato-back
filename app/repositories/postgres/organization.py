@@ -1,8 +1,9 @@
 from datetime import datetime
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import ORG_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import Organization
 from schemas import models
 from sqlalchemy import select
@@ -14,6 +15,7 @@ class OrganizationRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+        self.localization = get_config().Localization.config
 
     async def save_organization(
         self,
@@ -36,7 +38,7 @@ class OrganizationRepository:
         if org is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ORG_NOT_FOUND,
+                detail=self.localization["errors"]["org_not_found"],
                 sql_msg="",
             )
         return org
@@ -54,7 +56,7 @@ class OrganizationRepository:
         if org is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ORG_NOT_FOUND,
+                detail=self.localization["errors"]["org_not_found"],
                 sql_msg="",
             )
         return org.to_model()
@@ -72,7 +74,7 @@ class OrganizationRepository:
         if org is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ORG_NOT_FOUND,
+                detail=self.localization["errors"]["org_not_found"],
                 sql_msg="",
             )
         org.brand_name = upd_org.brand_name

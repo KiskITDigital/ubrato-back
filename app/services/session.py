@@ -6,7 +6,7 @@ from fastapi import Depends, status
 from repositories.postgres import SessionRepository, UserRepository
 from repositories.postgres.schemas import Session
 from schemas import models
-from services.exceptions import SESSION_EXPIRED, ServiceException
+from services.exceptions import ServiceException
 
 
 class SessionService:
@@ -23,6 +23,7 @@ class SessionService:
         self.time_live = int(config.Session.time_live)
         self.session_repository = session_repository
         self.user_repository = user_repository
+        self.localization = get_config().Localization.config
         return
 
     async def create_session(self, user_id: str) -> str:
@@ -48,7 +49,9 @@ class SessionService:
         ):
             raise ServiceException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=SESSION_EXPIRED,
+                detail=self.localization["errors"][
+                    "session_expired"
+                ],
             )
 
         user = await self.user_repository.get_by_id(user_id=session.user_id)

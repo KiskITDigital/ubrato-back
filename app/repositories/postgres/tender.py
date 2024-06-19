@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import TENDERID_NOT_FOUND, RepositoryException
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     City,
     ObjectGroup,
@@ -206,7 +207,9 @@ class TenderRepository:
         if found_tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TENDERID_NOT_FOUND.format(tender_id),
+                detail=get_config()
+                .Localization.config["errors"]["tenderid_not_found"]
+                .format(tender_id),
                 sql_msg="",
             )
 
@@ -229,7 +232,9 @@ class TenderRepository:
         if tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TENDERID_NOT_FOUND.format(tender_id),
+                detail=get_config()
+                .Localization.config["errors"]["tenderid_not_found"]
+                .format(tender_id),
                 sql_msg="",
             )
 
@@ -479,7 +484,9 @@ class TenderRepository:
         if tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=TENDERID_NOT_FOUND.format(tender_id),
+                detail=get_config()
+                .Localization.config["errors"]["tenderid_not_found"]
+                .format(tender_id),
                 sql_msg="",
             )
 
@@ -523,7 +530,9 @@ class TenderRepository:
         query = await self.db.execute(
             select(Tender, City.name)
             .join(City, Tender.city_id == City.id)
-            .join(UserFavoriteTender, Tender.id == UserFavoriteTender.tender_id)
+            .join(
+                UserFavoriteTender, Tender.id == UserFavoriteTender.tender_id
+            )
             .where(
                 and_(
                     UserFavoriteTender.user_id == user_id,

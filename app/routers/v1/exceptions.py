@@ -1,7 +1,0 @@
-NO_ACCESS = "You don't have access"
-INVALID_CREDENTIAL = "Invalid credentials"
-USER_ALREADY_EXIST = "User already exist"
-USER_EMAIL_NOT_FOUND = "User with email {} not found."
-TENDER_NOT_FOUND = "Tender not found"
-INVALID_INN = "Invalid inn"
-NO_COOKIE = "session cookie not found"

@@ -1,11 +1,9 @@
 from typing import List
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    QUESTIONNAIRE_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import Organization, Questionnaire, User
 from schemas import models
 from sqlalchemy import select
@@ -17,6 +15,7 @@ class QuestionnaireRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+        self.localization = get_config().Localization.config
 
     async def save(self, answers: List[str], user_id: str) -> None:
         self.db.add(
@@ -97,7 +96,9 @@ class QuestionnaireRepository:
         if result is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=QUESTIONNAIRE_NOT_FOUND,
+                detail=self.localization["errors"][
+                    "questionnaire_not_found"
+                ],
                 sql_msg="",
             )
 

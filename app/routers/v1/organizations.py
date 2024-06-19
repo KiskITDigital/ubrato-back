@@ -5,8 +5,7 @@ from repositories.postgres.schemas import (
     ContractorService,
     CustomerLocation,
 )
-from routers.v1.dependencies import authorized, get_user
-from routers.v1.exceptions import NO_ACCESS
+from routers.v1.dependencies import authorized, get_user, localization
 from schemas import models
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
@@ -222,7 +221,7 @@ async def update_my_cv(
     if cv.org_id != user.org_id:
         raise ServiceException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=NO_ACCESS,
+            detail=localization["errors"]["no_access"],
         )
     await org_service.update_contractor_cv(cv_id=cv_id, cv=data.__dict__)
     return SuccessResponse()
@@ -248,7 +247,7 @@ async def delete_my_cv(
     if cv.org_id != user.org_id:
         raise ServiceException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=NO_ACCESS,
+            detail=localization["errors"]["no_access"],
         )
     await org_service.delete_contractor_cv(cv_id=cv_id)
     return SuccessResponse()

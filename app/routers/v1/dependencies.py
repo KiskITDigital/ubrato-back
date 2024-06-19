@@ -3,9 +3,10 @@ from typing import Annotated
 from config import get_config
 from exceptions import AuthException
 from fastapi import Depends, Header, status
-from routers.v1.exceptions import NO_ACCESS
 from schemas.jwt_user import JWTUser
 from services import JWTService
+
+localization = get_config().Localization.config
 
 
 async def authorized(
@@ -33,7 +34,7 @@ async def is_admin(
     if user.role < get_config().Role.admin:
         raise AuthException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=NO_ACCESS,
+            detail=localization["errors"]["no_access"],
         )
 
 
@@ -44,5 +45,5 @@ async def is_creator_or_manager(
     if user.role < get_config().Role.manager and user.id != user_id:
         raise AuthException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=NO_ACCESS,
+            detail=localization["errors"]["no_access"],
         )

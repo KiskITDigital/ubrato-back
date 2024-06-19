@@ -1,13 +1,9 @@
 from typing import Any, List, Tuple
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    CV_NOT_FOUND,
-    ORG_NOT_FOUND,
-    PROFILE_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     City,
     ContractorCV,
@@ -42,7 +38,9 @@ class ProfileRepository:
         if org is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=ORG_NOT_FOUND.format(org_id),
+                detail=get_config()
+                .Localization.config["errors"]["org_not_found"]
+                .format(org_id),
                 sql_msg="",
             )
 
@@ -66,7 +64,9 @@ class ProfileRepository:
         if profile is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=PROFILE_NOT_FOUND.format(org_id),
+                detail=get_config()
+                .Localization.config["errors"]["profile_not_found"]
+                .format(org_id),
                 sql_msg="",
             )
 
@@ -103,7 +103,9 @@ class ProfileRepository:
         if profile is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=PROFILE_NOT_FOUND.format(org_id),
+                detail=get_config()
+                .Localization.config["errors"]["profile_not_found"]
+                .format(org_id),
                 sql_msg="",
             )
 
@@ -213,7 +215,9 @@ class ProfileRepository:
         if cv is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=CV_NOT_FOUND.format(cv_id),
+                detail=get_config()
+                .Localization.config["errors"]["cv_not_found"]
+                .format(cv_id),
                 sql_msg="",
             )
 
@@ -256,7 +260,9 @@ class ProfileRepository:
         if cv_to_update is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=CV_NOT_FOUND.format(cv_id),
+                detail=get_config()
+                .Localization.config["errors"]["cv_not_found"]
+                .format(cv_id),
                 sql_msg="",
             )
 
@@ -303,7 +309,9 @@ class ProfileRepository:
         if profile_to_update is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=PROFILE_NOT_FOUND.format(org_id),
+                detail=get_config()
+                .Localization.config["errors"]["profile_not_found"]
+                .format(org_id),
                 sql_msg="",
             )
 
@@ -322,7 +330,9 @@ class ProfileRepository:
         if profile_to_update is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=PROFILE_NOT_FOUND.format(org_id),
+                detail=get_config()
+                .Localization.config["errors"]["profile_not_found"]
+                .format(org_id),
                 sql_msg="",
             )
 

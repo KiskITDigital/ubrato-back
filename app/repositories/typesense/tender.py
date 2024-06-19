@@ -51,3 +51,8 @@ class TenderIndex:
             self.db.collections["tender_object"].documents.create(
                 {"tender_id": tender.id, "object_type_id": str(object)}
             )
+
+    def update_verified_status(self, tender_id: int, verified: bool) -> None:
+        self.db.collections["tender_index"].documents.update(
+            {"verified": verified}, {"filter_by": f"id:{tender_id}"}
+        )

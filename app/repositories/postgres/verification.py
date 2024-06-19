@@ -1,13 +1,10 @@
 import uuid
 from typing import Dict, List, Optional
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    DOCUMENT_NOT_FOUND,
-    VERIFIED_REQUEST_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     Document,
     DocumentType,
@@ -72,7 +69,9 @@ class VerificationRepository:
         if document is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=DOCUMENT_NOT_FOUND.format(doc_id),
+                detail=get_config()
+                .Localization.config["errors"]["document_not_found"]
+                .format(doc_id),
                 sql_msg="",
             )
         return document
@@ -103,7 +102,9 @@ class VerificationRepository:
         if verf_req is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=VERIFIED_REQUEST_NOT_FOUND.format(verf_id),
+                detail=get_config()
+                .Localization.config["errors"]["verified_request_not_found"]
+                .format(verf_id),
                 sql_msg="",
             )
 
@@ -123,7 +124,9 @@ class VerificationRepository:
         if verf_req is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=VERIFIED_REQUEST_NOT_FOUND.format(verf_id),
+                detail=get_config()
+                .Localization.config["errors"]["verified_request_not_found"]
+                .format(verf_id),
                 sql_msg="",
             )
         return verf_req

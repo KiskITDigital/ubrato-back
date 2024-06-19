@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres import TagsRepository, TenderRepository
 from repositories.postgres.schemas import Tender
@@ -7,13 +8,7 @@ from repositories.typesense.tender import TenderIndex
 from schemas import models
 from schemas.create_tender import CreateTenderRequest
 from schemas.models import ObjectsGroupsWithTypes, ServicesGroupsWithTypes
-from services.exceptions import (
-    ALREADY_HAS_OFFER,
-    INVALID_OBJECTS_COUNT,
-    INVALID_SERVICES_COUNT,
-    NO_ACCESS,
-    ServiceException,
-)
+from services.exceptions import ServiceException
 
 
 class TenderService:
@@ -29,6 +24,7 @@ class TenderService:
         self.tags_repository = tags_repository
         self.tender_repository = tender_repository
         self.tender_index = tender_index
+        self.localization = get_config().Localization.config
 
     async def create_tender(
         self, tender: CreateTenderRequest, user_id: str
@@ -36,13 +32,17 @@ class TenderService:
         if len(tender.services_types) == 0:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=INVALID_SERVICES_COUNT,
+                detail=self.localization["errors"][
+                    "invalid_services_count"
+                ],
             )
 
         if len(tender.objects_types) == 0:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=INVALID_OBJECTS_COUNT,
+                detail=self.localization["errors"][
+                    "invalid_objects_count"
+                ],
             )
 
         created_tender = await self.tender_repository.create_tender(
@@ -193,7 +193,7 @@ class TenderService:
         ):
             raise ServiceException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=NO_ACCESS,
+                detail=self.localization["errors"]["no_access"],
             )
 
         if await self.is_already_got_offer(
@@ -201,7 +201,9 @@ class TenderService:
         ):
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ALREADY_HAS_OFFER,
+                detail=self.localization["errors"][
+                    "already_has_offer"
+                ],
             )
 
         await self.tender_repository.make_offer(

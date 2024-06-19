@@ -1,12 +1,10 @@
 from datetime import datetime
 from typing import Any, List
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    NO_DRAFT_TENDER,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     City,
     DraftTender,
@@ -27,6 +25,7 @@ class DraftTenderRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+        self.localization = get_config().Localization.config
 
     async def create_tender(
         self,
@@ -125,7 +124,7 @@ class DraftTenderRepository:
         if found_tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=NO_DRAFT_TENDER,
+                detail=self.localization["errors"]["no_draft_tender"],
                 sql_msg="",
             )
 

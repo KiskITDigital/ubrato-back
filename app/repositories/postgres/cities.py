@@ -1,11 +1,9 @@
 from typing import List
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    CITY_NOT_FOUNT,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import City, Region
 from schemas import models
 from sqlalchemy import select
@@ -17,6 +15,7 @@ class CitiesRepository:
 
     def __init__(self, db: AsyncSession = Depends(get_db_connection)) -> None:
         self.db = db
+        self.localization = get_config().Localization.config
 
     async def get_by_id(self, city_id: int) -> City:
         query = await self.db.execute(select(City).where(City.id == city_id))
@@ -26,7 +25,7 @@ class CitiesRepository:
         if city is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=CITY_NOT_FOUNT.format(city_id),
+                detail=self.localization["errors"]["city_not_fount"].format(city_id),
                 sql_msg="",
             )
         return city

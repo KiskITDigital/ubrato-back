@@ -1,4 +1,5 @@
 import os
+import tomllib
 
 from dotenv import load_dotenv
 
@@ -43,6 +44,10 @@ class Config:
 
     class Dadata:
         api_key = os.getenv("DADATA_TOKEN", 336)
+
+    class Localization:
+        with open("localization.toml", "rb") as f:
+            config = tomllib.load(f)
 
 
 config = Config()

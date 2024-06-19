@@ -2,7 +2,7 @@ from typing import Annotated
 
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
-from routers.v1.exceptions import INVALID_CREDENTIAL, NO_COOKIE
+from routers.v1.dependencies import localization
 from schemas.change_password import ChangePasswordRequest
 from schemas.exception import ExceptionResponse
 from schemas.sign_up import SignUpRequest, SignUpResponse
@@ -66,8 +66,12 @@ async def signup_user(
 
     await notice_service.add_notice(
         user_id=created_user.id,
-        header="Registration is complete",
-        msg="Welcome to ubrato!",
+        header=localization["notice"][
+            "end_of_registration"
+        ]["header"],
+        msg=localization["notice"]["end_of_registration"][
+            "text"
+        ],
         href=None,
         href_text=None,
         href_color=None,
@@ -102,7 +106,9 @@ async def signin_user(
     if not user_service.password_valid(data.password, user.password):
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=INVALID_CREDENTIAL,
+            detail=localization["errors"][
+                "invalid_credential"
+            ],
         )
 
     session_id = await session_service.create_session(user.id)
@@ -138,7 +144,7 @@ async def refresh_session(
     if session_id is None:
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=NO_COOKIE,
+            detail=localization["errors"]["no_cookie"],
         )
     user = await session_service.get_user_session_by_id(session_id=session_id)
     org = await org_service.get_organization_by_user_id(user.id)

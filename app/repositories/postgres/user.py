@@ -1,12 +1,9 @@
 from typing import List, Tuple
 
+from config import get_config
 from fastapi import Depends, status
 from repositories.postgres.database import get_db_connection
-from repositories.postgres.exceptions import (
-    USER_EMAIL_NOT_FOUND,
-    USERID_NOT_FOUND,
-    RepositoryException,
-)
+from repositories.postgres.exceptions import RepositoryException
 from repositories.postgres.schemas import (
     ContractorProfile,
     CustomerProfile,
@@ -55,7 +52,9 @@ class UserRepository:
         if user is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=USER_EMAIL_NOT_FOUND.format(email),
+                detail=get_config()
+                .Localization.config["errors"]["user_email_not_found"]
+                .format(email),
                 sql_msg="",
             )
 
@@ -71,7 +70,9 @@ class UserRepository:
         if user is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=USERID_NOT_FOUND.format(user_id),
+                detail=get_config()
+                .Localization.config["errors"]["userid_not_found"]
+                .format(user_id),
                 sql_msg="",
             )
 
@@ -97,7 +98,9 @@ class UserRepository:
         if users is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=USERID_NOT_FOUND.format(user_id),
+                detail=get_config()
+                .Localization.config["errors"]["userid_not_found"]
+                .format(user_id),
                 sql_msg="",
             )
 
@@ -111,7 +114,9 @@ class UserRepository:
         if user is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=USERID_NOT_FOUND.format(user_id),
+                detail=get_config()
+                .Localization.config["errors"]["userid_not_found"]
+                .format(user_id),
                 sql_msg="",
             )
 

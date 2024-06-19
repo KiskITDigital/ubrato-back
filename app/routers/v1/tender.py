@@ -320,7 +320,9 @@ async def is_favorite(
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
     return SuccessResponse(
-        status=await tender_service.is_favorite(tender_id=tender_id, user_id=user.id)
+        status=await tender_service.is_favorite(
+            tender_id=tender_id, user_id=user.id
+        )
     )
 
 
@@ -354,5 +356,7 @@ async def remove_favorite(
     tender_service: TenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await tender_service.remove_from_favorite(tender_id=tender_id, user_id=user.id)
+    await tender_service.remove_from_favorite(
+        tender_id=tender_id, user_id=user.id
+    )
     return SuccessResponse()
