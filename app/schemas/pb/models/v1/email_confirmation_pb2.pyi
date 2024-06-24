@@ -15,22 +15,19 @@ else:
 DESCRIPTOR: google.protobuf.descriptor.FileDescriptor
 
 @typing_extensions.final
-class PasswordRecovery(google.protobuf.message.Message):
+class EmailConfirmation(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 
     EMAIL_FIELD_NUMBER: builtins.int
     SALT_FIELD_NUMBER: builtins.int
-    NAME_FIELD_NUMBER: builtins.int
     email: builtins.str
     salt: builtins.str
-    name: builtins.str
     def __init__(
         self,
         *,
         email: builtins.str = ...,
         salt: builtins.str = ...,
-        name: builtins.str = ...,
     ) -> None: ...
-    def ClearField(self, field_name: typing_extensions.Literal["email", b"email", "name", b"name", "salt", b"salt"]) -> None: ...
+    def ClearField(self, field_name: typing_extensions.Literal["email", b"email", "salt", b"salt"]) -> None: ...
 
-global___PasswordRecovery = PasswordRecovery
+global___EmailConfirmation = EmailConfirmation

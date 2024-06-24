@@ -2,9 +2,10 @@ from typing import Annotated
 
 from exceptions import ServiceException
 from fastapi import APIRouter, Cookie, Depends, Response, status
-from routers.v1.dependencies import localization
+from routers.v1.dependencies import authorized, get_user, localization
 from schemas.change_password import ChangePasswordRequest
 from schemas.exception import ExceptionResponse
+from schemas.jwt_user import JWTUser
 from schemas.sign_up import SignUpRequest, SignUpResponse
 from schemas.sing_in import SignInRequest, SignInResponse
 from schemas.success import SuccessResponse
@@ -66,12 +67,8 @@ async def signup_user(
 
     await notice_service.add_notice(
         user_id=created_user.id,
-        header=localization["notice"][
-            "end_of_registration"
-        ]["header"],
-        msg=localization["notice"]["end_of_registration"][
-            "text"
-        ],
+        header=localization["notice"]["end_of_registration"]["header"],
+        msg=localization["notice"]["end_of_registration"]["text"],
         href=None,
         href_text=None,
         href_color=None,
@@ -106,9 +103,7 @@ async def signin_user(
     if not user_service.password_valid(data.password, user.password):
         raise ServiceException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=localization["errors"][
-                "invalid_credential"
-            ],
+            detail=localization["errors"]["invalid_credential"],
         )
 
     session_id = await session_service.create_session(user.id)
@@ -185,4 +180,46 @@ async def reset_password(
     await user_service.reset_password(
         email=data.email, password=data.password, code=data.code
     )
+    return SuccessResponse()
+
+
+@router.get(
+    "/confirm-email",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def ask_email_confirmation(
+    user_service: UserService = Depends(),
+    jwt_service: JWTService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    access_token = jwt_service.generate_auth_jwt(user_id=user.id)
+    user_email = (await user_service.get_by_id(id=user.id)).email
+
+    await user_service.ask_confirm_email(
+        user_email=user_email, salt=access_token
+    )
+    return SuccessResponse()
+
+
+@router.post(
+    "/confirm-email",
+    response_model=SuccessResponse,
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+        status.HTTP_401_UNAUTHORIZED: {"model": ExceptionResponse},
+    },
+)
+async def confirm_email(
+    token: str,
+    user_service: UserService = Depends(),
+    jwt_service: JWTService = Depends(),
+) -> SuccessResponse:
+    access_token = jwt_service.decode_auth_jwt(token=token)
+
+    await user_service.confirm_email(user_id=access_token.id)
     return SuccessResponse()

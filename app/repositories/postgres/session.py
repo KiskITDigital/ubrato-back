@@ -28,9 +28,7 @@ class SessionRepository:
         if session is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=self.localization["errors"][
-                    "session_not_found"
-                ],
+                detail=self.localization["errors"]["session_not_found"],
                 sql_msg="",
             )
         return session

@@ -194,3 +194,13 @@ class UserRepository:
             )
 
         return contractors
+
+    async def set_email_verified_status(
+        self, user_id: str, verified: bool
+    ) -> None:
+        await self.db.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(email_verified=verified)
+        )
+        await self.db.commit()

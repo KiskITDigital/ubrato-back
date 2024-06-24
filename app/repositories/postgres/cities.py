@@ -25,7 +25,9 @@ class CitiesRepository:
         if city is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=self.localization["errors"]["city_not_fount"].format(city_id),
+                detail=self.localization["errors"]["city_not_fount"].format(
+                    city_id
+                ),
                 sql_msg="",
             )
         return city

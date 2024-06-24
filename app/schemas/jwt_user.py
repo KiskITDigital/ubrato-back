@@ -45,3 +45,16 @@ class JWTUser:
         self.org_ogrn = org_ogrn
         self.org_kpp = org_kpp
         self.exp = exp
+
+
+class JWTAuthUser:
+    id: str
+    exp: int
+
+    def __init__(
+        self,
+        id: str,
+        exp: int,
+    ) -> None:
+        self.id = id
+        self.exp = exp

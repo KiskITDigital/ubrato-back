@@ -96,9 +96,7 @@ class QuestionnaireRepository:
         if result is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=self.localization["errors"][
-                    "questionnaire_not_found"
-                ],
+                detail=self.localization["errors"]["questionnaire_not_found"],
                 sql_msg="",
             )
 

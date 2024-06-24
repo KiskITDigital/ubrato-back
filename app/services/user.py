@@ -5,7 +5,7 @@ from typing import List, Tuple
 import bcrypt
 import pyotp
 from broker.nats import NatsClient, get_nats_connection
-from broker.topic import EMAIL_RESET_PASS_TOPIC
+from broker.topic import EMAIL_CONFIRMATION_TOPIC, EMAIL_RESET_PASS_TOPIC
 from config import get_config
 from fastapi import Depends, status
 from repositories.postgres import TenderRepository, UserRepository
@@ -13,7 +13,8 @@ from repositories.postgres.schemas import Organization, User
 from repositories.typesense import ContractorIndex
 from repositories.typesense.schemas import TypesenseContractor
 from schemas import models
-from schemas.pb.models.v1.password_recovery_pb2 import EmailPasswordRecovery
+from schemas.pb.models.v1.email_confirmation_pb2 import EmailConfirmation
+from schemas.pb.models.v1.password_recovery_pb2 import PasswordRecovery
 from services.exceptions import ServiceException
 
 
@@ -115,7 +116,7 @@ class UserService:
         salt = md5()
         salt.update(totp.now().encode())
 
-        payload = EmailPasswordRecovery(
+        payload = PasswordRecovery(
             email=user.email, salt=salt.hexdigest(), name=user.first_name
         )
 
@@ -136,9 +137,7 @@ class UserService:
         if salt.hexdigest() != code:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"][
-                    "expired_reset_code"
-                ],
+                detail=self.localization["errors"]["expired_reset_code"],
             )
 
         password = bcrypt.hashpw(
@@ -179,3 +178,19 @@ class UserService:
 
     async def list_favorite_tenders(self, user_id: str) -> List[models.Tender]:
         return await self.tender_repository.get_user_favorites(user_id=user_id)
+
+    async def confirm_email(self, user_id: str) -> None:
+        await self.user_repository.set_email_verified_status(
+            user_id=user_id, verified=True
+        )
+
+    async def ask_confirm_email(
+        self, user_email: str, salt: str
+    ) -> None:
+        payload = EmailConfirmation(
+            email=user_email, salt=salt
+        )
+
+        await self.nats_client.pub(
+            EMAIL_CONFIRMATION_TOPIC, payload=payload.SerializeToString()
+        )

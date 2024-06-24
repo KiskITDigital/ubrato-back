@@ -49,9 +49,7 @@ class SessionService:
         ):
             raise ServiceException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=self.localization["errors"][
-                    "session_expired"
-                ],
+                detail=self.localization["errors"]["session_expired"],
             )
 
         user = await self.user_repository.get_by_id(user_id=session.user_id)

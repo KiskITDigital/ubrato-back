@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name       VARCHAR(100)    NOT NULL,
     avatar          VARCHAR(255)    NOT NULL,
     verified        BOOLEAN         DEFAULT FALSE,
+    email_verified  BOOLEAN         DEFAULT FALSE,
     role            SMALLINT        DEFAULT 0,
     is_contractor   BOOLEAN         DEFAULT FALSE,
     created_at      TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP

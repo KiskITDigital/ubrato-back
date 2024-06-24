@@ -32,17 +32,13 @@ class TenderService:
         if len(tender.services_types) == 0:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"][
-                    "invalid_services_count"
-                ],
+                detail=self.localization["errors"]["invalid_services_count"],
             )
 
         if len(tender.objects_types) == 0:
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"][
-                    "invalid_objects_count"
-                ],
+                detail=self.localization["errors"]["invalid_objects_count"],
             )
 
         created_tender = await self.tender_repository.create_tender(
@@ -201,9 +197,7 @@ class TenderService:
         ):
             raise ServiceException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"][
-                    "already_has_offer"
-                ],
+                detail=self.localization["errors"]["already_has_offer"],
             )
 
         await self.tender_repository.make_offer(
