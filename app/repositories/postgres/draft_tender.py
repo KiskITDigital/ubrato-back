@@ -252,3 +252,24 @@ class DraftTenderRepository:
             objects_types=objects_type_names,
             update_at=tender.update_at,
         )
+
+    async def get_user_tenders(self, user_id: str) -> List[models.DraftTender]:
+        query = await self.db.execute(
+            select(DraftTender, City.name)
+            .join(City)
+            .where(DraftTender.user_id == user_id)
+        )
+
+        found_tenders = query.tuples().all()
+
+        tenders: List[models.DraftTender] = []
+
+        for found_tender in found_tenders:
+            tender, city_name = found_tender
+
+            tenders.append(await self.format_draft_tender(
+                tender=tender,
+                city_name=city_name,
+            ))
+
+        return tenders

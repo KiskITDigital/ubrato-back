@@ -387,3 +387,19 @@ async def remove_favorite(
         tender_id=tender_id, user_id=user.id
     )
     return SuccessResponse()
+
+
+@router.get(
+    "/my/drafts",
+    response_model=List[models.DraftTender],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+    tags=["draft"],
+)
+async def get_user_drafts(
+    tender_service: DraftTenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.DraftTender]:
+    return await tender_service.get_user_tenders(user_id=user.id)

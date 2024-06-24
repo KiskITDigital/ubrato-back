@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import Depends
 from repositories.postgres import DraftTenderRepository, TagsRepository
 from repositories.postgres.schemas import DraftTender
@@ -60,4 +62,9 @@ class DraftTenderService:
     async def delete_tender(self, id: int) -> None:
         await self.tender_repository.delete_draft_tender(
             id=id,
+        )
+
+    async def get_user_tenders(self, user_id: str) -> List[models.DraftTender]:
+        return await self.tender_repository.get_user_tenders(
+            user_id=user_id,
         )
