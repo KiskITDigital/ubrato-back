@@ -184,12 +184,8 @@ class UserService:
             user_id=user_id, verified=True
         )
 
-    async def ask_confirm_email(
-        self, user_email: str, salt: str
-    ) -> None:
-        payload = EmailConfirmation(
-            email=user_email, salt=salt
-        )
+    async def ask_confirm_email(self, user_email: str, salt: str) -> None:
+        payload = EmailConfirmation(email=user_email, salt=salt)
 
         await self.nats_client.pub(
             EMAIL_CONFIRMATION_TOPIC, payload=payload.SerializeToString()
