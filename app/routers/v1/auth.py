@@ -74,6 +74,12 @@ async def signup_user(
         href_color=None,
     )
 
+    access_token = jwt_service.generate_auth_jwt(user_id=created_user.id)
+
+    await user_service.ask_confirm_email(
+        user_email=created_user.email, salt=access_token
+    )
+
     return SignUpResponse(
         access_token=jwt_service.generate_jwt(created_user, created_org)
     )
