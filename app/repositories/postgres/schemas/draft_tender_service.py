@@ -1,13 +1,13 @@
 from repositories.postgres.schemas.base import Base
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class DraftTenderServiceType(Base):
     __tablename__ = "draft_tender_services_types"
 
-    tender_id: Mapped[str] = mapped_column(
-        String(40), ForeignKey("draft_tender.id"), primary_key=True
+    tender_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("draft_tender.id"), primary_key=True
     )
     service_type_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("services_types.id"), primary_key=True

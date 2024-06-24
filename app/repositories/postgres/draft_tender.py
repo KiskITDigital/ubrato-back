@@ -58,7 +58,7 @@ class DraftTenderRepository:
         return tender
 
     async def update_draft_tender(
-        self, tender: dict[str, Any], id: str
+        self, tender: dict[str, Any], id: int
     ) -> DraftTender:
         query = await self.db.execute(
             select(DraftTender).where(DraftTender.id == id)
@@ -112,7 +112,7 @@ class DraftTenderRepository:
         await self.db.refresh(tender_to_update)
         return tender_to_update
 
-    async def get_draft_tender_by_id(self, id: str) -> models.DraftTender:
+    async def get_draft_tender_by_id(self, id: int) -> models.DraftTender:
         query = await self.db.execute(
             select(DraftTender, City.name)
             .join(City)
@@ -135,7 +135,7 @@ class DraftTenderRepository:
             city_name=city_name,
         )
 
-    async def delete_draft_tender(self, id: str) -> None:
+    async def delete_draft_tender(self, id: int) -> None:
         await self.db.execute(
             delete(DraftTenderServiceType).where(
                 DraftTenderServiceType.tender_id == id,
@@ -231,6 +231,7 @@ class DraftTenderRepository:
 
         return models.DraftTender(
             id=tender.id,
+            user_id=tender.user_id,
             name=tender.name,
             price=tender.price,
             is_contract_price=tender.is_contract_price,

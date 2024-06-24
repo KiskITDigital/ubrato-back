@@ -46,18 +46,18 @@ class DraftTenderService:
             id=created_tender.id
         )
 
-    async def get_by_id(self, id: str) -> models.DraftTender:
+    async def get_by_id(self, id: int) -> models.DraftTender:
         return await self.tender_repository.get_draft_tender_by_id(id=id)
 
     async def update_tender(
-        self, tender: CreateTenderRequest, id: str
+        self, tender: CreateTenderRequest, id: int
     ) -> None:
         await self.tender_repository.update_draft_tender(
             tender=tender.__dict__,
             id=id,
         )
 
-    async def delete_tender(self, id: str) -> None:
+    async def delete_tender(self, id: int) -> None:
         await self.tender_repository.delete_draft_tender(
             id=id,
         )

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS draft_tender (
-    id                  VARCHAR(40)     NOT NULL REFERENCES users(id),
+    id                  SERIAL          PRIMARY KEY,
+    user_id             VARCHAR(40)     NOT NULL REFERENCES users(id),
     name                VARCHAR(255)    NOT NULL,
     price               INT             NOT NULL,
     is_contract_price   BOOLEAN         NOT NULL DEFAULT FALSE,
@@ -14,6 +15,5 @@ CREATE TABLE IF NOT EXISTS draft_tender (
     reception_end       TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_start          TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     work_end            TIMESTAMPTZ     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_at          TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(id)
+    update_at           TIMESTAMPTZ     DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS draft_tender_services_types (
-    tender_id           VARCHAR(40) NOT NULL REFERENCES draft_tender(id),
+    tender_id           INT         NOT NULL REFERENCES draft_tender(id),
     service_type_id     INT         NOT NULL REFERENCES services_types(id),
     PRIMARY KEY (tender_id, service_type_id)
 );

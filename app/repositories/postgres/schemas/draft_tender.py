@@ -7,6 +7,7 @@ from sqlalchemy import (
     TIMESTAMP,
     Boolean,
     ForeignKey,
+    Identity,
     Integer,
     String,
     Text,
@@ -18,7 +19,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 class DraftTender(Base):
     __tablename__ = "draft_tender"
 
-    id: Mapped[str] = mapped_column(
+    id: Mapped[int] = mapped_column(
+        Integer, Identity(start=1, cycle=True), primary_key=True
+    )
+    user_id: Mapped[str] = mapped_column(
         String(40), ForeignKey("users.id"), primary_key=True
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)

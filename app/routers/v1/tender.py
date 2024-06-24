@@ -1,7 +1,12 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, status
-from routers.v1.dependencies import authorized, get_user, is_creator_or_manager
+from routers.v1.dependencies import (
+    authorized,
+    get_user,
+    is_creator_or_manager,
+    localization,
+)
 from schemas import models
 from schemas.create_tender import CreateTenderRequest
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
@@ -11,6 +16,7 @@ from schemas.success import SuccessResponse
 from schemas.tender_count import TenderCountResponse
 from schemas.tender_respond import TenderRespondRequest
 from services import DraftTenderService, TenderService
+from services.exceptions import ServiceException
 from tools.cache import redis_cache
 
 router = APIRouter(
@@ -256,7 +262,7 @@ async def create_draft_tender(
 
 
 @router.put(
-    "/draft",
+    "/draft/{id}",
     response_model=SuccessResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
@@ -265,16 +271,23 @@ async def create_draft_tender(
     tags=["draft"],
 )
 async def update_draft_tender(
-    tender: CreateTenderRequest,
+    id: int,
+    new_tender: CreateTenderRequest,
     tender_service: DraftTenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await tender_service.update_tender(tender=tender, id=user.id)
+    tender = await tender_service.get_by_id(id=id)
+    if tender.user_id != user.id:
+        raise ServiceException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=localization["errors"]["no_access"],
+        )
+    await tender_service.update_tender(tender=new_tender, id=id)
     return SuccessResponse()
 
 
 @router.delete(
-    "/draft",
+    "/draft/{id}",
     response_model=SuccessResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
@@ -283,15 +296,22 @@ async def update_draft_tender(
     tags=["draft"],
 )
 async def delete_draft_tender(
+    id: int,
     tender_service: DraftTenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:
-    await tender_service.delete_tender(id=user.id)
+    tender = await tender_service.get_by_id(id=id)
+    if tender.user_id != user.id:
+        raise ServiceException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=localization["errors"]["no_access"],
+        )
+    await tender_service.delete_tender(id=id)
     return SuccessResponse()
 
 
 @router.get(
-    "/draft",
+    "/draft/{id}",
     response_model=models.DraftTender,
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
@@ -300,10 +320,17 @@ async def delete_draft_tender(
     tags=["draft"],
 )
 async def get_draft_tender(
+    id: int,
     tender_service: DraftTenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> models.DraftTender:
-    return await tender_service.get_by_id(id=user.id)
+    tender = await tender_service.get_by_id(id=id)
+    if tender.user_id != user.id:
+        raise ServiceException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=localization["errors"]["no_access"],
+        )
+    return await tender_service.get_by_id(id=id)
 
 
 @router.get(

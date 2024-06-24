@@ -30,7 +30,8 @@ class Tender(BaseModel):
 
 
 class DraftTender(BaseModel):
-    id: str
+    id: int
+    user_id: str
     name: str
     price: int
     is_contract_price: bool
