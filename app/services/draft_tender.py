@@ -4,7 +4,7 @@ from fastapi import Depends
 from repositories.postgres import DraftTenderRepository, TagsRepository
 from repositories.postgres.schemas import DraftTender
 from schemas import models
-from schemas.create_tender import CreateTenderRequest
+from schemas.create_draft_tender import CreateDraftTenderRequest
 
 
 class DraftTenderService:
@@ -20,11 +20,11 @@ class DraftTenderService:
         self.tender_repository = tender_repository
 
     async def create_tender(
-        self, tender: CreateTenderRequest, user_id: str
+        self, tender: CreateDraftTenderRequest, user_id: str
     ) -> models.DraftTender:
         created_tender = await self.tender_repository.create_tender(
             tender=DraftTender(
-                id=user_id,
+                user_id=user_id,
                 name=tender.name,
                 price=tender.price,
                 is_contract_price=tender.is_contract_price,
@@ -45,14 +45,14 @@ class DraftTenderService:
         )
 
         return await self.tender_repository.get_draft_tender_by_id(
-            id=created_tender.id
+            tender_id=created_tender.id
         )
 
     async def get_by_id(self, id: int) -> models.DraftTender:
-        return await self.tender_repository.get_draft_tender_by_id(id=id)
+        return await self.tender_repository.get_draft_tender_by_id(tender_id=id)
 
     async def update_tender(
-        self, tender: CreateTenderRequest, id: int
+        self, tender: CreateDraftTenderRequest, id: int
     ) -> None:
         await self.tender_repository.update_draft_tender(
             tender=tender.__dict__,

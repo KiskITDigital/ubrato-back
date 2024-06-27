@@ -8,6 +8,7 @@ from routers.v1.dependencies import (
     localization,
 )
 from schemas import models
+from schemas.create_draft_tender import CreateDraftTenderRequest
 from schemas.create_tender import CreateTenderRequest
 from schemas.exception import ExceptionResponse, UnauthExceptionResponse
 from schemas.jwt_user import JWTUser
@@ -251,7 +252,7 @@ async def get_count_active_tenders(
     tags=["draft"],
 )
 async def create_draft_tender(
-    tender: CreateTenderRequest,
+    tender: CreateDraftTenderRequest,
     tender_service: DraftTenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> models.DraftTender:
@@ -272,7 +273,7 @@ async def create_draft_tender(
 )
 async def update_draft_tender(
     id: int,
-    new_tender: CreateTenderRequest,
+    new_tender: CreateDraftTenderRequest,
     tender_service: DraftTenderService = Depends(),
     user: JWTUser = Depends(get_user),
 ) -> SuccessResponse:

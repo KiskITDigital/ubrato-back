@@ -112,27 +112,22 @@ class DraftTenderRepository:
         await self.db.refresh(tender_to_update)
         return tender_to_update
 
-    async def get_draft_tender_by_id(self, id: int) -> models.DraftTender:
+    async def get_draft_tender_by_id(self, tender_id: int) -> models.DraftTender:
         query = await self.db.execute(
-            select(DraftTender, City.name)
-            .join(City)
-            .where(DraftTender.id == id)
+            select(DraftTender).where(DraftTender.id == tender_id)
         )
 
-        found_tender = query.tuples().first()
+        tender = query.scalar()
 
-        if found_tender is None:
+        if tender is None:
             raise RepositoryException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=self.localization["errors"]["no_draft_tender"],
                 sql_msg="",
             )
 
-        tender, city_name = found_tender
-
         return await self.format_draft_tender(
             tender=tender,
-            city_name=city_name,
         )
 
     async def delete_draft_tender(self, id: int) -> None:
@@ -155,12 +150,11 @@ class DraftTenderRepository:
     async def format_draft_tender(
         self,
         tender: DraftTender,
-        city_name: str,
     ) -> models.DraftTender:
-        services_type_names: List[str] = []
+        services_type_names: List[int] = []
 
         query = await self.db.execute(
-            select(ServiceType.name)
+            select(ServiceType.id)
             .join(
                 DraftTenderServiceType,
                 DraftTenderServiceType.service_type_id == ServiceType.id,
@@ -168,13 +162,13 @@ class DraftTenderRepository:
             .where(DraftTenderServiceType.tender_id == tender.id)
         )
 
-        for name in query.scalars():
-            services_type_names.append(name)
+        for id in query.scalars():
+            services_type_names.append(id)
 
-        services_groups_names: dict[str, None] = {}
+        services_groups_names: dict[int, None] = {}
 
         query = await self.db.execute(
-            select(ServiceGroup.name)
+            select(ServiceGroup.id)
             .select_from(ServiceType)
             .join(
                 ServiceGroup,
@@ -188,13 +182,13 @@ class DraftTenderRepository:
             )
         )
 
-        for name in query.scalars():
-            services_groups_names[name] = None
+        for id in query.scalars():
+            services_groups_names[id] = None
 
-        objects_type_names: List[str] = []
+        objects_type_names: List[int] = []
 
         query = await self.db.execute(
-            select(ObjectType.name)
+            select(ObjectType.id)
             .join(
                 DraftTenderObjectType,
                 DraftTenderObjectType.object_type_id == ObjectType.id,
@@ -202,11 +196,11 @@ class DraftTenderRepository:
             .where(DraftTenderObjectType.tender_id == tender.id)
         )
 
-        for name in query.scalars():
-            objects_type_names.append(name)
+        for id in query.scalars():
+            objects_type_names.append(id)
 
         query = await self.db.execute(
-            select(ObjectGroup.name)
+            select(ObjectGroup.id)
             .select_from(ObjectType)
             .join(
                 ObjectGroup,
@@ -222,13 +216,6 @@ class DraftTenderRepository:
 
         object_group_name = query.scalars().first()
 
-        if object_group_name is None:
-            raise RepositoryException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="",
-                sql_msg="failed format tender",
-            )
-
         return models.DraftTender(
             id=tender.id,
             user_id=tender.user_id,
@@ -236,7 +223,7 @@ class DraftTenderRepository:
             price=tender.price,
             is_contract_price=tender.is_contract_price,
             is_nds_price=tender.is_nds_price,
-            location=city_name,
+            location=tender.city_id,
             floor_space=tender.floor_space,
             description=tender.description,
             wishes=tender.wishes,
@@ -269,7 +256,6 @@ class DraftTenderRepository:
 
             tenders.append(await self.format_draft_tender(
                 tender=tender,
-                city_name=city_name,
             ))
 
         return tenders
