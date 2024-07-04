@@ -29,17 +29,17 @@ class TenderService:
     async def create_tender(
         self, tender: CreateTenderRequest, user_id: str
     ) -> models.Tender:
-        if len(tender.services_types) == 0:
-            raise ServiceException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"]["invalid_services_count"],
-            )
+        # if len(tender.services_types) == 0:
+        #     raise ServiceException(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         detail=self.localization["errors"]["invalid_services_count"],
+        #     )
 
-        if len(tender.objects_types) == 0:
-            raise ServiceException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=self.localization["errors"]["invalid_objects_count"],
-            )
+        # if len(tender.objects_types) == 0:
+        #     raise ServiceException(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         detail=self.localization["errors"]["invalid_objects_count"],
+        #     )
 
         created_tender = await self.tender_repository.create_tender(
             tender=Tender(
