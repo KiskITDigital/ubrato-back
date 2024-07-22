@@ -407,13 +407,12 @@ async def get_user_drafts(
 
 
 @router.get(
-    "/my/drafts",
+    "/my/tenders",
     response_model=List[models.Tender],
     responses={
         status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
     },
     dependencies=[Depends(authorized)],
-    tags=["draft"],
 )
 async def get_user_tenders(
     tender_service: TenderService = Depends(),
