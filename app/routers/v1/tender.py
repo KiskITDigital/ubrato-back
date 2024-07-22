@@ -404,3 +404,19 @@ async def get_user_drafts(
     user: JWTUser = Depends(get_user),
 ) -> List[models.DraftTender]:
     return await tender_service.get_user_tenders(user_id=user.id)
+
+
+@router.get(
+    "/my/drafts",
+    response_model=List[models.Tender],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+    tags=["draft"],
+)
+async def get_user_tenders(
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.Tender]:
+    return await tender_service.get_user_tenders(user_id=user.id)

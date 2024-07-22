@@ -232,3 +232,6 @@ class TenderService:
         return await self.tender_repository.is_favorite(
             tender_id=tender_id, user_id=user_id
         )
+
+    async def get_user_tenders(self, user_id: str) -> List[models.Tender]:
+        return await self.tender_repository.get_user_tenders(user_id=user_id)

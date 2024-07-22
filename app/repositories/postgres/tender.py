@@ -552,3 +552,21 @@ class TenderRepository:
             tenders.append(tender_model)
 
         return tenders
+
+    async def get_user_tenders(self, user_id: str) -> List[models.Tender]:
+        query = await self.db.execute(
+            select(Tender, City.name).join(City).where(Tender.user_id == user_id)
+        )
+
+        tenders: List[models.Tender] = []
+
+        for found_tender in query.all():
+            tender, city_name = found_tender._tuple()
+
+            tender_model = await self.format_tender(
+                tender=tender,
+                city_name=city_name,
+            )
+            tenders.append(tender_model)
+
+        return tenders
