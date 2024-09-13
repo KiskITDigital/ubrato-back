@@ -307,10 +307,10 @@ class TenderRepository:
         tender: Tender,
         city_name: str,
     ) -> models.Tender:
-        services_type_names: List[str] = []
+        services_type_names: dict[int, List[str]] = {}
 
         query = await self.db.execute(
-            select(ServiceType.name)
+            select(ServiceType.name, ServiceType.service_group_id)
             .join(
                 TenderServiceType,
                 TenderServiceType.service_type_id == ServiceType.id,
@@ -318,13 +318,16 @@ class TenderRepository:
             .where(TenderServiceType.tender_id == tender.id)
         )
 
-        for name in query.scalars():
-            services_type_names.append(name)
+        for service in query.all():
+            service_name, service_group_id = service._tuple()
+            if service_group_id not in services_type_names:
+                services_type_names[service_group_id] = []
+            services_type_names[service_group_id].append(service_name)
 
-        services_groups_names: dict[str, None] = {}
+        services_groups_names: dict[str, List[str]] = {}
 
         query = await self.db.execute(
-            select(ServiceGroup.name)
+            select(ServiceGroup.name, ServiceGroup.id)
             .select_from(ServiceType)
             .join(
                 ServiceGroup,
@@ -338,8 +341,13 @@ class TenderRepository:
             )
         )
 
-        for name in query.scalars():
-            services_groups_names[name] = None
+        for service_group in query.all():
+            service_group_name, service_group_id = service_group._tuple()
+            if service_group_name not in services_groups_names:
+                services_groups_names[service_group_name] = []
+            services_groups_names[service_group_name] = services_type_names[
+                service_group_id
+            ]
 
         object_type_names: List[str] = []
 
@@ -379,6 +387,15 @@ class TenderRepository:
                 sql_msg="failed format tender",
             )
 
+        catergories: List[models.Category] = []
+
+        for name in services_groups_names.keys():
+            catergories.append(
+                models.Category(
+                    name=name, services=services_groups_names[name]
+                )
+            )
+
         return models.Tender(
             id=tender.id,
             name=tender.name,
@@ -391,8 +408,7 @@ class TenderRepository:
             wishes=tender.wishes,
             specification=tender.specification,
             attachments=tender.attachments,
-            services_groups=list(services_groups_names.keys()),
-            services_types=services_type_names,
+            categories=catergories,
             reception_start=tender.reception_start,
             reception_end=tender.reception_end,
             work_start=tender.work_start,
@@ -555,7 +571,9 @@ class TenderRepository:
 
     async def get_user_tenders(self, user_id: str) -> List[models.Tender]:
         query = await self.db.execute(
-            select(Tender, City.name).join(City).where(Tender.user_id == user_id)
+            select(Tender, City.name)
+            .join(City)
+            .where(Tender.user_id == user_id)
         )
 
         tenders: List[models.Tender] = []

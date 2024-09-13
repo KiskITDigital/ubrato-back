@@ -4,6 +4,11 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class Category(BaseModel):
+    name: str
+    services: List[str]
+
+
 class Tender(BaseModel):
     id: int
     name: str
@@ -16,8 +21,7 @@ class Tender(BaseModel):
     wishes: str
     specification: str
     attachments: List[str]
-    services_groups: List[str]
-    services_types: List[str]
+    categories: List[Category]
     reception_start: datetime
     reception_end: datetime
     work_start: datetime

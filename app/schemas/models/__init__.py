@@ -32,6 +32,7 @@ __all__ = [
     "ContractorObject",
     "TenderResponse",
     "FavoriteContractor",
+    "Category",
 ]
 
 from .city import City
@@ -65,7 +66,7 @@ from .service_group import (
     ServicesGroupsWithTypes,
     ServiceTypeModel,
 )
-from .tender import DraftTender, Tender
+from .tender import Category, DraftTender, Tender
 from .tender_response import TenderResponse
 from .user import User, UserMe, UserPrivateDTO
 from .verification import VerificationInfo
