@@ -112,7 +112,9 @@ class DraftTenderRepository:
         await self.db.refresh(tender_to_update)
         return tender_to_update
 
-    async def get_draft_tender_by_id(self, tender_id: int) -> models.DraftTender:
+    async def get_draft_tender_by_id(
+        self, tender_id: int
+    ) -> models.DraftTender:
         query = await self.db.execute(
             select(DraftTender).where(DraftTender.id == tender_id)
         )
@@ -254,8 +256,10 @@ class DraftTenderRepository:
         for found_tender in found_tenders:
             tender, city_name = found_tender
 
-            tenders.append(await self.format_draft_tender(
-                tender=tender,
-            ))
+            tenders.append(
+                await self.format_draft_tender(
+                    tender=tender,
+                )
+            )
 
         return tenders

@@ -8,7 +8,7 @@ from schemas.exception import ExceptionResponse
 from schemas.jwt_user import JWTUser
 from schemas.offer_tender import OfferTenderRequest
 from schemas.success import SuccessResponse
-from schemas.upd_avatar import UpdAvatarRequest
+from schemas.update_profile import UpdateUserInfoRequest, UpdAvatarRequest
 from services import (
     NoticeService,
     OrganizationService,
@@ -278,3 +278,25 @@ async def list_favorite_tenders(
     user: JWTUser = Depends(get_user),
 ) -> List[models.Tender]:
     return await user_service.list_favorite_tenders(user_id=user.id)
+
+
+@router.put(
+    "/me/info",
+    responses={
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def update_user_info(
+    data: UpdateUserInfoRequest,
+    user_service: UserService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> SuccessResponse:
+    await user_service.upd_info(
+        user_id=user.id,
+        first_name=data.first_name,
+        middle_name=data.middle_name,
+        last_name=data.last_name,
+        phone=data.phone,
+    )
+    return SuccessResponse()

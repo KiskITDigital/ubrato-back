@@ -27,8 +27,12 @@ class DraftTender(Base):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     price: Mapped[Optional[int]] = mapped_column(Integer, nullable=False)
-    is_contract_price: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=False)
-    is_nds_price: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=False)
+    is_contract_price: Mapped[Optional[bool]] = mapped_column(
+        Boolean, nullable=False
+    )
+    is_nds_price: Mapped[Optional[bool]] = mapped_column(
+        Boolean, nullable=False
+    )
     city_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("cities.id"), nullable=False
     )

@@ -190,3 +190,19 @@ class UserService:
         await self.nats_client.pub(
             EMAIL_CONFIRMATION_TOPIC, payload=payload.SerializeToString()
         )
+
+    async def upd_info(
+        self,
+        user_id: str,
+        first_name: str,
+        middle_name: str,
+        last_name: str,
+        phone: str,
+    ) -> None:
+        return await self.user_repository.update_info(
+            user_id=user_id,
+            first_name=first_name,
+            middle_name=middle_name,
+            last_name=last_name,
+            phone=phone,
+        )

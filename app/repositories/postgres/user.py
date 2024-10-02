@@ -204,3 +204,30 @@ class UserRepository:
             .values(email_verified=verified)
         )
         await self.db.commit()
+
+    async def update_info(
+        self,
+        user_id: str,
+        first_name: str,
+        middle_name: str,
+        last_name: str,
+        phone: str,
+    ) -> None:
+        query = await self.db.execute(select(User).where(User.id == user_id))
+
+        user = query.scalar()
+
+        if user is None:
+            raise RepositoryException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=get_config()
+                .Localization.config["errors"]["userid_not_found"]
+                .format(user_id),
+                sql_msg="",
+            )
+
+        user.first_name = first_name
+        user.middle_name = middle_name
+        user.last_name = last_name
+        user.phone = phone
+        await self.db.commit()

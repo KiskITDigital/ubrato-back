@@ -1,8 +1,8 @@
 {
-    "apiKey": "xyz",
+    "apiKey": "32c69dfccc4aadaacba3dad3113afdc5",
     "node": {
-      "host":"localhost",
-      "port":"8108",
+      "host":"search.ubrato.ru",
+      "port":"80",
       "protocol":"http",
       "path":"",
       "tls":false

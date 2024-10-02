@@ -1,7 +1,10 @@
 from typing import List
 
 from pydantic import BaseModel
+from pydantic_extra_types.phone_numbers import PhoneNumber
 from schemas.models.organization import ContactInfo
+
+PhoneNumber.phone_format = "E164"
 
 
 class UpdateCustomerProfileRequest(BaseModel):
@@ -40,3 +43,14 @@ class UpdateBrandContactRequest(BaseModel):
     emails: List[ContactInfo]
     phones: List[ContactInfo]
     messengers: List[ContactInfo]
+
+
+class UpdAvatarRequest(BaseModel):
+    avatar: str
+
+
+class UpdateUserInfoRequest(BaseModel):
+    first_name: str
+    middle_name: str
+    last_name: str
+    phone: PhoneNumber

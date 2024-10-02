@@ -49,7 +49,9 @@ class DraftTenderService:
         )
 
     async def get_by_id(self, id: int) -> models.DraftTender:
-        return await self.tender_repository.get_draft_tender_by_id(tender_id=id)
+        return await self.tender_repository.get_draft_tender_by_id(
+            tender_id=id
+        )
 
     async def update_tender(
         self, tender: CreateDraftTenderRequest, id: int
