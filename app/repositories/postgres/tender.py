@@ -9,6 +9,7 @@ from repositories.postgres.schemas import (
     City,
     ObjectGroup,
     ObjectType,
+    Organization,
     ServiceGroup,
     ServiceType,
     Tender,
@@ -452,17 +453,6 @@ class TenderRepository:
 
         return query.scalar() is not None
 
-    async def get_tender_responses(
-        self, tender_id: int
-    ) -> List[TenderRespond]:
-        query = await self.db.execute(
-            select(TenderRespond).where(
-                TenderRespond.tender_id == tender_id,
-            )
-        )
-
-        return [response for response in query.scalars().all()]
-
     async def get_user_responses(self, user_id: str) -> List[TenderRespond]:
         query = await self.db.execute(
             select(TenderRespond).where(
@@ -586,5 +576,32 @@ class TenderRepository:
                 city_name=city_name,
             )
             tenders.append(tender_model)
+
+        return tenders
+
+    async def get_tender_responses(self, tender_id: int) -> List[models.TenderResponse]:
+        query = await self.db.execute(
+            select(Organization, TenderRespond)
+            .join(
+                Organization,
+                Organization.user_id == TenderRespond.user_id,
+            )
+            .where(TenderRespond.tender_id == tender_id)
+        )
+
+        tenders: List[models.TenderResponse] = []
+
+        for found_tender in query.all():
+            org, response = found_tender._tuple()
+
+            response_model = models.TenderResponse(
+                company_id=org.id,
+                company_name=org.brand_name,
+                company_avatar=org.avatar,
+                price=response.price,
+                response_at=response.respond_at,
+            )
+
+            tenders.append(response_model)
 
         return tenders

@@ -419,3 +419,19 @@ async def get_user_tenders(
     user: JWTUser = Depends(get_user),
 ) -> List[models.Tender]:
     return await tender_service.get_user_tenders(user_id=user.id)
+
+
+@router.get(
+    "/my/tenders/{tender_id}/responses",
+    response_model=List[models.TenderResponse],
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ExceptionResponse},
+    },
+    dependencies=[Depends(authorized)],
+)
+async def get_tender_responses(
+    tender_id: int,
+    tender_service: TenderService = Depends(),
+    user: JWTUser = Depends(get_user),
+) -> List[models.TenderResponse]:
+    return await tender_service.get_tender_responses(tender_id=tender_id)
